@@ -31,7 +31,7 @@ public final class ItemAdded implements Event {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        ItemAdded itemAdded = (ItemAdded) o;
+        var itemAdded = (ItemAdded) o;
         return Objects.equals(userId, itemAdded.userId) &&
                 Objects.equals(itemId, itemAdded.itemId) &&
                 Objects.equals(name, itemAdded.name);

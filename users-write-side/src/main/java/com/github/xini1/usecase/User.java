@@ -5,5 +5,5 @@ package com.github.xini1.usecase;
  */
 public enum User {
 
-    ADMIN
+    ADMIN, REGULAR
 }
