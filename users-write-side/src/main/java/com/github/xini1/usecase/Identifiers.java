@@ -5,7 +5,7 @@ import java.util.UUID;
 /**
  * @author Maxim Tereshchenko
  */
-public interface AddItemUseCase {
+public interface Identifiers {
 
-    void addItem(UUID userId, User user, String name);
+    UUID newIdentifier();
 }
