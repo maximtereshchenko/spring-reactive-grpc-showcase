@@ -34,6 +34,9 @@ final class ItemService implements AddItemUseCase, DisablePurchasingOfItemUseCas
 
     @Override
     public void disablePurchasing(UUID userId, User user, UUID itemId) {
+        if (user != User.ADMIN) {
+            throw new UserIsNotAdmin();
+        }
         var eventStream = eventStore.findById(itemId);
         if (eventStream.isEmpty()) {
             throw new ItemNotFound();
