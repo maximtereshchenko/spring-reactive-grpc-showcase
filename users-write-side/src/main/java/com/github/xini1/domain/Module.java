@@ -1,6 +1,7 @@
 package com.github.xini1.domain;
 
 import com.github.xini1.usecase.AddItemUseCase;
+import com.github.xini1.usecase.DisablePurchasingOfItemUseCase;
 import com.github.xini1.usecase.EventStore;
 import com.github.xini1.usecase.Identifiers;
 
@@ -17,6 +18,10 @@ public final class Module {
 
     public AddItemUseCase addItemUseCase() {
         return itemService;
+    }
+
+    public DisablePurchasingOfItemUseCase disablePurchasingOfItemUseCase() {
+        return null;
     }
 
     public static final class Builder {
