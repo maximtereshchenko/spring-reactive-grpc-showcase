@@ -36,4 +36,9 @@ public final class ItemAdded implements Event {
                 Objects.equals(itemId, itemAdded.itemId) &&
                 Objects.equals(name, itemAdded.name);
     }
+
+    @Override
+    public UUID itemId() {
+        return itemId;
+    }
 }

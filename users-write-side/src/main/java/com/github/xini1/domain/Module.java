@@ -21,7 +21,7 @@ public final class Module {
     }
 
     public DisablePurchasingOfItemUseCase disablePurchasingOfItemUseCase() {
-        return null;
+        return itemService;
     }
 
     public static final class Builder {
