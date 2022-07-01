@@ -7,6 +7,7 @@ import com.github.xini1.domain.Module;
 import com.github.xini1.exception.ItemNotFound;
 import com.github.xini1.exception.UserIsNotAdmin;
 import com.github.xini1.usecase.ItemAdded;
+import com.github.xini1.usecase.PurchasingDisabled;
 import com.github.xini1.usecase.User;
 import org.junit.jupiter.api.Test;
 
@@ -26,14 +27,14 @@ final class AdminUseCasesTest {
             .build();
 
     @Test
-    void givenUserIsAdmin_whenAddItem_thenItemAddedEventSaved() {
+    void givenUserIsAdmin_whenAddItem_thenItemAddedEventPublished() {
         module.addItemUseCase().addItem(userId, User.ADMIN, "item");
 
         assertThat(eventStore.events()).containsExactly(new ItemAdded(userId, itemId, "item"));
     }
 
     @Test
-    void givenUserIsNotAdmin_whenAddItem_thenNoEventsSaved() {
+    void givenUserIsNotAdmin_whenAddItem_thenNoEventsPublished() {
         var useCase = module.addItemUseCase();
 
         assertThatThrownBy(() -> useCase.addItem(userId, User.REGULAR, "item"))
@@ -43,7 +44,7 @@ final class AdminUseCasesTest {
     }
 
     @Test
-    void givenItemDoNotExist_whenDisablePurchasing_thenNoEventsSaved() {
+    void givenItemDoNotExist_whenDisablePurchasing_thenNoEventsPublished() {
         var useCase = module.disablePurchasingOfItemUseCase();
 
         assertThatThrownBy(() -> useCase.disablePurchasing(userId, User.ADMIN, itemId))
@@ -53,12 +54,22 @@ final class AdminUseCasesTest {
     }
 
     @Test
-    void givenUserIsNotAdmin_whenDisablePurchasing_thenNoEventsSaved() {
+    void givenUserIsNotAdmin_whenDisablePurchasing_thenNoEventsPublished() {
         var useCase = module.disablePurchasingOfItemUseCase();
 
         assertThatThrownBy(() -> useCase.disablePurchasing(userId, User.REGULAR, itemId))
                 .isInstanceOf(UserIsNotAdmin.class);
 
         assertThat(eventStore.events()).isEmpty();
+    }
+
+    @Test
+    void givenItemExists_whenDisablePurchasing_thenPurchasingDisabledEventPublished() {
+        module.addItemUseCase().addItem(userId, User.ADMIN, "item");
+
+        module.disablePurchasingOfItemUseCase().disablePurchasing(userId, User.ADMIN, itemId);
+
+        assertThat(eventStore.events())
+                .containsExactly(new ItemAdded(userId, itemId, "name"), new PurchasingDisabled(userId, itemId));
     }
 }

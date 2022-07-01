@@ -37,8 +37,8 @@ final class ItemService implements AddItemUseCase, DisablePurchasingOfItemUseCas
         if (user != User.ADMIN) {
             throw new UserIsNotAdmin();
         }
-        var eventStream = eventStore.findById(itemId);
-        if (eventStream.isEmpty()) {
+        var events = eventStore.findById(itemId);
+        if (events.isEmpty()) {
             throw new ItemNotFound();
         }
     }
