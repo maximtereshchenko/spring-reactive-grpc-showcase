@@ -21,4 +21,8 @@ closing orders.
 To build these services Spring Reactor will be used alongside with gRPC for communication between them. Apache
 Kafka and MongoDB were chosen mostly of their reactive driver support.
 
+# User stories
+
+1) Admin can add new item for purchase.
+
 # What have I learnt?
