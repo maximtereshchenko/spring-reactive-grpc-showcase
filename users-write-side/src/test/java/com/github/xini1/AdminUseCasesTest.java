@@ -51,4 +51,14 @@ final class AdminUseCasesTest {
 
         assertThat(eventStore.events()).isEmpty();
     }
+
+    @Test
+    void givenUserIsNotAdmin_whenDisablePurchasing_thenNoEventsSaved() {
+        var useCase = module.disablePurchasingOfItemUseCase();
+
+        assertThatThrownBy(() -> useCase.disablePurchasing(userId, User.REGULAR, itemId))
+                .isInstanceOf(UserIsNotAdmin.class);
+
+        assertThat(eventStore.events()).isEmpty();
+    }
 }
