@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.github.xini1.domain.Module;
+import com.github.xini1.exception.ItemIsAlreadyActive;
 import com.github.xini1.exception.ItemIsAlreadyDeactivated;
 import com.github.xini1.exception.ItemNotFound;
 import com.github.xini1.exception.UserIsNotAdmin;
@@ -105,5 +106,17 @@ final class AdminUseCasesTest {
                 .isInstanceOf(UserIsNotAdmin.class);
 
         assertThat(eventStore.events()).isEmpty();
+    }
+
+    @Test
+    void givenActiveItem_whenActivateItem_thenItemIsAlreadyActiveThrown() {
+        module.createItemUseCase().create(userId, User.ADMIN, "item");
+        var useCase = module.activateItemUseCase();
+
+        assertThatThrownBy(() -> useCase.activate(userId, User.ADMIN, itemId))
+                .isInstanceOf(ItemIsAlreadyActive.class);
+
+        assertThat(eventStore.events())
+                .containsExactly(new ItemCreated(userId, itemId, "item"));
     }
 }
