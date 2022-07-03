@@ -86,4 +86,14 @@ final class AdminUseCasesTest {
         assertThat(eventStore.events())
                 .containsExactly(new ItemCreated(userId, itemId, "item"), new ItemDeactivated(userId, itemId));
     }
+
+    @Test
+    void givenItemDoNotExist_whenActivateItem_thenItemNotFoundThrown() {
+        var useCase = module.activateItemUseCase();
+
+        assertThatThrownBy(() -> useCase.activate(userId, User.ADMIN, itemId))
+                .isInstanceOf(ItemNotFound.class);
+
+        assertThat(eventStore.events()).isEmpty();
+    }
 }
