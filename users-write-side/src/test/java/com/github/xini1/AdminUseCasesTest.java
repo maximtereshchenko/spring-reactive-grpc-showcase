@@ -8,6 +8,7 @@ import com.github.xini1.exception.ItemIsAlreadyActive;
 import com.github.xini1.exception.ItemIsAlreadyDeactivated;
 import com.github.xini1.exception.ItemNotFound;
 import com.github.xini1.exception.UserIsNotAdmin;
+import com.github.xini1.usecase.ItemActivated;
 import com.github.xini1.usecase.ItemCreated;
 import com.github.xini1.usecase.ItemDeactivated;
 import com.github.xini1.usecase.User;
@@ -79,7 +80,7 @@ final class AdminUseCasesTest {
     }
 
     @Test
-    void givenItemExists_whenDeactivateItem_thenItemDeactivatedEventPublished() {
+    void givenActiveItem_whenDeactivateItem_thenItemDeactivatedEventPublished() {
         module.createItemUseCase().create(userId, User.ADMIN, "item");
 
         module.deactivateItemUseCase().deactivate(userId, User.ADMIN, itemId);
@@ -118,5 +119,20 @@ final class AdminUseCasesTest {
 
         assertThat(eventStore.events())
                 .containsExactly(new ItemCreated(userId, itemId, "item"));
+    }
+
+    @Test
+    void givenDeactivatedItem_whenActivateItem_thenItemActivatedEventPublished() {
+        module.createItemUseCase().create(userId, User.ADMIN, "item");
+        module.deactivateItemUseCase().deactivate(userId, User.ADMIN, itemId);
+
+        module.activateItemUseCase().activate(userId, User.ADMIN, itemId);
+
+        assertThat(eventStore.events())
+                .containsExactly(
+                        new ItemCreated(userId, itemId, "item"),
+                        new ItemDeactivated(userId, itemId),
+                        new ItemActivated(userId, itemId)
+                );
     }
 }

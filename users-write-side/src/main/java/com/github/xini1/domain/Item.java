@@ -6,6 +6,7 @@ import com.github.xini1.exception.ItemIsAlreadyDeactivated;
 import com.github.xini1.usecase.Event;
 import com.github.xini1.usecase.EventVisitor;
 import com.github.xini1.usecase.Identifiers;
+import com.github.xini1.usecase.ItemActivated;
 import com.github.xini1.usecase.ItemCreated;
 import com.github.xini1.usecase.ItemDeactivated;
 
@@ -145,6 +146,11 @@ final class Item {
         public void visit(ItemDeactivated itemDeactivated) {
             item.state = new Deactivated(itemDeactivated.itemId());
             item.newEvents.add(itemDeactivated);
+        }
+
+        @Override
+        public void visit(ItemActivated itemActivated) {
+
         }
     }
 }
