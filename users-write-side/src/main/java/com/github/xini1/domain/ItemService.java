@@ -49,5 +49,6 @@ final class ItemService implements CreateItemUseCase, DeactivateItemUseCase, Act
         }
         var item = items.find(itemId)
                 .orElseThrow(ItemNotFound::new);
+        item.activate(userId);
     }
 }

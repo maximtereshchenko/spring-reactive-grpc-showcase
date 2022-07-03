@@ -1,6 +1,7 @@
 package com.github.xini1.domain;
 
 import com.github.xini1.exception.ItemHasNotBeenCreated;
+import com.github.xini1.exception.ItemIsAlreadyActive;
 import com.github.xini1.exception.ItemIsAlreadyDeactivated;
 import com.github.xini1.usecase.Event;
 import com.github.xini1.usecase.EventVisitor;
@@ -47,6 +48,10 @@ final class Item {
         new EventHandler(this).visit(new ItemDeactivated(userId, state.id()));
     }
 
+    void activate(UUID userId) {
+        state.activate();
+    }
+
     private interface State {
 
         UUID id();
@@ -89,7 +94,7 @@ final class Item {
 
         @Override
         public void activate() {
-            //TODO
+            throw new ItemIsAlreadyActive();
         }
 
         @Override
