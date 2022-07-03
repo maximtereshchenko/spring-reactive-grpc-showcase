@@ -24,6 +24,7 @@ Kafka and MongoDB were chosen mostly of their reactive driver support.
 # User stories
 
 1) Admin can create new item for purchase.
-2) Admin can deactivate item.
+2) Admin can deactivate active item.
+3) Admin can activate deactivated item.
 
 # What have I learnt?

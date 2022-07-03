@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.github.xini1.domain.Module;
+import com.github.xini1.exception.ItemIsAlreadyDeactivated;
 import com.github.xini1.exception.ItemNotFound;
 import com.github.xini1.exception.UserIsNotAdmin;
 import com.github.xini1.usecase.ItemCreated;
@@ -34,7 +35,7 @@ final class AdminUseCasesTest {
     }
 
     @Test
-    void givenUserIsNotAdmin_whenCreateItem_thenNoEventsPublished() {
+    void givenUserIsNotAdmin_whenCreateItem_thenUserIsNotAdminThrown() {
         var useCase = module.createItemUseCase();
 
         assertThatThrownBy(() -> useCase.create(userId, User.REGULAR, "item"))
@@ -44,7 +45,7 @@ final class AdminUseCasesTest {
     }
 
     @Test
-    void givenItemDoNotExist_whenDeactivateItem_thenNoEventsPublished() {
+    void givenItemDoNotExist_whenDeactivateItem_thenItemNotFoundThrown() {
         var useCase = module.deactivateItemUseCase();
 
         assertThatThrownBy(() -> useCase.deactivate(userId, User.ADMIN, itemId))
@@ -54,13 +55,26 @@ final class AdminUseCasesTest {
     }
 
     @Test
-    void givenUserIsNotAdmin_whenDeactivateItem_thenNoEventsPublished() {
+    void givenUserIsNotAdmin_whenDeactivateItem_thenUserIsNotAdminThrown() {
         var useCase = module.deactivateItemUseCase();
 
         assertThatThrownBy(() -> useCase.deactivate(userId, User.REGULAR, itemId))
                 .isInstanceOf(UserIsNotAdmin.class);
 
         assertThat(eventStore.events()).isEmpty();
+    }
+
+    @Test
+    void givenDeactivatedItem_whenDeactivateItem_thenItemIsAlreadyDeactivatedThrown() {
+        module.createItemUseCase().create(userId, User.ADMIN, "item");
+        var useCase = module.deactivateItemUseCase();
+        useCase.deactivate(userId, User.ADMIN, itemId);
+
+        assertThatThrownBy(() -> useCase.deactivate(userId, User.ADMIN, itemId))
+                .isInstanceOf(ItemIsAlreadyDeactivated.class);
+
+        assertThat(eventStore.events())
+                .containsExactly(new ItemCreated(userId, itemId, "item"), new ItemDeactivated(userId, itemId));
     }
 
     @Test
