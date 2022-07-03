@@ -7,5 +7,5 @@ import java.util.UUID;
  */
 public interface AddItemToCartUseCase {
 
-    void add(UUID userId, User user, UUID item);
+    void add(UUID userId, User user, UUID itemId);
 }

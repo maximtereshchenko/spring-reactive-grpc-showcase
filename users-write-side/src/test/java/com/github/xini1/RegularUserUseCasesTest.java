@@ -6,6 +6,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.github.xini1.domain.Module;
 import com.github.xini1.exception.CouldNotAddDeactivatedItemToCart;
 import com.github.xini1.exception.UserIsNotRegular;
+import com.github.xini1.usecase.ItemCreated;
+import com.github.xini1.usecase.ItemDeactivated;
 import com.github.xini1.usecase.User;
 import org.junit.jupiter.api.Test;
 
@@ -43,6 +45,7 @@ final class RegularUserUseCasesTest {
         assertThatThrownBy(() -> useCase.add(userId, User.REGULAR, itemId))
                 .isInstanceOf(CouldNotAddDeactivatedItemToCart.class);
 
-        assertThat(eventStore.events()).isEmpty();
+        assertThat(eventStore.events())
+                .containsExactly(new ItemCreated(userId, itemId, "item"), new ItemDeactivated(userId, itemId));
     }
 }

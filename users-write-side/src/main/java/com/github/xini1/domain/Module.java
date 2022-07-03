@@ -52,7 +52,8 @@ public final class Module {
         }
 
         public Module build() {
-            return new Module(new ItemService(new Items(eventStore), identifiers), new CartService());
+            var items = new Items(eventStore);
+            return new Module(new ItemService(items, identifiers), new CartService(items));
         }
     }
 }

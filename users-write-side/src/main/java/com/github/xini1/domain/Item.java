@@ -54,6 +54,10 @@ final class Item {
         new EventHandler(this).visit(new ItemActivated(userId, state.id()));
     }
 
+    boolean isDeactivated() {
+        return state.isDeactivated();
+    }
+
     private interface State {
 
         UUID id();
@@ -61,6 +65,8 @@ final class Item {
         void activate();
 
         void deactivate();
+
+        boolean isDeactivated();
     }
 
     private static final class Initial implements State {
@@ -77,6 +83,11 @@ final class Item {
 
         @Override
         public void deactivate() {
+            throw new ItemHasNotBeenCreated();
+        }
+
+        @Override
+        public boolean isDeactivated() {
             throw new ItemHasNotBeenCreated();
         }
     }
@@ -103,6 +114,11 @@ final class Item {
         public void deactivate() {
             //empty
         }
+
+        @Override
+        public boolean isDeactivated() {
+            return false;
+        }
     }
 
     private static final class Deactivated implements State {
@@ -126,6 +142,11 @@ final class Item {
         @Override
         public void deactivate() {
             throw new ItemIsAlreadyDeactivated();
+        }
+
+        @Override
+        public boolean isDeactivated() {
+            return true;
         }
     }
 
