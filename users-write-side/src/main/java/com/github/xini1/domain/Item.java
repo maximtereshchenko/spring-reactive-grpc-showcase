@@ -1,6 +1,7 @@
 package com.github.xini1.domain;
 
 import com.github.xini1.exception.ItemHasNotBeenCreated;
+import com.github.xini1.exception.ItemIsAlreadyDeactivated;
 import com.github.xini1.usecase.Event;
 import com.github.xini1.usecase.EventVisitor;
 import com.github.xini1.usecase.Identifiers;
@@ -117,7 +118,7 @@ final class Item {
 
         @Override
         public void deactivate() {
-            //TODO
+            throw new ItemIsAlreadyDeactivated();
         }
     }
 
