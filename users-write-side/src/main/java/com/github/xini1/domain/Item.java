@@ -51,6 +51,7 @@ final class Item {
 
     void activate(UUID userId) {
         state.activate();
+        new EventHandler(this).visit(new ItemActivated(userId, state.id()));
     }
 
     private interface State {
@@ -119,7 +120,7 @@ final class Item {
 
         @Override
         public void activate() {
-            //TODO
+            //empty
         }
 
         @Override
@@ -150,7 +151,8 @@ final class Item {
 
         @Override
         public void visit(ItemActivated itemActivated) {
-
+            item.state = new Active(itemActivated.itemId());
+            item.newEvents.add(itemActivated);
         }
     }
 }
