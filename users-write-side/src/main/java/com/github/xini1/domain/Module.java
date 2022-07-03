@@ -1,6 +1,7 @@
 package com.github.xini1.domain;
 
 import com.github.xini1.usecase.ActivateItemUseCase;
+import com.github.xini1.usecase.AddItemToCartUseCase;
 import com.github.xini1.usecase.CreateItemUseCase;
 import com.github.xini1.usecase.DeactivateItemUseCase;
 import com.github.xini1.usecase.EventStore;
@@ -27,6 +28,10 @@ public final class Module {
 
     public ActivateItemUseCase activateItemUseCase() {
         return itemService;
+    }
+
+    public AddItemToCartUseCase addItemToCartUseCase() {
+        return null;
     }
 
     public static final class Builder {
