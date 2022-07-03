@@ -5,9 +5,7 @@ import java.util.UUID;
 /**
  * @author Maxim Tereshchenko
  */
-public interface Event {
+public interface CreateItemUseCase {
 
-    UUID itemId();
-
-    void accept(EventVisitor eventVisitor);
+    void create(UUID userId, User user, String name);
 }

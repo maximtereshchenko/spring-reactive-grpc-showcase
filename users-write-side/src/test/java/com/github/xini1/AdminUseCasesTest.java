@@ -6,8 +6,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.github.xini1.domain.Module;
 import com.github.xini1.exception.ItemNotFound;
 import com.github.xini1.exception.UserIsNotAdmin;
-import com.github.xini1.usecase.ItemAdded;
-import com.github.xini1.usecase.PurchasingDisabled;
+import com.github.xini1.usecase.ItemCreated;
+import com.github.xini1.usecase.ItemDeactivated;
 import com.github.xini1.usecase.User;
 import org.junit.jupiter.api.Test;
 
@@ -27,49 +27,49 @@ final class AdminUseCasesTest {
             .build();
 
     @Test
-    void givenUserIsAdmin_whenAddItem_thenItemAddedEventPublished() {
-        module.addItemUseCase().addItem(userId, User.ADMIN, "item");
+    void givenUserIsAdmin_whenCreateItem_thenItemCreatedEventPublished() {
+        module.createItemUseCase().create(userId, User.ADMIN, "item");
 
-        assertThat(eventStore.events()).containsExactly(new ItemAdded(userId, itemId, "item"));
+        assertThat(eventStore.events()).containsExactly(new ItemCreated(userId, itemId, "item"));
     }
 
     @Test
-    void givenUserIsNotAdmin_whenAddItem_thenNoEventsPublished() {
-        var useCase = module.addItemUseCase();
+    void givenUserIsNotAdmin_whenCreateItem_thenNoEventsPublished() {
+        var useCase = module.createItemUseCase();
 
-        assertThatThrownBy(() -> useCase.addItem(userId, User.REGULAR, "item"))
+        assertThatThrownBy(() -> useCase.create(userId, User.REGULAR, "item"))
                 .isInstanceOf(UserIsNotAdmin.class);
 
         assertThat(eventStore.events()).isEmpty();
     }
 
     @Test
-    void givenItemDoNotExist_whenDisablePurchasing_thenNoEventsPublished() {
-        var useCase = module.disablePurchasingOfItemUseCase();
+    void givenItemDoNotExist_whenDeactivateItem_thenNoEventsPublished() {
+        var useCase = module.deactivateItemUseCase();
 
-        assertThatThrownBy(() -> useCase.disablePurchasing(userId, User.ADMIN, itemId))
+        assertThatThrownBy(() -> useCase.deactivate(userId, User.ADMIN, itemId))
                 .isInstanceOf(ItemNotFound.class);
 
         assertThat(eventStore.events()).isEmpty();
     }
 
     @Test
-    void givenUserIsNotAdmin_whenDisablePurchasing_thenNoEventsPublished() {
-        var useCase = module.disablePurchasingOfItemUseCase();
+    void givenUserIsNotAdmin_whenDeactivateItem_thenNoEventsPublished() {
+        var useCase = module.deactivateItemUseCase();
 
-        assertThatThrownBy(() -> useCase.disablePurchasing(userId, User.REGULAR, itemId))
+        assertThatThrownBy(() -> useCase.deactivate(userId, User.REGULAR, itemId))
                 .isInstanceOf(UserIsNotAdmin.class);
 
         assertThat(eventStore.events()).isEmpty();
     }
 
     @Test
-    void givenItemExists_whenDisablePurchasing_thenPurchasingDisabledEventPublished() {
-        module.addItemUseCase().addItem(userId, User.ADMIN, "item");
+    void givenItemExists_whenDeactivateItem_thenItemDeactivatedEventPublished() {
+        module.createItemUseCase().create(userId, User.ADMIN, "item");
 
-        module.disablePurchasingOfItemUseCase().disablePurchasing(userId, User.ADMIN, itemId);
+        module.deactivateItemUseCase().deactivate(userId, User.ADMIN, itemId);
 
         assertThat(eventStore.events())
-                .containsExactly(new ItemAdded(userId, itemId, "name"), new PurchasingDisabled(userId, itemId));
+                .containsExactly(new ItemCreated(userId, itemId, "item"), new ItemDeactivated(userId, itemId));
     }
 }

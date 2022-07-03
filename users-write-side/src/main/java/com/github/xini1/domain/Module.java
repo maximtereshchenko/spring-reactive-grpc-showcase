@@ -1,7 +1,7 @@
 package com.github.xini1.domain;
 
-import com.github.xini1.usecase.AddItemUseCase;
-import com.github.xini1.usecase.DisablePurchasingOfItemUseCase;
+import com.github.xini1.usecase.CreateItemUseCase;
+import com.github.xini1.usecase.DeactivateItemUseCase;
 import com.github.xini1.usecase.EventStore;
 import com.github.xini1.usecase.Identifiers;
 
@@ -16,11 +16,11 @@ public final class Module {
         this.itemService = itemService;
     }
 
-    public AddItemUseCase addItemUseCase() {
+    public CreateItemUseCase createItemUseCase() {
         return itemService;
     }
 
-    public DisablePurchasingOfItemUseCase disablePurchasingOfItemUseCase() {
+    public DeactivateItemUseCase deactivateItemUseCase() {
         return itemService;
     }
 
@@ -40,7 +40,7 @@ public final class Module {
         }
 
         public Module build() {
-            return new Module(new ItemService(eventStore, identifiers));
+            return new Module(new ItemService(new Items(eventStore), identifiers));
         }
     }
 }

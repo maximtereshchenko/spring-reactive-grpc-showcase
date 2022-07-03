@@ -5,7 +5,7 @@ import java.util.UUID;
 /**
  * @author Maxim Tereshchenko
  */
-public interface AddItemUseCase {
+public interface DeactivateItemUseCase {
 
-    void addItem(UUID userId, User user, String name);
+    void deactivate(UUID userId, User user, UUID itemId);
 }

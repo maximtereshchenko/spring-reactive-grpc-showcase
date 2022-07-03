@@ -6,12 +6,12 @@ import java.util.UUID;
 /**
  * @author Maxim Tereshchenko
  */
-public final class PurchasingDisabled implements Event {
+public final class ItemDeactivated implements Event {
 
     private final UUID userId;
     private final UUID itemId;
 
-    public PurchasingDisabled(UUID userId, UUID itemId) {
+    public ItemDeactivated(UUID userId, UUID itemId) {
         this.userId = userId;
         this.itemId = itemId;
     }
@@ -19,6 +19,11 @@ public final class PurchasingDisabled implements Event {
     @Override
     public UUID itemId() {
         return itemId;
+    }
+
+    @Override
+    public void accept(EventVisitor eventVisitor) {
+        eventVisitor.visit(this);
     }
 
     @Override
@@ -34,8 +39,16 @@ public final class PurchasingDisabled implements Event {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        var that = (PurchasingDisabled) o;
+        var that = (ItemDeactivated) o;
         return Objects.equals(userId, that.userId) &&
                 Objects.equals(itemId, that.itemId);
+    }
+
+    @Override
+    public String toString() {
+        return "ItemDeactivated{" +
+                "userId=" + userId +
+                ", itemId=" + itemId +
+                '}';
     }
 }
