@@ -26,7 +26,7 @@ public final class Module {
     }
 
     public ActivateItemUseCase activateItemUseCase() {
-        return null;
+        return itemService;
     }
 
     public static final class Builder {

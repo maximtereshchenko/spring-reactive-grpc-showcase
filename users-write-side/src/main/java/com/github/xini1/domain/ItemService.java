@@ -2,6 +2,7 @@ package com.github.xini1.domain;
 
 import com.github.xini1.exception.ItemNotFound;
 import com.github.xini1.exception.UserIsNotAdmin;
+import com.github.xini1.usecase.ActivateItemUseCase;
 import com.github.xini1.usecase.CreateItemUseCase;
 import com.github.xini1.usecase.DeactivateItemUseCase;
 import com.github.xini1.usecase.Identifiers;
@@ -12,7 +13,7 @@ import java.util.UUID;
 /**
  * @author Maxim Tereshchenko
  */
-final class ItemService implements CreateItemUseCase, DeactivateItemUseCase {
+final class ItemService implements CreateItemUseCase, DeactivateItemUseCase, ActivateItemUseCase {
 
     private final Items items;
     private final Identifiers identifiers;
@@ -39,5 +40,11 @@ final class ItemService implements CreateItemUseCase, DeactivateItemUseCase {
                 .orElseThrow(ItemNotFound::new);
         item.deactivate(userId);
         items.save(item);
+    }
+
+    @Override
+    public void activate(UUID userId, User user, UUID itemId) {
+        var item = items.find(itemId)
+                .orElseThrow(ItemNotFound::new);
     }
 }
