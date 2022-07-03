@@ -44,6 +44,9 @@ final class ItemService implements CreateItemUseCase, DeactivateItemUseCase, Act
 
     @Override
     public void activate(UUID userId, User user, UUID itemId) {
+        if (user != User.ADMIN) {
+            throw new UserIsNotAdmin();
+        }
         var item = items.find(itemId)
                 .orElseThrow(ItemNotFound::new);
     }
