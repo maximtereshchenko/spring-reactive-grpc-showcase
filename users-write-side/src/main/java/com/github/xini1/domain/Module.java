@@ -13,9 +13,11 @@ import com.github.xini1.usecase.Identifiers;
 public final class Module {
 
     private final ItemService itemService;
+    private final CartService cartService;
 
-    private Module(ItemService itemService) {
+    private Module(ItemService itemService, CartService cartService) {
         this.itemService = itemService;
+        this.cartService = cartService;
     }
 
     public CreateItemUseCase createItemUseCase() {
@@ -31,7 +33,7 @@ public final class Module {
     }
 
     public AddItemToCartUseCase addItemToCartUseCase() {
-        return null;
+        return cartService;
     }
 
     public static final class Builder {
@@ -50,7 +52,7 @@ public final class Module {
         }
 
         public Module build() {
-            return new Module(new ItemService(new Items(eventStore), identifiers));
+            return new Module(new ItemService(new Items(eventStore), identifiers), new CartService());
         }
     }
 }
