@@ -96,4 +96,14 @@ final class AdminUseCasesTest {
 
         assertThat(eventStore.events()).isEmpty();
     }
+
+    @Test
+    void givenUserIsNotAdmin_whenActivateItem_thenUserIsNotAdminThrown() {
+        var useCase = module.activateItemUseCase();
+
+        assertThatThrownBy(() -> useCase.activate(userId, User.REGULAR, itemId))
+                .isInstanceOf(UserIsNotAdmin.class);
+
+        assertThat(eventStore.events()).isEmpty();
+    }
 }
