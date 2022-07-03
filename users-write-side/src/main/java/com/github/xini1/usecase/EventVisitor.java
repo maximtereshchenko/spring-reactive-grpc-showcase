@@ -10,4 +10,6 @@ public interface EventVisitor {
     void visit(ItemDeactivated itemDeactivated);
 
     void visit(ItemActivated itemActivated);
+
+    void visit(ItemAddedToCart itemAddedToCart);
 }

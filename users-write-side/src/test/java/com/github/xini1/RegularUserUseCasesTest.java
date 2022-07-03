@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.github.xini1.domain.Module;
 import com.github.xini1.exception.CouldNotAddDeactivatedItemToCart;
 import com.github.xini1.exception.UserIsNotRegular;
+import com.github.xini1.usecase.ItemAddedToCart;
 import com.github.xini1.usecase.ItemCreated;
 import com.github.xini1.usecase.ItemDeactivated;
 import com.github.xini1.usecase.User;
@@ -47,5 +48,18 @@ final class RegularUserUseCasesTest {
 
         assertThat(eventStore.events())
                 .containsExactly(new ItemCreated(userId, itemId, "item"), new ItemDeactivated(userId, itemId));
+    }
+
+    @Test
+    void givenActivateItem_whenAddItemToCart_thenItemAddedToCartEventPublished() {
+        module.createItemUseCase().create(userId, User.ADMIN, "item");
+
+        module.addItemToCartUseCase().add(userId, User.REGULAR, itemId);
+
+        assertThat(eventStore.events())
+                .containsExactly(
+                        new ItemCreated(userId, itemId, "item"),
+                        new ItemAddedToCart(userId, itemId)
+                );
     }
 }

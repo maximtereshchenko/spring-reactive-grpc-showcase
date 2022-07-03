@@ -7,6 +7,7 @@ import com.github.xini1.usecase.Event;
 import com.github.xini1.usecase.EventVisitor;
 import com.github.xini1.usecase.Identifiers;
 import com.github.xini1.usecase.ItemActivated;
+import com.github.xini1.usecase.ItemAddedToCart;
 import com.github.xini1.usecase.ItemCreated;
 import com.github.xini1.usecase.ItemDeactivated;
 
@@ -174,6 +175,11 @@ final class Item {
         public void visit(ItemActivated itemActivated) {
             item.state = new Active(itemActivated.itemId());
             item.newEvents.add(itemActivated);
+        }
+
+        @Override
+        public void visit(ItemAddedToCart itemAddedToCart) {
+            //empty
         }
     }
 }
