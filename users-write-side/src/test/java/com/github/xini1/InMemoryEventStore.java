@@ -1,9 +1,10 @@
 package com.github.xini1;
 
-import com.github.xini1.usecase.CartEvent;
-import com.github.xini1.usecase.Event;
-import com.github.xini1.usecase.EventStore;
-import com.github.xini1.usecase.ItemEvent;
+import com.github.xini1.event.CartEvent;
+import com.github.xini1.event.Event;
+import com.github.xini1.event.EventType;
+import com.github.xini1.event.ItemEvent;
+import com.github.xini1.port.EventStore;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,23 +25,23 @@ final class InMemoryEventStore implements EventStore {
 
     @Override
     public List<ItemEvent> itemEvents(UUID itemId) {
-        return events.stream()
-                .filter(event -> ItemEvent.class.isAssignableFrom(event.getClass()))
-                .map(ItemEvent.class::cast)
-                .filter(event -> event.itemId().equals(itemId))
-                .collect(Collectors.toList());
+        return find(EventType.ITEM, itemId, ItemEvent.class);
     }
 
     @Override
     public List<CartEvent> cartEvents(UUID userId) {
-        return events.stream()
-                .filter(event -> CartEvent.class.isAssignableFrom(event.getClass()))
-                .map(CartEvent.class::cast)
-                .filter(event -> event.userId().equals(userId))
-                .collect(Collectors.toList());
+        return find(EventType.CART, userId, CartEvent.class);
     }
 
     List<Event> events() {
         return events;
+    }
+
+    private <T extends Event> List<T> find(EventType eventType, UUID aggregateId, Class<T> resultType) {
+        return events.stream()
+                .filter(event -> event.type() == eventType)
+                .filter(event -> event.aggregateId().equals(aggregateId))
+                .map(resultType::cast)
+                .collect(Collectors.toList());
     }
 }

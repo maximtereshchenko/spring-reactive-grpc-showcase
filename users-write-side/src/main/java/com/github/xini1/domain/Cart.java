@@ -1,7 +1,7 @@
 package com.github.xini1.domain;
 
-import com.github.xini1.usecase.CartEvent;
-import com.github.xini1.usecase.ItemAddedToCart;
+import com.github.xini1.event.CartEvent;
+import com.github.xini1.event.ItemAddedToCart;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +28,7 @@ final class Cart extends AggregateRoot {
     }
 
     void add(Item item) {
-        apply(new ItemAddedToCart(userId, item.id()));
+        apply(new ItemAddedToCart(nextVersion(), userId, item.id()));
     }
 
     private void onEvent(ItemAddedToCart itemAddedToCart) {

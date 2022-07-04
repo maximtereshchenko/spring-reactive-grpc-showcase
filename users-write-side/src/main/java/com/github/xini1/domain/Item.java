@@ -1,13 +1,13 @@
 package com.github.xini1.domain;
 
+import com.github.xini1.event.ItemActivated;
+import com.github.xini1.event.ItemCreated;
+import com.github.xini1.event.ItemDeactivated;
+import com.github.xini1.event.ItemEvent;
 import com.github.xini1.exception.ItemHasNotBeenCreated;
 import com.github.xini1.exception.ItemIsAlreadyActive;
 import com.github.xini1.exception.ItemIsAlreadyDeactivated;
-import com.github.xini1.usecase.Identifiers;
-import com.github.xini1.usecase.ItemActivated;
-import com.github.xini1.usecase.ItemCreated;
-import com.github.xini1.usecase.ItemDeactivated;
-import com.github.xini1.usecase.ItemEvent;
+import com.github.xini1.port.Identifiers;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,7 +28,7 @@ final class Item extends AggregateRoot {
 
     static Item create(UUID userId, String name, Identifiers identifiers) {
         var item = new Item();
-        item.apply(new ItemCreated(userId, identifiers.newIdentifier(), name));
+        item.apply(new ItemCreated(item.nextVersion(), userId, identifiers.newIdentifier(), name));
         return item;
     }
 
@@ -48,12 +48,12 @@ final class Item extends AggregateRoot {
 
     void deactivate(UUID userId) {
         state.onDeactivation();
-        apply(new ItemDeactivated(userId, state.id()));
+        apply(new ItemDeactivated(nextVersion(), userId, state.id()));
     }
 
     void activate(UUID userId) {
         state.onActivation();
-        apply(new ItemActivated(userId, state.id()));
+        apply(new ItemActivated(nextVersion(), userId, state.id()));
     }
 
     boolean isDeactivated() {
@@ -61,15 +61,15 @@ final class Item extends AggregateRoot {
     }
 
     private void onEvent(ItemCreated itemCreated) {
-        state = new Active(itemCreated.itemId());
+        state = new Active(itemCreated.aggregateId());
     }
 
     private void onEvent(ItemDeactivated itemDeactivated) {
-        state = new Deactivated(itemDeactivated.itemId());
+        state = new Deactivated(itemDeactivated.aggregateId());
     }
 
     private void onEvent(ItemActivated itemActivated) {
-        state = new Active(itemActivated.itemId());
+        state = new Active(itemActivated.aggregateId());
     }
 
     private interface State {

@@ -4,13 +4,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.github.xini1.domain.Module;
+import com.github.xini1.event.ItemActivated;
+import com.github.xini1.event.ItemCreated;
+import com.github.xini1.event.ItemDeactivated;
 import com.github.xini1.exception.ItemIsAlreadyActive;
 import com.github.xini1.exception.ItemIsAlreadyDeactivated;
 import com.github.xini1.exception.ItemNotFound;
 import com.github.xini1.exception.UserIsNotAdmin;
-import com.github.xini1.usecase.ItemActivated;
-import com.github.xini1.usecase.ItemCreated;
-import com.github.xini1.usecase.ItemDeactivated;
 import com.github.xini1.usecase.User;
 import org.junit.jupiter.api.Test;
 
@@ -33,7 +33,7 @@ final class AdminUseCasesTest {
     void givenUserIsAdmin_whenCreateItem_thenItemCreatedEventPublished() {
         module.createItemUseCase().create(userId, User.ADMIN, "item");
 
-        assertThat(eventStore.events()).containsExactly(new ItemCreated(userId, itemId, "item"));
+        assertThat(eventStore.events()).containsExactly(new ItemCreated(1, userId, itemId, "item"));
     }
 
     @Test
@@ -76,7 +76,10 @@ final class AdminUseCasesTest {
                 .isInstanceOf(ItemIsAlreadyDeactivated.class);
 
         assertThat(eventStore.events())
-                .containsExactly(new ItemCreated(userId, itemId, "item"), new ItemDeactivated(userId, itemId));
+                .containsExactly(
+                        new ItemCreated(1, userId, itemId, "item"),
+                        new ItemDeactivated(2, userId, itemId)
+                );
     }
 
     @Test
@@ -86,7 +89,10 @@ final class AdminUseCasesTest {
         module.deactivateItemUseCase().deactivate(userId, User.ADMIN, itemId);
 
         assertThat(eventStore.events())
-                .containsExactly(new ItemCreated(userId, itemId, "item"), new ItemDeactivated(userId, itemId));
+                .containsExactly(
+                        new ItemCreated(1, userId, itemId, "item"),
+                        new ItemDeactivated(2, userId, itemId)
+                );
     }
 
     @Test
@@ -118,7 +124,7 @@ final class AdminUseCasesTest {
                 .isInstanceOf(ItemIsAlreadyActive.class);
 
         assertThat(eventStore.events())
-                .containsExactly(new ItemCreated(userId, itemId, "item"));
+                .containsExactly(new ItemCreated(1, userId, itemId, "item"));
     }
 
     @Test
@@ -130,9 +136,9 @@ final class AdminUseCasesTest {
 
         assertThat(eventStore.events())
                 .containsExactly(
-                        new ItemCreated(userId, itemId, "item"),
-                        new ItemDeactivated(userId, itemId),
-                        new ItemActivated(userId, itemId)
+                        new ItemCreated(1, userId, itemId, "item"),
+                        new ItemDeactivated(2, userId, itemId),
+                        new ItemActivated(3, userId, itemId)
                 );
     }
 }

@@ -1,4 +1,8 @@
-package com.github.xini1.usecase;
+package com.github.xini1.port;
+
+import com.github.xini1.event.CartEvent;
+import com.github.xini1.event.Event;
+import com.github.xini1.event.ItemEvent;
 
 import java.util.List;
 import java.util.UUID;

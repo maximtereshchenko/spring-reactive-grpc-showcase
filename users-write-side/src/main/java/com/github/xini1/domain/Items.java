@@ -1,6 +1,6 @@
 package com.github.xini1.domain;
 
-import com.github.xini1.usecase.EventStore;
+import com.github.xini1.port.EventStore;
 
 import java.util.Optional;
 import java.util.UUID;
