@@ -5,7 +5,9 @@ This is a repository to try out gRPC and Spring Reactor technologies.
 # How the project is looking?
 
 ![](structure.png)
-There are 4 "Microservices" (not really, but they will be deployed separately as Docker containers).
+There will be 4 "Microservices" (not really, but they will be deployed separately as Docker containers). I will
+utilize Ports and Adapters architecture, which will enable TDD approach in developing business logic. I will try to CQRS
+pattern to separate write side from read side for functionality related to creating orders and managing items to buy.
 
 "API Gateway" is responsible for reading ReST request, asking "Users" service to decipher JWT and routing request to
 "Orders (write side)" to perform some action or "Orders (read side)" to query some information.
@@ -30,3 +32,11 @@ Kafka and MongoDB were chosen mostly of their reactive driver support.
 5) Regular user can order items in cart, if it contains any.
 
 # What have I learnt?
+
+* How to organize aggregates in case of Event Sourcing.
+
+# Out of scope concerns
+
+* Optimistic locking, regarding events with the same version.
+* Separation of writing events to database and their publishing, which can lead to interested parties not knowing about
+  something important happened. Can be resolved with Outbox pattern, I guess.
