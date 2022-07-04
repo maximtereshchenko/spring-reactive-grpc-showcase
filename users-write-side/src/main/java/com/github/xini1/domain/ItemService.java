@@ -1,6 +1,5 @@
 package com.github.xini1.domain;
 
-import com.github.xini1.exception.ItemIsNotFound;
 import com.github.xini1.exception.UserIsNotAdmin;
 import com.github.xini1.port.Identifiers;
 import com.github.xini1.usecase.ActivateItemUseCase;
@@ -38,8 +37,7 @@ final class ItemService implements CreateItemUseCase, DeactivateItemUseCase, Act
         if (user != User.ADMIN) {
             throw new UserIsNotAdmin();
         }
-        var item = items.find(itemId)
-                .orElseThrow(ItemIsNotFound::new);
+        var item = items.find(itemId);
         item.deactivate(userId);
         items.save(item);
     }
@@ -49,8 +47,7 @@ final class ItemService implements CreateItemUseCase, DeactivateItemUseCase, Act
         if (user != User.ADMIN) {
             throw new UserIsNotAdmin();
         }
-        var item = items.find(itemId)
-                .orElseThrow(ItemIsNotFound::new);
+        var item = items.find(itemId);
         item.activate(userId);
         items.save(item);
     }

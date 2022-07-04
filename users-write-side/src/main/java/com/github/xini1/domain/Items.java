@@ -1,8 +1,8 @@
 package com.github.xini1.domain;
 
+import com.github.xini1.exception.ItemIsNotFound;
 import com.github.xini1.port.EventStore;
 
-import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -21,7 +21,8 @@ final class Items {
                 .forEach(eventStore::publish);
     }
 
-    Optional<Item> find(UUID itemId) {
-        return Item.fromEvents(eventStore.itemEvents(itemId));
+    Item find(UUID itemId) {
+        return Item.fromEvents(eventStore.itemEvents(itemId))
+                .orElseThrow(ItemIsNotFound::new);
     }
 }
