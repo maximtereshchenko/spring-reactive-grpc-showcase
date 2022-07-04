@@ -22,7 +22,7 @@ final class Items {
     }
 
     Item find(UUID itemId) {
-        return Item.fromEvents(eventStore.itemEvents(itemId))
+        return Item.fromEvents(itemId, eventStore.itemEvents(itemId))
                 .orElseThrow(ItemIsNotFound::new);
     }
 }

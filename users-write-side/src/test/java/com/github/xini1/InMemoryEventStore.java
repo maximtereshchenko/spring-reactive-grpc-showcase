@@ -7,6 +7,7 @@ import com.github.xini1.event.item.ItemEvent;
 import com.github.xini1.port.EventStore;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -41,6 +42,7 @@ final class InMemoryEventStore implements EventStore {
         return events.stream()
                 .filter(event -> event.type() == eventType)
                 .filter(event -> event.aggregateId().equals(aggregateId))
+                .sorted(Comparator.comparingLong(Event::version))
                 .map(resultType::cast)
                 .collect(Collectors.toList());
     }

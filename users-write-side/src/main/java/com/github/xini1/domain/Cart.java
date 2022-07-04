@@ -16,11 +16,10 @@ import java.util.UUID;
  */
 final class Cart extends AggregateRoot {
 
-    private final UUID userId;
     private final Set<UUID> items = new HashSet<>();
 
     Cart(UUID userId) {
-        this.userId = userId;
+        super(userId);
         register(ItemAddedToCart.class, this::onEvent);
         register(ItemsOrdered.class, this::onEvent);
     }
@@ -36,14 +35,14 @@ final class Cart extends AggregateRoot {
         if (item.isDeactivated()) {
             throw new CouldNotAddDeactivatedItemToCart();
         }
-        apply(new ItemAddedToCart(nextVersion(), userId, item.id()));
+        apply(new ItemAddedToCart(nextVersion(), id(), item.id()));
     }
 
     void order() {
         if (items.isEmpty()) {
             throw new CartIsEmpty();
         }
-        apply(new ItemsOrdered(nextVersion(), userId, items));
+        apply(new ItemsOrdered(nextVersion(), id(), items));
     }
 
     private void onEvent(ItemAddedToCart itemAddedToCart) {

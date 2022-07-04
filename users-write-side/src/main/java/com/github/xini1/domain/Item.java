@@ -4,7 +4,6 @@ import com.github.xini1.event.item.ItemActivated;
 import com.github.xini1.event.item.ItemCreated;
 import com.github.xini1.event.item.ItemDeactivated;
 import com.github.xini1.event.item.ItemEvent;
-import com.github.xini1.exception.ItemHasNotBeenCreated;
 import com.github.xini1.exception.ItemIsAlreadyActive;
 import com.github.xini1.exception.ItemIsAlreadyDeactivated;
 import com.github.xini1.port.Identifiers;
@@ -18,42 +17,39 @@ import java.util.UUID;
  */
 final class Item extends AggregateRoot {
 
-    private State state = new Initial();
+    private State state = new Active();
 
-    Item() {
+    Item(UUID itemId) {
+        super(itemId);
         register(ItemCreated.class, this::onEvent);
         register(ItemDeactivated.class, this::onEvent);
         register(ItemActivated.class, this::onEvent);
     }
 
     static Item create(UUID userId, String name, Identifiers identifiers) {
-        var item = new Item();
-        item.apply(new ItemCreated(item.nextVersion(), userId, identifiers.newIdentifier(), name));
+        var item = new Item(identifiers.newIdentifier());
+        item.apply(new ItemCreated(item.nextVersion(), userId, item.id(), name));
         return item;
     }
 
-    static Optional<Item> fromEvents(List<ItemEvent> events) {
+    static Optional<Item> fromEvents(UUID itemId, List<ItemEvent> events) {
         if (events.isEmpty()) {
             return Optional.empty();
         }
-        var item = new Item();
+        var item = new Item(itemId);
         events.forEach(item::apply);
         item.clearEvents();
         return Optional.of(item);
     }
 
-    UUID id() {
-        return state.id();
-    }
-
     void deactivate(UUID userId) {
         state.onDeactivation();
-        apply(new ItemDeactivated(nextVersion(), userId, state.id()));
+        apply(new ItemDeactivated(nextVersion(), userId, id()));
     }
 
     void activate(UUID userId) {
         state.onActivation();
-        apply(new ItemActivated(nextVersion(), userId, state.id()));
+        apply(new ItemActivated(nextVersion(), userId, id()));
     }
 
     boolean isDeactivated() {
@@ -61,20 +57,18 @@ final class Item extends AggregateRoot {
     }
 
     private void onEvent(ItemCreated itemCreated) {
-        state = new Active(itemCreated.aggregateId());
+        //empty
     }
 
     private void onEvent(ItemDeactivated itemDeactivated) {
-        state = new Deactivated(itemDeactivated.aggregateId());
+        state = new Deactivated();
     }
 
     private void onEvent(ItemActivated itemActivated) {
-        state = new Active(itemActivated.aggregateId());
+        state = new Active();
     }
 
     private interface State {
-
-        UUID id();
 
         void onActivation();
 
@@ -83,41 +77,7 @@ final class Item extends AggregateRoot {
         boolean isDeactivated();
     }
 
-    private static final class Initial implements State {
-
-        @Override
-        public UUID id() {
-            throw new ItemHasNotBeenCreated();
-        }
-
-        @Override
-        public void onActivation() {
-            throw new ItemHasNotBeenCreated();
-        }
-
-        @Override
-        public void onDeactivation() {
-            throw new ItemHasNotBeenCreated();
-        }
-
-        @Override
-        public boolean isDeactivated() {
-            throw new ItemHasNotBeenCreated();
-        }
-    }
-
     private static final class Active implements State {
-
-        private final UUID id;
-
-        private Active(UUID id) {
-            this.id = id;
-        }
-
-        @Override
-        public UUID id() {
-            return id;
-        }
 
         @Override
         public void onActivation() {
@@ -136,17 +96,6 @@ final class Item extends AggregateRoot {
     }
 
     private static final class Deactivated implements State {
-
-        private final UUID id;
-
-        private Deactivated(UUID id) {
-            this.id = id;
-        }
-
-        @Override
-        public UUID id() {
-            return id;
-        }
 
         @Override
         public void onActivation() {

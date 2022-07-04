@@ -15,6 +15,10 @@ public final class ItemActivated extends ItemEvent {
         this.userId = userId;
     }
 
+    public UUID userId() {
+        return userId;
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), userId);
