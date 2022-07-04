@@ -9,7 +9,7 @@ import com.github.xini1.event.ItemCreated;
 import com.github.xini1.event.ItemDeactivated;
 import com.github.xini1.exception.ItemIsAlreadyActive;
 import com.github.xini1.exception.ItemIsAlreadyDeactivated;
-import com.github.xini1.exception.ItemNotFound;
+import com.github.xini1.exception.ItemIsNotFound;
 import com.github.xini1.exception.UserIsNotAdmin;
 import com.github.xini1.usecase.User;
 import org.junit.jupiter.api.Test;
@@ -49,12 +49,12 @@ final class AdminUseCasesTest {
     }
 
     @Test
-    void givenItemDoNotExist_whenDeactivateItem_thenItemNotFoundThrown() {
+    void givenItemDoNotExist_whenDeactivateItem_thenItemIsNotFoundThrown() {
         var useCase = module.deactivateItemUseCase();
         var itemId = identifiers.uuid(1);
 
         assertThatThrownBy(() -> useCase.deactivate(userId, User.ADMIN, itemId))
-                .isInstanceOf(ItemNotFound.class);
+                .isInstanceOf(ItemIsNotFound.class);
 
         assertThat(eventStore.events()).isEmpty();
     }
@@ -103,12 +103,12 @@ final class AdminUseCasesTest {
     }
 
     @Test
-    void givenItemDoNotExist_whenActivateItem_thenItemNotFoundThrown() {
+    void givenItemDoNotExist_whenActivateItem_thenItemIsNotFoundThrown() {
         var useCase = module.activateItemUseCase();
         var itemId = identifiers.uuid(1);
 
         assertThatThrownBy(() -> useCase.activate(userId, User.ADMIN, itemId))
-                .isInstanceOf(ItemNotFound.class);
+                .isInstanceOf(ItemIsNotFound.class);
 
         assertThat(eventStore.events()).isEmpty();
     }
