@@ -6,7 +6,7 @@ import java.util.UUID;
 /**
  * @author Maxim Tereshchenko
  */
-public final class ItemAddedToCart implements Event {
+public final class ItemAddedToCart implements CartEvent {
 
     private final UUID userId;
     private final UUID itemId;
@@ -17,13 +17,12 @@ public final class ItemAddedToCart implements Event {
     }
 
     @Override
-    public UUID itemId() {
-        return itemId;
+    public UUID userId() {
+        return userId;
     }
 
-    @Override
-    public void accept(EventVisitor eventVisitor) {
-        eventVisitor.visit(this);
+    public UUID itemId() {
+        return itemId;
     }
 
     @Override

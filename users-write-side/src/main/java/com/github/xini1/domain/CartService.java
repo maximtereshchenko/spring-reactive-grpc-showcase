@@ -13,9 +13,11 @@ import java.util.UUID;
 final class CartService implements AddItemToCartUseCase {
 
     private final Items items;
+    private final Carts carts;
 
-    CartService(Items items) {
+    CartService(Items items, Carts carts) {
         this.items = items;
+        this.carts = carts;
     }
 
     @Override
@@ -28,5 +30,8 @@ final class CartService implements AddItemToCartUseCase {
         if (item.isDeactivated()) {
             throw new CouldNotAddDeactivatedItemToCart();
         }
+        var cart = carts.find(userId);
+        cart.add(item);
+        carts.save(cart);
     }
 }

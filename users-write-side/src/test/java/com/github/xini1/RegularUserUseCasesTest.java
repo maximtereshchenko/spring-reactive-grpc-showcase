@@ -51,7 +51,7 @@ final class RegularUserUseCasesTest {
     }
 
     @Test
-    void givenActivateItem_whenAddItemToCart_thenItemAddedToCartEventPublished() {
+    void givenActiveItem_whenAddItemToCart_thenItemAddedToCartEventPublished() {
         module.createItemUseCase().create(userId, User.ADMIN, "item");
 
         module.addItemToCartUseCase().add(userId, User.REGULAR, itemId);

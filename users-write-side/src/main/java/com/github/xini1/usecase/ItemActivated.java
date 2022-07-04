@@ -6,7 +6,7 @@ import java.util.UUID;
 /**
  * @author Maxim Tereshchenko
  */
-public final class ItemActivated implements Event {
+public final class ItemActivated implements ItemEvent {
 
     private final UUID userId;
     private final UUID itemId;

@@ -10,5 +10,7 @@ public interface EventStore {
 
     void publish(Event event);
 
-    List<Event> findById(UUID itemId);
+    List<ItemEvent> itemEvents(UUID itemId);
+
+    List<CartEvent> cartEvents(UUID userId);
 }

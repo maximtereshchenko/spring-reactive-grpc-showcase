@@ -22,6 +22,6 @@ final class Items {
     }
 
     Optional<Item> find(UUID itemId) {
-        return Item.fromEvents(eventStore.findById(itemId));
+        return Item.fromEvents(eventStore.itemEvents(itemId));
     }
 }

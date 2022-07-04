@@ -3,13 +3,13 @@ package com.github.xini1.domain;
 import com.github.xini1.exception.ItemHasNotBeenCreated;
 import com.github.xini1.exception.ItemIsAlreadyActive;
 import com.github.xini1.exception.ItemIsAlreadyDeactivated;
-import com.github.xini1.usecase.Event;
 import com.github.xini1.usecase.EventVisitor;
 import com.github.xini1.usecase.Identifiers;
 import com.github.xini1.usecase.ItemActivated;
 import com.github.xini1.usecase.ItemAddedToCart;
 import com.github.xini1.usecase.ItemCreated;
 import com.github.xini1.usecase.ItemDeactivated;
+import com.github.xini1.usecase.ItemEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +21,7 @@ import java.util.UUID;
  */
 final class Item {
 
-    private final List<Event> newEvents = new ArrayList<>();
+    private final List<ItemEvent> newEvents = new ArrayList<>();
     private State state = new Initial();
 
     static Item create(UUID userId, String name, Identifiers identifiers) {
@@ -30,7 +30,7 @@ final class Item {
         return item;
     }
 
-    static Optional<Item> fromEvents(List<Event> events) {
+    static Optional<Item> fromEvents(List<ItemEvent> events) {
         if (events.isEmpty()) {
             return Optional.empty();
         }
@@ -41,8 +41,8 @@ final class Item {
         return Optional.of(item);
     }
 
-    List<Event> newEvents() {
-        return List.copyOf(newEvents);
+    UUID id() {
+        return state.id();
     }
 
     void deactivate(UUID userId) {
@@ -57,6 +57,10 @@ final class Item {
 
     boolean isDeactivated() {
         return state.isDeactivated();
+    }
+
+    List<ItemEvent> newEvents() {
+        return List.copyOf(newEvents);
     }
 
     private interface State {
