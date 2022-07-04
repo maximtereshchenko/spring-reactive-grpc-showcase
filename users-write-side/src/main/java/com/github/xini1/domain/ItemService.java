@@ -1,6 +1,7 @@
 package com.github.xini1.domain;
 
 import com.github.xini1.exception.UserIsNotAdmin;
+import com.github.xini1.port.EventStore;
 import com.github.xini1.port.Identifiers;
 import com.github.xini1.usecase.ActivateItemUseCase;
 import com.github.xini1.usecase.CreateItemUseCase;
@@ -14,11 +15,11 @@ import java.util.UUID;
  */
 final class ItemService implements CreateItemUseCase, DeactivateItemUseCase, ActivateItemUseCase {
 
-    private final Items items;
+    private final EventStore eventStore;
     private final Identifiers identifiers;
 
-    ItemService(Items items, Identifiers identifiers) {
-        this.items = items;
+    ItemService(EventStore eventStore, Identifiers identifiers) {
+        this.eventStore = eventStore;
         this.identifiers = identifiers;
     }
 
@@ -28,7 +29,7 @@ final class ItemService implements CreateItemUseCase, DeactivateItemUseCase, Act
             throw new UserIsNotAdmin();
         }
         var item = Item.create(userId, name, identifiers);
-        items.save(item);
+        item.save(eventStore);
         return item.id();
     }
 
@@ -37,9 +38,9 @@ final class ItemService implements CreateItemUseCase, DeactivateItemUseCase, Act
         if (user != User.ADMIN) {
             throw new UserIsNotAdmin();
         }
-        var item = items.find(itemId);
+        var item = Item.fromEvents(itemId, eventStore);
         item.deactivate(userId);
-        items.save(item);
+        item.save(eventStore);
     }
 
     @Override
@@ -47,8 +48,8 @@ final class ItemService implements CreateItemUseCase, DeactivateItemUseCase, Act
         if (user != User.ADMIN) {
             throw new UserIsNotAdmin();
         }
-        var item = items.find(itemId);
+        var item = Item.fromEvents(itemId, eventStore);
         item.activate(userId);
-        items.save(item);
+        item.save(eventStore);
     }
 }

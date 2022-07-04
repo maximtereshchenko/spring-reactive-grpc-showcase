@@ -57,8 +57,7 @@ public final class Module {
         }
 
         public Module build() {
-            var items = new Items(eventStore);
-            return new Module(new ItemService(items, identifiers), new CartService(items, new Carts(eventStore)));
+            return new Module(new ItemService(eventStore, identifiers), new CartService(eventStore));
         }
     }
 }

@@ -3,13 +3,12 @@ package com.github.xini1.domain;
 import com.github.xini1.event.item.ItemActivated;
 import com.github.xini1.event.item.ItemCreated;
 import com.github.xini1.event.item.ItemDeactivated;
-import com.github.xini1.event.item.ItemEvent;
 import com.github.xini1.exception.ItemIsAlreadyActive;
 import com.github.xini1.exception.ItemIsAlreadyDeactivated;
+import com.github.xini1.exception.ItemIsNotFound;
+import com.github.xini1.port.EventStore;
 import com.github.xini1.port.Identifiers;
 
-import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -32,14 +31,15 @@ final class Item extends AggregateRoot {
         return item;
     }
 
-    static Optional<Item> fromEvents(UUID itemId, List<ItemEvent> events) {
+    static Item fromEvents(UUID itemId, EventStore eventStore) {
+        var events = eventStore.itemEvents(itemId);
         if (events.isEmpty()) {
-            return Optional.empty();
+            throw new ItemIsNotFound();
         }
         var item = new Item(itemId);
         events.forEach(item::apply);
         item.clearEvents();
-        return Optional.of(item);
+        return item;
     }
 
     void deactivate(UUID userId) {

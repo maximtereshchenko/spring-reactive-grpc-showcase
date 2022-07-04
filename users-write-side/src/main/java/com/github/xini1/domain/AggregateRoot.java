@@ -1,6 +1,7 @@
 package com.github.xini1.domain;
 
 import com.github.xini1.event.Event;
+import com.github.xini1.port.EventStore;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,7 +45,7 @@ abstract class AggregateRoot {
         newEvents.clear();
     }
 
-    List<Event> newEvents() {
-        return List.copyOf(newEvents);
+    void save(EventStore eventStore) {
+        newEvents.forEach(eventStore::publish);
     }
 }

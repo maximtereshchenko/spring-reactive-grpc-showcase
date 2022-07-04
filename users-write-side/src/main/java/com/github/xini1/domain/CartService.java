@@ -1,6 +1,7 @@
 package com.github.xini1.domain;
 
 import com.github.xini1.exception.UserIsNotRegular;
+import com.github.xini1.port.EventStore;
 import com.github.xini1.usecase.AddItemToCartUseCase;
 import com.github.xini1.usecase.OrderItemsInCartUseCase;
 import com.github.xini1.usecase.User;
@@ -12,12 +13,10 @@ import java.util.UUID;
  */
 final class CartService implements AddItemToCartUseCase, OrderItemsInCartUseCase {
 
-    private final Items items;
-    private final Carts carts;
+    private final EventStore eventStore;
 
-    CartService(Items items, Carts carts) {
-        this.items = items;
-        this.carts = carts;
+    CartService(EventStore eventStore) {
+        this.eventStore = eventStore;
     }
 
     @Override
@@ -25,9 +24,9 @@ final class CartService implements AddItemToCartUseCase, OrderItemsInCartUseCase
         if (user != User.REGULAR) {
             throw new UserIsNotRegular();
         }
-        var cart = carts.find(userId);
-        cart.add(items.find(itemId));
-        carts.save(cart);
+        var cart = Cart.fromEvents(userId, eventStore);
+        cart.add(Item.fromEvents(itemId, eventStore));
+        cart.save(eventStore);
     }
 
     @Override
@@ -35,8 +34,8 @@ final class CartService implements AddItemToCartUseCase, OrderItemsInCartUseCase
         if (user != User.REGULAR) {
             throw new UserIsNotRegular();
         }
-        var cart = carts.find(userId);
+        var cart = Cart.fromEvents(userId, eventStore);
         cart.order();
-        carts.save(cart);
+        cart.save(eventStore);
     }
 }

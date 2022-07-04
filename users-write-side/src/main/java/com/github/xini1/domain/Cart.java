@@ -1,13 +1,12 @@
 package com.github.xini1.domain;
 
-import com.github.xini1.event.cart.CartEvent;
 import com.github.xini1.event.cart.ItemAddedToCart;
 import com.github.xini1.event.cart.ItemsOrdered;
 import com.github.xini1.exception.CartIsEmpty;
 import com.github.xini1.exception.CouldNotAddDeactivatedItemToCart;
+import com.github.xini1.port.EventStore;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -24,9 +23,10 @@ final class Cart extends AggregateRoot {
         register(ItemsOrdered.class, this::onEvent);
     }
 
-    static Cart fromEvents(UUID userId, List<CartEvent> cartEvents) {
+    static Cart fromEvents(UUID userId, EventStore eventStore) {
         var cart = new Cart(userId);
-        cartEvents.forEach(cart::apply);
+        eventStore.cartEvents(userId)
+                .forEach(cart::apply);
         cart.clearEvents();
         return cart;
     }
