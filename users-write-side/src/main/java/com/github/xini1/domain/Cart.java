@@ -3,6 +3,7 @@ package com.github.xini1.domain;
 import com.github.xini1.event.CartEvent;
 import com.github.xini1.event.ItemAddedToCart;
 import com.github.xini1.exception.CartIsEmpty;
+import com.github.xini1.exception.CouldNotAddDeactivatedItemToCart;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +30,9 @@ final class Cart extends AggregateRoot {
     }
 
     void add(Item item) {
+        if (item.isDeactivated()) {
+            throw new CouldNotAddDeactivatedItemToCart();
+        }
         apply(new ItemAddedToCart(nextVersion(), userId, item.id()));
     }
 

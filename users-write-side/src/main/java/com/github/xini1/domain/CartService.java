@@ -1,6 +1,5 @@
 package com.github.xini1.domain;
 
-import com.github.xini1.exception.CouldNotAddDeactivatedItemToCart;
 import com.github.xini1.exception.UserIsNotRegular;
 import com.github.xini1.usecase.AddItemToCartUseCase;
 import com.github.xini1.usecase.OrderItemsInCartUseCase;
@@ -26,13 +25,11 @@ final class CartService implements AddItemToCartUseCase, OrderItemsInCartUseCase
         if (user != User.REGULAR) {
             throw new UserIsNotRegular();
         }
-        var item = items.find(itemId)
-                .orElseThrow();
-        if (item.isDeactivated()) {
-            throw new CouldNotAddDeactivatedItemToCart();
-        }
         var cart = carts.find(userId);
-        cart.add(item);
+        cart.add(
+                items.find(itemId)
+                        .orElseThrow()
+        );
         carts.save(cart);
     }
 
