@@ -2,7 +2,6 @@ package com.github.xini1.domain;
 
 import com.github.xini1.exception.UserIsNotAdmin;
 import com.github.xini1.port.EventStore;
-import com.github.xini1.port.Identifiers;
 import com.github.xini1.usecase.ActivateItemUseCase;
 import com.github.xini1.usecase.CreateItemUseCase;
 import com.github.xini1.usecase.DeactivateItemUseCase;
@@ -16,11 +15,9 @@ import java.util.UUID;
 final class ItemService implements CreateItemUseCase, DeactivateItemUseCase, ActivateItemUseCase {
 
     private final EventStore eventStore;
-    private final Identifiers identifiers;
 
-    ItemService(EventStore eventStore, Identifiers identifiers) {
+    ItemService(EventStore eventStore) {
         this.eventStore = eventStore;
-        this.identifiers = identifiers;
     }
 
     @Override
@@ -28,7 +25,7 @@ final class ItemService implements CreateItemUseCase, DeactivateItemUseCase, Act
         if (user != User.ADMIN) {
             throw new UserIsNotAdmin();
         }
-        var item = Item.create(userId, name, identifiers);
+        var item = Item.create(userId, name);
         item.save(eventStore);
         return item.id();
     }

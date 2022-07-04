@@ -7,7 +7,6 @@ import com.github.xini1.exception.ItemIsAlreadyActive;
 import com.github.xini1.exception.ItemIsAlreadyDeactivated;
 import com.github.xini1.exception.ItemIsNotFound;
 import com.github.xini1.port.EventStore;
-import com.github.xini1.port.Identifiers;
 
 import java.util.UUID;
 
@@ -25,8 +24,8 @@ final class Item extends AggregateRoot {
         register(ItemActivated.class, this::onEvent);
     }
 
-    static Item create(UUID userId, String name, Identifiers identifiers) {
-        var item = new Item(identifiers.newIdentifier());
+    static Item create(UUID userId, String name) {
+        var item = new Item(UUID.randomUUID());
         item.apply(new ItemCreated(item.nextVersion(), userId, item.id(), name));
         return item;
     }

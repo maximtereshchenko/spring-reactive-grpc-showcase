@@ -23,20 +23,16 @@ import java.util.UUID;
  */
 final class RegularUserUseCasesTest {
 
-    private final IncrementedIdentifiers identifiers = new IncrementedIdentifiers();
     private final InMemoryEventStore eventStore = new InMemoryEventStore();
-    private final Module module = new Module.Builder()
-            .with(eventStore)
-            .with(identifiers)
-            .build();
-    private final UUID userId = identifiers.uuid(1);
+    private final Module module = new Module(eventStore);
+    private final UUID userId = UUID.fromString("00000000-000-0000-0000-000000000001");
+    private final UUID nonExistentItemId = UUID.fromString("00000000-000-0000-0000-000000000002");
 
     @Test
     void givenUserIsAdmin_whenAddItemToCart_thenUserIsNotRegularThrown() {
         var useCase = module.addItemToCartUseCase();
-        var itemId = identifiers.uuid(1);
 
-        assertThatThrownBy(() -> useCase.add(userId, User.ADMIN, itemId))
+        assertThatThrownBy(() -> useCase.add(userId, User.ADMIN, nonExistentItemId))
                 .isInstanceOf(UserIsNotRegular.class);
 
         assertThat(eventStore.events()).isEmpty();
@@ -45,9 +41,8 @@ final class RegularUserUseCasesTest {
     @Test
     void givenItemDoNotExist_whenAddItemToCart_thenItemIsNotFoundThrown() {
         var useCase = module.addItemToCartUseCase();
-        var itemId = identifiers.uuid(1);
 
-        assertThatThrownBy(() -> useCase.add(userId, User.REGULAR, itemId))
+        assertThatThrownBy(() -> useCase.add(userId, User.REGULAR, nonExistentItemId))
                 .isInstanceOf(ItemIsNotFound.class);
 
         assertThat(eventStore.events()).isEmpty();
