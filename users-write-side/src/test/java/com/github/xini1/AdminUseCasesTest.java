@@ -21,19 +21,21 @@ import java.util.UUID;
  */
 final class AdminUseCasesTest {
 
-    private final UUID itemId = UUID.fromString("00000000-000-0000-0000-000000000001");
-    private final UUID userId = UUID.fromString("00000000-000-0000-0000-000000000002");
     private final InMemoryEventStore eventStore = new InMemoryEventStore();
+    private final IncrementedIdentifiers identifiers = new IncrementedIdentifiers();
     private final Module module = new Module.Builder()
             .with(eventStore)
-            .with(new StaticIdentifiers(itemId))
+            .with(identifiers)
             .build();
+    private final UUID userId = identifiers.uuid(1);
 
     @Test
     void givenUserIsAdmin_whenCreateItem_thenItemCreatedEventPublished() {
-        module.createItemUseCase().create(userId, User.ADMIN, "item");
+        var itemId = module.createItemUseCase()
+                .create(userId, User.ADMIN, "item");
 
-        assertThat(eventStore.events()).containsExactly(new ItemCreated(1, userId, itemId, "item"));
+        assertThat(eventStore.events())
+                .containsExactly(new ItemCreated(1, userId, itemId, "item"));
     }
 
     @Test
@@ -49,6 +51,7 @@ final class AdminUseCasesTest {
     @Test
     void givenItemDoNotExist_whenDeactivateItem_thenItemNotFoundThrown() {
         var useCase = module.deactivateItemUseCase();
+        var itemId = identifiers.uuid(1);
 
         assertThatThrownBy(() -> useCase.deactivate(userId, User.ADMIN, itemId))
                 .isInstanceOf(ItemNotFound.class);
@@ -59,6 +62,7 @@ final class AdminUseCasesTest {
     @Test
     void givenUserIsNotAdmin_whenDeactivateItem_thenUserIsNotAdminThrown() {
         var useCase = module.deactivateItemUseCase();
+        var itemId = identifiers.uuid(1);
 
         assertThatThrownBy(() -> useCase.deactivate(userId, User.REGULAR, itemId))
                 .isInstanceOf(UserIsNotAdmin.class);
@@ -68,7 +72,8 @@ final class AdminUseCasesTest {
 
     @Test
     void givenDeactivatedItem_whenDeactivateItem_thenItemIsAlreadyDeactivatedThrown() {
-        module.createItemUseCase().create(userId, User.ADMIN, "item");
+        var itemId = module.createItemUseCase()
+                .create(userId, User.ADMIN, "item");
         var useCase = module.deactivateItemUseCase();
         useCase.deactivate(userId, User.ADMIN, itemId);
 
@@ -84,9 +89,11 @@ final class AdminUseCasesTest {
 
     @Test
     void givenActiveItem_whenDeactivateItem_thenItemDeactivatedEventPublished() {
-        module.createItemUseCase().create(userId, User.ADMIN, "item");
+        var itemId = module.createItemUseCase()
+                .create(userId, User.ADMIN, "item");
 
-        module.deactivateItemUseCase().deactivate(userId, User.ADMIN, itemId);
+        module.deactivateItemUseCase()
+                .deactivate(userId, User.ADMIN, itemId);
 
         assertThat(eventStore.events())
                 .containsExactly(
@@ -98,6 +105,7 @@ final class AdminUseCasesTest {
     @Test
     void givenItemDoNotExist_whenActivateItem_thenItemNotFoundThrown() {
         var useCase = module.activateItemUseCase();
+        var itemId = identifiers.uuid(1);
 
         assertThatThrownBy(() -> useCase.activate(userId, User.ADMIN, itemId))
                 .isInstanceOf(ItemNotFound.class);
@@ -108,6 +116,7 @@ final class AdminUseCasesTest {
     @Test
     void givenUserIsNotAdmin_whenActivateItem_thenUserIsNotAdminThrown() {
         var useCase = module.activateItemUseCase();
+        var itemId = identifiers.uuid(1);
 
         assertThatThrownBy(() -> useCase.activate(userId, User.REGULAR, itemId))
                 .isInstanceOf(UserIsNotAdmin.class);
@@ -117,7 +126,8 @@ final class AdminUseCasesTest {
 
     @Test
     void givenActiveItem_whenActivateItem_thenItemIsAlreadyActiveThrown() {
-        module.createItemUseCase().create(userId, User.ADMIN, "item");
+        var itemId = module.createItemUseCase()
+                .create(userId, User.ADMIN, "item");
         var useCase = module.activateItemUseCase();
 
         assertThatThrownBy(() -> useCase.activate(userId, User.ADMIN, itemId))
@@ -129,8 +139,10 @@ final class AdminUseCasesTest {
 
     @Test
     void givenDeactivatedItem_whenActivateItem_thenItemActivatedEventPublished() {
-        module.createItemUseCase().create(userId, User.ADMIN, "item");
-        module.deactivateItemUseCase().deactivate(userId, User.ADMIN, itemId);
+        var itemId = module.createItemUseCase()
+                .create(userId, User.ADMIN, "item");
+        module.deactivateItemUseCase()
+                .deactivate(userId, User.ADMIN, itemId);
 
         module.activateItemUseCase().activate(userId, User.ADMIN, itemId);
 

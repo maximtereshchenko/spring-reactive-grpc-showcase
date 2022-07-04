@@ -7,5 +7,5 @@ import java.util.UUID;
  */
 public interface CreateItemUseCase {
 
-    void create(UUID userId, User user, String name);
+    UUID create(UUID userId, User user, String name);
 }

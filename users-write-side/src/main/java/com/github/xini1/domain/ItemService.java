@@ -24,11 +24,13 @@ final class ItemService implements CreateItemUseCase, DeactivateItemUseCase, Act
     }
 
     @Override
-    public void create(UUID userId, User user, String name) {
+    public UUID create(UUID userId, User user, String name) {
         if (user != User.ADMIN) {
             throw new UserIsNotAdmin();
         }
-        items.save(Item.create(userId, name, identifiers));
+        var item = Item.create(userId, name, identifiers);
+        items.save(item);
+        return item.id();
     }
 
     @Override

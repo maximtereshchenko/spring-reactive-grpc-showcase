@@ -19,17 +19,18 @@ import java.util.UUID;
  */
 final class RegularUserUseCasesTest {
 
-    private final UUID itemId = UUID.fromString("00000000-000-0000-0000-000000000001");
-    private final UUID userId = UUID.fromString("00000000-000-0000-0000-000000000002");
+    private final IncrementedIdentifiers identifiers = new IncrementedIdentifiers();
     private final InMemoryEventStore eventStore = new InMemoryEventStore();
     private final Module module = new Module.Builder()
             .with(eventStore)
-            .with(new StaticIdentifiers(itemId))
+            .with(identifiers)
             .build();
+    private final UUID userId = identifiers.uuid(1);
 
     @Test
     void givenUserIsAdmin_whenAddItemToCart_thenUserIsNotRegularThrown() {
         var useCase = module.addItemToCartUseCase();
+        var itemId = identifiers.uuid(1);
 
         assertThatThrownBy(() -> useCase.add(userId, User.ADMIN, itemId))
                 .isInstanceOf(UserIsNotRegular.class);
@@ -39,8 +40,10 @@ final class RegularUserUseCasesTest {
 
     @Test
     void givenDeactivatedItem_whenAddItemToCart_thenCouldNotAddDeactivatedItemToCartThrown() {
-        module.createItemUseCase().create(userId, User.ADMIN, "item");
-        module.deactivateItemUseCase().deactivate(userId, User.ADMIN, itemId);
+        var itemId = module.createItemUseCase()
+                .create(userId, User.ADMIN, "item");
+        module.deactivateItemUseCase()
+                .deactivate(userId, User.ADMIN, itemId);
         var useCase = module.addItemToCartUseCase();
 
         assertThatThrownBy(() -> useCase.add(userId, User.REGULAR, itemId))
@@ -55,9 +58,11 @@ final class RegularUserUseCasesTest {
 
     @Test
     void givenActiveItem_whenAddItemToCart_thenItemAddedToCartEventPublished() {
-        module.createItemUseCase().create(userId, User.ADMIN, "item");
+        var itemId = module.createItemUseCase()
+                .create(userId, User.ADMIN, "item");
 
-        module.addItemToCartUseCase().add(userId, User.REGULAR, itemId);
+        module.addItemToCartUseCase()
+                .add(userId, User.REGULAR, itemId);
 
         assertThat(eventStore.events())
                 .containsExactly(
