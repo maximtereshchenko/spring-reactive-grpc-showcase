@@ -32,6 +32,9 @@ final class CartService implements AddItemToCartUseCase, OrderItemsInCartUseCase
 
     @Override
     public void order(UUID userId, User user) {
+        if (user != User.REGULAR) {
+            throw new UserIsNotRegular();
+        }
         var cart = carts.find(userId);
         cart.order();
         carts.save(cart);
