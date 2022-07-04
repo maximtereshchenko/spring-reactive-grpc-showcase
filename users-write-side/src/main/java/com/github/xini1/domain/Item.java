@@ -1,9 +1,9 @@
 package com.github.xini1.domain;
 
-import com.github.xini1.event.ItemActivated;
-import com.github.xini1.event.ItemCreated;
-import com.github.xini1.event.ItemDeactivated;
-import com.github.xini1.event.ItemEvent;
+import com.github.xini1.event.item.ItemActivated;
+import com.github.xini1.event.item.ItemCreated;
+import com.github.xini1.event.item.ItemDeactivated;
+import com.github.xini1.event.item.ItemEvent;
 import com.github.xini1.exception.ItemHasNotBeenCreated;
 import com.github.xini1.exception.ItemIsAlreadyActive;
 import com.github.xini1.exception.ItemIsAlreadyDeactivated;

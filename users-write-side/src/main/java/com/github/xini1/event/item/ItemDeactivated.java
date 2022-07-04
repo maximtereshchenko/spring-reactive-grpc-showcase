@@ -1,4 +1,4 @@
-package com.github.xini1.event;
+package com.github.xini1.event.item;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -6,11 +6,11 @@ import java.util.UUID;
 /**
  * @author Maxim Tereshchenko
  */
-public final class ItemActivated extends ItemEvent {
+public final class ItemDeactivated extends ItemEvent {
 
     private final UUID userId;
 
-    public ItemActivated(long version, UUID userId, UUID itemId) {
+    public ItemDeactivated(long version, UUID userId, UUID itemId) {
         super(version, itemId);
         this.userId = userId;
     }
@@ -31,13 +31,13 @@ public final class ItemActivated extends ItemEvent {
         if (!super.equals(object)) {
             return false;
         }
-        var that = (ItemActivated) object;
+        var that = (ItemDeactivated) object;
         return Objects.equals(userId, that.userId);
     }
 
     @Override
     public String toString() {
-        return "ItemActivated{" +
+        return "ItemDeactivated{" +
                 "userId=" + userId +
                 "} " + super.toString();
     }

@@ -1,9 +1,9 @@
 package com.github.xini1;
 
-import com.github.xini1.event.CartEvent;
 import com.github.xini1.event.Event;
 import com.github.xini1.event.EventType;
-import com.github.xini1.event.ItemEvent;
+import com.github.xini1.event.cart.CartEvent;
+import com.github.xini1.event.item.ItemEvent;
 import com.github.xini1.port.EventStore;
 
 import java.util.ArrayList;

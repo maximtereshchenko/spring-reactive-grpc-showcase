@@ -1,4 +1,4 @@
-package com.github.xini1.event;
+package com.github.xini1.event.cart;
 
 import java.util.Objects;
 import java.util.UUID;

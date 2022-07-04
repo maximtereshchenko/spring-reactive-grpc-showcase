@@ -4,10 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.github.xini1.domain.Module;
-import com.github.xini1.event.ItemAddedToCart;
-import com.github.xini1.event.ItemCreated;
-import com.github.xini1.event.ItemDeactivated;
-import com.github.xini1.event.ItemsOrdered;
+import com.github.xini1.event.cart.ItemAddedToCart;
+import com.github.xini1.event.cart.ItemsOrdered;
+import com.github.xini1.event.item.ItemCreated;
+import com.github.xini1.event.item.ItemDeactivated;
 import com.github.xini1.exception.CartIsEmpty;
 import com.github.xini1.exception.CouldNotAddDeactivatedItemToCart;
 import com.github.xini1.exception.ItemIsNotFound;

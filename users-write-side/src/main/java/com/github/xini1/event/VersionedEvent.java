@@ -5,11 +5,11 @@ import java.util.Objects;
 /**
  * @author Maxim Tereshchenko
  */
-abstract class VersionedEvent implements Event {
+public abstract class VersionedEvent implements Event {
 
     private final long version;
 
-    VersionedEvent(long version) {
+    protected VersionedEvent(long version) {
         this.version = version;
     }
 

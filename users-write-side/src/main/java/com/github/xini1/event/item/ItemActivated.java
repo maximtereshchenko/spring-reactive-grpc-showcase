@@ -1,4 +1,4 @@
-package com.github.xini1.event;
+package com.github.xini1.event.item;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -6,20 +6,18 @@ import java.util.UUID;
 /**
  * @author Maxim Tereshchenko
  */
-public final class ItemCreated extends ItemEvent {
+public final class ItemActivated extends ItemEvent {
 
     private final UUID userId;
-    private final String name;
 
-    public ItemCreated(long version, UUID userId, UUID itemId, String name) {
+    public ItemActivated(long version, UUID userId, UUID itemId) {
         super(version, itemId);
         this.userId = userId;
-        this.name = name;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), userId, name);
+        return Objects.hash(super.hashCode(), userId);
     }
 
     @Override
@@ -33,15 +31,14 @@ public final class ItemCreated extends ItemEvent {
         if (!super.equals(object)) {
             return false;
         }
-        var that = (ItemCreated) object;
-        return Objects.equals(userId, that.userId) && Objects.equals(name, that.name);
+        var that = (ItemActivated) object;
+        return Objects.equals(userId, that.userId);
     }
 
     @Override
     public String toString() {
-        return "ItemCreated{" +
+        return "ItemActivated{" +
                 "userId=" + userId +
-                ", name='" + name + '\'' +
                 "} " + super.toString();
     }
 }

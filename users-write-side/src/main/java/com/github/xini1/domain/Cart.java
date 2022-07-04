@@ -1,8 +1,8 @@
 package com.github.xini1.domain;
 
-import com.github.xini1.event.CartEvent;
-import com.github.xini1.event.ItemAddedToCart;
-import com.github.xini1.event.ItemsOrdered;
+import com.github.xini1.event.cart.CartEvent;
+import com.github.xini1.event.cart.ItemAddedToCart;
+import com.github.xini1.event.cart.ItemsOrdered;
 import com.github.xini1.exception.CartIsEmpty;
 import com.github.xini1.exception.CouldNotAddDeactivatedItemToCart;
 
