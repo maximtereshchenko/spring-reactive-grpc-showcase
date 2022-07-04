@@ -87,6 +87,16 @@ final class RegularUserUseCasesTest {
     }
 
     @Test
+    void givenUserIsAdmin_whenOrderItemsInCart_thenUserIsNotRegularThrown() {
+        var useCase = module.orderItemsInCartUseCase();
+
+        assertThatThrownBy(() -> useCase.order(userId, User.ADMIN))
+                .isInstanceOf(UserIsNotRegular.class);
+
+        assertThat(eventStore.events()).isEmpty();
+    }
+
+    @Test
     void givenCartIsEmpty_whenOrderItemsInCart_thenCartIsEmptyThrown() {
         var useCase = module.orderItemsInCartUseCase();
 
