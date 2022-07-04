@@ -7,6 +7,7 @@ import com.github.xini1.domain.Module;
 import com.github.xini1.event.ItemAddedToCart;
 import com.github.xini1.event.ItemCreated;
 import com.github.xini1.event.ItemDeactivated;
+import com.github.xini1.exception.CartIsEmpty;
 import com.github.xini1.exception.CouldNotAddDeactivatedItemToCart;
 import com.github.xini1.exception.UserIsNotRegular;
 import com.github.xini1.usecase.User;
@@ -69,5 +70,15 @@ final class RegularUserUseCasesTest {
                         new ItemCreated(1, userId, itemId, "item"),
                         new ItemAddedToCart(1, userId, itemId)
                 );
+    }
+
+    @Test
+    void givenCartIsEmpty_whenOrderItemsInCart_thenCartIsEmptyThrown() {
+        var useCase = module.orderItemsInCartUseCase();
+
+        assertThatThrownBy(() -> useCase.order(userId, User.REGULAR))
+                .isInstanceOf(CartIsEmpty.class);
+
+        assertThat(eventStore.events()).isEmpty();
     }
 }

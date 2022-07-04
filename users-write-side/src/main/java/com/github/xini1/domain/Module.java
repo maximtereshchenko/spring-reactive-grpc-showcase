@@ -6,6 +6,7 @@ import com.github.xini1.usecase.ActivateItemUseCase;
 import com.github.xini1.usecase.AddItemToCartUseCase;
 import com.github.xini1.usecase.CreateItemUseCase;
 import com.github.xini1.usecase.DeactivateItemUseCase;
+import com.github.xini1.usecase.OrderItemsInCartUseCase;
 
 /**
  * @author Maxim Tereshchenko
@@ -34,6 +35,10 @@ public final class Module {
 
     public AddItemToCartUseCase addItemToCartUseCase() {
         return cartService;
+    }
+
+    public OrderItemsInCartUseCase orderItemsInCartUseCase() {
+        return null;
     }
 
     public static final class Builder {
