@@ -38,7 +38,7 @@ public final class Module {
     }
 
     public OrderItemsInCartUseCase orderItemsInCartUseCase() {
-        return null;
+        return cartService;
     }
 
     public static final class Builder {
