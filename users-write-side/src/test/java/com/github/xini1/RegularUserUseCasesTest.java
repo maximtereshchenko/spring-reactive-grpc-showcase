@@ -7,6 +7,7 @@ import com.github.xini1.domain.Module;
 import com.github.xini1.event.ItemAddedToCart;
 import com.github.xini1.event.ItemCreated;
 import com.github.xini1.event.ItemDeactivated;
+import com.github.xini1.event.ItemsOrdered;
 import com.github.xini1.exception.CartIsEmpty;
 import com.github.xini1.exception.CouldNotAddDeactivatedItemToCart;
 import com.github.xini1.exception.ItemIsNotFound;
@@ -92,5 +93,23 @@ final class RegularUserUseCasesTest {
                 .isInstanceOf(CartIsEmpty.class);
 
         assertThat(eventStore.events()).isEmpty();
+    }
+
+    @Test
+    void givenCartIsNotEmpty_whenOrderItemsInCart_thenItemsOrderedEventPublished() {
+        var itemId = module.createItemUseCase()
+                .create(userId, User.ADMIN, "item");
+        module.addItemToCartUseCase()
+                .add(userId, User.REGULAR, itemId);
+
+        module.orderItemsInCartUseCase()
+                .order(userId, User.REGULAR);
+
+        assertThat(eventStore.events())
+                .containsExactly(
+                        new ItemCreated(1, userId, itemId, "item"),
+                        new ItemAddedToCart(1, userId, itemId),
+                        new ItemsOrdered(2, userId)
+                );
     }
 }
