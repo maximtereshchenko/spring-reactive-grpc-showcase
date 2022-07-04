@@ -14,7 +14,7 @@ There are 4 "Microservices" (not really, but they will be deployed separately as
 JWT.
 
 "Orders (write side)" is responsible for creating new items for purchase, activating/deactivating items, adding/removing
-items to/from user's cart, closing orders.
+items to/from user's cart, ordering items in cart.
 
 "Orders (read side)" is responsible for viewing information about user's cart, closed orders, most purchased items.
 
@@ -27,5 +27,6 @@ Kafka and MongoDB were chosen mostly of their reactive driver support.
 2) Admin can deactivate active item.
 3) Admin can activate deactivated item.
 4) Regular user can add active item to cart.
+5) Regular user can order items in cart, if it contains any.
 
 # What have I learnt?
