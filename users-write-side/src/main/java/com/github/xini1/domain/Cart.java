@@ -2,11 +2,13 @@ package com.github.xini1.domain;
 
 import com.github.xini1.event.CartEvent;
 import com.github.xini1.event.ItemAddedToCart;
+import com.github.xini1.event.ItemsOrdered;
 import com.github.xini1.exception.CartIsEmpty;
 import com.github.xini1.exception.CouldNotAddDeactivatedItemToCart;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -15,11 +17,12 @@ import java.util.UUID;
 final class Cart extends AggregateRoot {
 
     private final UUID userId;
-    private final List<UUID> items = new ArrayList<>();
+    private final Set<UUID> items = new HashSet<>();
 
     Cart(UUID userId) {
         this.userId = userId;
         register(ItemAddedToCart.class, this::onEvent);
+        register(ItemsOrdered.class, this::onEvent);
     }
 
     static Cart fromEvents(UUID userId, List<CartEvent> cartEvents) {
@@ -40,9 +43,14 @@ final class Cart extends AggregateRoot {
         if (items.isEmpty()) {
             throw new CartIsEmpty();
         }
+        apply(new ItemsOrdered(nextVersion(), userId, items));
     }
 
     private void onEvent(ItemAddedToCart itemAddedToCart) {
         items.add(itemAddedToCart.itemId());
+    }
+
+    private void onEvent(ItemsOrdered itemsOrdered) {
+        items.clear();
     }
 }

@@ -1,5 +1,7 @@
 package com.github.xini1.event;
 
+import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -7,13 +9,16 @@ import java.util.UUID;
  */
 public final class ItemsOrdered extends CartEvent {
 
-    public ItemsOrdered(long version, UUID userId) {
+    private final Set<UUID> items;
+
+    public ItemsOrdered(long version, UUID userId, Set<UUID> items) {
         super(version, userId);
+        this.items = Set.copyOf(items);
     }
 
     @Override
     public int hashCode() {
-        return super.hashCode();
+        return Objects.hash(super.hashCode(), items);
     }
 
     @Override
@@ -24,11 +29,17 @@ public final class ItemsOrdered extends CartEvent {
         if (object == null || getClass() != object.getClass()) {
             return false;
         }
-        return super.equals(object);
+        if (!super.equals(object)) {
+            return false;
+        }
+        var that = (ItemsOrdered) object;
+        return Objects.equals(items, that.items);
     }
 
     @Override
     public String toString() {
-        return "ItemsOrdered{} " + super.toString();
+        return "ItemsOrdered{" +
+                "items=" + items +
+                "} " + super.toString();
     }
 }

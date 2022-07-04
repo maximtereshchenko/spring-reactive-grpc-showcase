@@ -15,6 +15,7 @@ import com.github.xini1.exception.UserIsNotRegular;
 import com.github.xini1.usecase.User;
 import org.junit.jupiter.api.Test;
 
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -109,7 +110,7 @@ final class RegularUserUseCasesTest {
                 .containsExactly(
                         new ItemCreated(1, userId, itemId, "item"),
                         new ItemAddedToCart(1, userId, itemId),
-                        new ItemsOrdered(2, userId)
+                        new ItemsOrdered(2, userId, Set.of(itemId))
                 );
     }
 }
