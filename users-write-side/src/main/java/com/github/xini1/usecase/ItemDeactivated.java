@@ -22,11 +22,6 @@ public final class ItemDeactivated implements ItemEvent {
     }
 
     @Override
-    public void accept(EventVisitor eventVisitor) {
-        eventVisitor.visit(this);
-    }
-
-    @Override
     public int hashCode() {
         return Objects.hash(userId, itemId);
     }

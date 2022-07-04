@@ -17,7 +17,7 @@ final class Cart extends AggregateRoot {
 
     Cart(UUID userId) {
         this.userId = userId;
-        addHandler(ItemAddedToCart.class, this::apply);
+        register(ItemAddedToCart.class, this::onEvent);
     }
 
     static Cart fromEvents(UUID userId, List<CartEvent> cartEvents) {
@@ -28,10 +28,10 @@ final class Cart extends AggregateRoot {
     }
 
     void add(Item item) {
-        super.apply(new ItemAddedToCart(userId, item.id()));
+        apply(new ItemAddedToCart(userId, item.id()));
     }
 
-    private void apply(ItemAddedToCart itemAddedToCart) {
+    private void onEvent(ItemAddedToCart itemAddedToCart) {
         items.add(itemAddedToCart.itemId());
     }
 }

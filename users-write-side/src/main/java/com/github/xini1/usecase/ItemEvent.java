@@ -8,6 +8,4 @@ import java.util.UUID;
 public interface ItemEvent extends Event {
 
     UUID itemId();
-
-    void accept(EventVisitor eventVisitor);
 }

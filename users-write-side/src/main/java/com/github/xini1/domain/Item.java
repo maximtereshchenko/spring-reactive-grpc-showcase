@@ -3,15 +3,12 @@ package com.github.xini1.domain;
 import com.github.xini1.exception.ItemHasNotBeenCreated;
 import com.github.xini1.exception.ItemIsAlreadyActive;
 import com.github.xini1.exception.ItemIsAlreadyDeactivated;
-import com.github.xini1.usecase.EventVisitor;
 import com.github.xini1.usecase.Identifiers;
 import com.github.xini1.usecase.ItemActivated;
-import com.github.xini1.usecase.ItemAddedToCart;
 import com.github.xini1.usecase.ItemCreated;
 import com.github.xini1.usecase.ItemDeactivated;
 import com.github.xini1.usecase.ItemEvent;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -19,14 +16,19 @@ import java.util.UUID;
 /**
  * @author Maxim Tereshchenko
  */
-final class Item {
+final class Item extends AggregateRoot {
 
-    private final List<ItemEvent> newEvents = new ArrayList<>();
     private State state = new Initial();
+
+    Item() {
+        register(ItemCreated.class, this::onEvent);
+        register(ItemDeactivated.class, this::onEvent);
+        register(ItemActivated.class, this::onEvent);
+    }
 
     static Item create(UUID userId, String name, Identifiers identifiers) {
         var item = new Item();
-        new EventHandler(item).visit(new ItemCreated(userId, identifiers.newIdentifier(), name));
+        item.apply(new ItemCreated(userId, identifiers.newIdentifier(), name));
         return item;
     }
 
@@ -35,9 +37,8 @@ final class Item {
             return Optional.empty();
         }
         var item = new Item();
-        var eventHandler = new EventHandler(item);
-        events.forEach(event -> event.accept(eventHandler));
-        item.newEvents.clear();
+        events.forEach(item::apply);
+        item.clearEvents();
         return Optional.of(item);
     }
 
@@ -46,30 +47,38 @@ final class Item {
     }
 
     void deactivate(UUID userId) {
-        state.deactivate();
-        new EventHandler(this).visit(new ItemDeactivated(userId, state.id()));
+        state.onDeactivation();
+        apply(new ItemDeactivated(userId, state.id()));
     }
 
     void activate(UUID userId) {
-        state.activate();
-        new EventHandler(this).visit(new ItemActivated(userId, state.id()));
+        state.onActivation();
+        apply(new ItemActivated(userId, state.id()));
     }
 
     boolean isDeactivated() {
         return state.isDeactivated();
     }
 
-    List<ItemEvent> newEvents() {
-        return List.copyOf(newEvents);
+    private void onEvent(ItemCreated itemCreated) {
+        state = new Active(itemCreated.itemId());
+    }
+
+    private void onEvent(ItemDeactivated itemDeactivated) {
+        state = new Deactivated(itemDeactivated.itemId());
+    }
+
+    private void onEvent(ItemActivated itemActivated) {
+        state = new Active(itemActivated.itemId());
     }
 
     private interface State {
 
         UUID id();
 
-        void activate();
+        void onActivation();
 
-        void deactivate();
+        void onDeactivation();
 
         boolean isDeactivated();
     }
@@ -82,12 +91,12 @@ final class Item {
         }
 
         @Override
-        public void activate() {
+        public void onActivation() {
             throw new ItemHasNotBeenCreated();
         }
 
         @Override
-        public void deactivate() {
+        public void onDeactivation() {
             throw new ItemHasNotBeenCreated();
         }
 
@@ -111,12 +120,12 @@ final class Item {
         }
 
         @Override
-        public void activate() {
+        public void onActivation() {
             throw new ItemIsAlreadyActive();
         }
 
         @Override
-        public void deactivate() {
+        public void onDeactivation() {
             //empty
         }
 
@@ -140,50 +149,18 @@ final class Item {
         }
 
         @Override
-        public void activate() {
+        public void onActivation() {
             //empty
         }
 
         @Override
-        public void deactivate() {
+        public void onDeactivation() {
             throw new ItemIsAlreadyDeactivated();
         }
 
         @Override
         public boolean isDeactivated() {
             return true;
-        }
-    }
-
-    private static final class EventHandler implements EventVisitor {
-
-        private final Item item;
-
-        EventHandler(Item item) {
-            this.item = item;
-        }
-
-        @Override
-        public void visit(ItemCreated itemCreated) {
-            item.state = new Active(itemCreated.itemId());
-            item.newEvents.add(itemCreated);
-        }
-
-        @Override
-        public void visit(ItemDeactivated itemDeactivated) {
-            item.state = new Deactivated(itemDeactivated.itemId());
-            item.newEvents.add(itemDeactivated);
-        }
-
-        @Override
-        public void visit(ItemActivated itemActivated) {
-            item.state = new Active(itemActivated.itemId());
-            item.newEvents.add(itemActivated);
-        }
-
-        @Override
-        public void visit(ItemAddedToCart itemAddedToCart) {
-            //empty
         }
     }
 }

@@ -16,7 +16,7 @@ abstract class AggregateRoot {
     private final List<Event> newEvents = new ArrayList<>();
     private final Map<Class<? extends Event>, Consumer<Event>> handlers = new HashMap<>();
 
-    <T extends Event> void addHandler(Class<T> eventType, Consumer<T> handler) {
+    <T extends Event> void register(Class<T> eventType, Consumer<T> handler) {
         handlers.put(eventType, event -> handler.accept(eventType.cast(event)));
     }
 

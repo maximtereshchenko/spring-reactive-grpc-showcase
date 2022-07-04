@@ -50,9 +50,4 @@ public final class ItemCreated implements ItemEvent {
     public UUID itemId() {
         return itemId;
     }
-
-    @Override
-    public void accept(EventVisitor eventVisitor) {
-        eventVisitor.visit(this);
-    }
 }
