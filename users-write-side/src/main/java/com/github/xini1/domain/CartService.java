@@ -1,5 +1,6 @@
 package com.github.xini1.domain;
 
+import com.github.xini1.exception.ItemIsNotFound;
 import com.github.xini1.exception.UserIsNotRegular;
 import com.github.xini1.usecase.AddItemToCartUseCase;
 import com.github.xini1.usecase.OrderItemsInCartUseCase;
@@ -28,7 +29,7 @@ final class CartService implements AddItemToCartUseCase, OrderItemsInCartUseCase
         var cart = carts.find(userId);
         cart.add(
                 items.find(itemId)
-                        .orElseThrow()
+                        .orElseThrow(ItemIsNotFound::new)
         );
         carts.save(cart);
     }
