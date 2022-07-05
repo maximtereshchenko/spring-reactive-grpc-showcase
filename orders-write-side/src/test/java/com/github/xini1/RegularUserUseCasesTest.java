@@ -163,4 +163,14 @@ final class RegularUserUseCasesTest {
 
         assertThat(eventStore.events()).isEmpty();
     }
+
+    @Test
+    void givenItemDoNotExist_whenRemoveItemFromCart_thenItemIsNotFoundThrown() {
+        var useCase = module.removeItemFromCartUseCase();
+
+        assertThatThrownBy(() -> useCase.remove(userId, User.REGULAR, nonExistentItemId, 1))
+                .isInstanceOf(ItemIsNotFound.class);
+
+        assertThat(eventStore.events()).isEmpty();
+    }
 }
