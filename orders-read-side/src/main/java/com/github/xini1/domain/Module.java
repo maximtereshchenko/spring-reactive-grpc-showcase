@@ -7,7 +7,13 @@ import com.github.xini1.usecase.ViewCartUseCase;
  */
 public final class Module {
 
+    private final ViewService viewService;
+
+    public Module() {
+        viewService = new ViewService();
+    }
+
     public ViewCartUseCase viewCartUseCase() {
-        return null;
+        return viewService;
     }
 }
