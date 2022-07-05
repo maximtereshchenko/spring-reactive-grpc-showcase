@@ -1,6 +1,7 @@
 package com.github.xini1.domain;
 
 import com.github.xini1.event.cart.ItemAddedToCart;
+import com.github.xini1.event.cart.ItemRemovedFromCart;
 import com.github.xini1.event.cart.ItemsOrdered;
 import com.github.xini1.exception.CartHasDeactivatedItem;
 import com.github.xini1.exception.CartIsEmpty;
@@ -11,6 +12,7 @@ import com.github.xini1.port.EventStore;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -24,6 +26,7 @@ final class Cart extends AggregateRoot {
         super(userId);
         register(ItemAddedToCart.class, this::onEvent);
         register(ItemsOrdered.class, this::onEvent);
+        register(ItemRemovedFromCart.class, this::onEvent);
     }
 
     static Cart fromEvents(UUID userId, EventStore eventStore) {
@@ -51,6 +54,7 @@ final class Cart extends AggregateRoot {
         if (quantity > items.getOrDefault(item.id(), 0)) {
             throw new QuantityIsMoreThanCartHas();
         }
+        apply(new ItemRemovedFromCart(nextVersion(), id(), item.id(), quantity));
     }
 
     void order(EventStore eventStore) {
@@ -70,10 +74,6 @@ final class Cart extends AggregateRoot {
                 .anyMatch(Item::isDeactivated);
     }
 
-    private void onEvent(ItemAddedToCart itemAddedToCart) {
-        items.compute(itemAddedToCart.itemId(), (id, oldQuantity) -> sum(oldQuantity, itemAddedToCart.quantity()));
-    }
-
     private Integer sum(Integer oldQuantity, int quantity) {
         if (oldQuantity == null) {
             return quantity;
@@ -83,5 +83,16 @@ final class Cart extends AggregateRoot {
 
     private void onEvent(ItemsOrdered itemsOrdered) {
         items.clear();
+    }
+
+    private void onEvent(ItemAddedToCart itemAddedToCart) {
+        items.compute(itemAddedToCart.itemId(), (id, oldQuantity) -> sum(oldQuantity, itemAddedToCart.quantity()));
+    }
+
+    private void onEvent(ItemRemovedFromCart itemRemovedFromCart) {
+        items.compute(
+                itemRemovedFromCart.itemId(),
+                (id, oldQuantity) -> Objects.requireNonNull(oldQuantity) - itemRemovedFromCart.quantity()
+        );
     }
 }

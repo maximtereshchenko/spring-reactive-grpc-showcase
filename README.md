@@ -29,7 +29,8 @@ Kafka and MongoDB were chosen mostly of their reactive driver support.
 2) Admin can deactivate active item.
 3) Admin can activate deactivated item.
 4) Regular user can add active item to cart.
-5) Regular user can order items in cart, if it contains any.
+5) Regular user can remove item from cart.
+6) Regular user can order items in cart, if it contains any.
 
 # What have I learnt?
 
