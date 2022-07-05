@@ -1,5 +1,6 @@
 package com.github.xini1.domain;
 
+import com.github.xini1.port.ViewStore;
 import com.github.xini1.usecase.OnItemAddedToCartEventUseCase;
 import com.github.xini1.usecase.OnItemCreatedEventUseCase;
 import com.github.xini1.usecase.ViewCartUseCase;
@@ -12,9 +13,9 @@ public final class Module {
     private final ViewService viewService;
     private final UpdateService updateService;
 
-    public Module() {
-        viewService = new ViewService();
-        updateService = new UpdateService();
+    public Module(ViewStore viewStore) {
+        viewService = new ViewService(viewStore);
+        updateService = new UpdateService(viewStore);
     }
 
     public ViewCartUseCase viewCartUseCase() {

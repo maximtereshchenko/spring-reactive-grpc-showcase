@@ -17,6 +17,10 @@ public final class ItemCreated extends ItemEvent {
         this.name = name;
     }
 
+    public String name() {
+        return name;
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), userId, name);
