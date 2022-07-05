@@ -5,6 +5,7 @@ import com.github.xini1.event.cart.ItemsOrdered;
 import com.github.xini1.exception.CartHasDeactivatedItem;
 import com.github.xini1.exception.CartIsEmpty;
 import com.github.xini1.exception.CouldNotAddDeactivatedItemToCart;
+import com.github.xini1.exception.QuantityIsNotPositive;
 import com.github.xini1.port.EventStore;
 
 import java.util.HashMap;
@@ -35,6 +36,9 @@ final class Cart extends AggregateRoot {
     void add(Item item, int quantity) {
         if (item.isDeactivated()) {
             throw new CouldNotAddDeactivatedItemToCart();
+        }
+        if (quantity < 1) {
+            throw new QuantityIsNotPositive();
         }
         apply(new ItemAddedToCart(nextVersion(), id(), item.id(), quantity));
     }
