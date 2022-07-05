@@ -12,6 +12,7 @@ import com.github.xini1.exception.CartHasDeactivatedItem;
 import com.github.xini1.exception.CartIsEmpty;
 import com.github.xini1.exception.CouldNotAddDeactivatedItemToCart;
 import com.github.xini1.exception.ItemIsNotFound;
+import com.github.xini1.exception.QuantityIsMoreThanCartHas;
 import com.github.xini1.exception.QuantityIsNotPositive;
 import com.github.xini1.exception.UserIsNotRegular;
 import com.github.xini1.usecase.User;
@@ -51,7 +52,7 @@ final class RegularUserUseCasesTest {
     }
 
     @Test
-    void givenQuantityLessThan1_whenAddItemToCart_thenQuantityIsNotPositiveThrown() {
+    void givenQuantityIsLessThan1_whenAddItemToCart_thenQuantityIsNotPositiveThrown() {
         var itemId = module.createItemUseCase()
                 .create(userId, User.ADMIN, "item");
         var useCase = module.addItemToCartUseCase();
@@ -175,7 +176,7 @@ final class RegularUserUseCasesTest {
     }
 
     @Test
-    void givenQuantityLessThan1_whenRemoveItemFromCart_thenQuantityIsNotPositiveThrown() {
+    void givenQuantityIsLessThan1_whenRemoveItemFromCart_thenQuantityIsNotPositiveThrown() {
         var itemId = module.createItemUseCase()
                 .create(userId, User.ADMIN, "item");
         var useCase = module.removeItemFromCartUseCase();
@@ -184,5 +185,23 @@ final class RegularUserUseCasesTest {
                 .isInstanceOf(QuantityIsNotPositive.class);
 
         assertThat(eventStore.events()).containsExactly(new ItemCreated(1, userId, itemId, "item"));
+    }
+
+    @Test
+    void givenQuantityIsMoreThanCartHas_whenRemoveItemFromCart_thenQuantityIsMoreThanCartHasThrown() {
+        var itemId = module.createItemUseCase()
+                .create(userId, User.ADMIN, "item");
+        module.addItemToCartUseCase()
+                .add(userId, User.REGULAR, itemId, 1);
+        var useCase = module.removeItemFromCartUseCase();
+
+        assertThatThrownBy(() -> useCase.remove(userId, User.REGULAR, itemId, 2))
+                .isInstanceOf(QuantityIsMoreThanCartHas.class);
+
+        assertThat(eventStore.events())
+                .containsExactly(
+                        new ItemCreated(1, userId, itemId, "item"),
+                        new ItemAddedToCart(1, userId, itemId, 1)
+                );
     }
 }
