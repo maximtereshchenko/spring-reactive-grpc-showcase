@@ -2,6 +2,7 @@ package com.github.xini1.domain;
 
 import com.github.xini1.event.cart.ItemAddedToCart;
 import com.github.xini1.event.cart.ItemsOrdered;
+import com.github.xini1.exception.CartHasDeactivatedItem;
 import com.github.xini1.exception.CartIsEmpty;
 import com.github.xini1.exception.CouldNotAddDeactivatedItemToCart;
 import com.github.xini1.port.EventStore;
@@ -38,11 +39,20 @@ final class Cart extends AggregateRoot {
         apply(new ItemAddedToCart(nextVersion(), id(), item.id()));
     }
 
-    void order() {
+    void order(EventStore eventStore) {
         if (items.isEmpty()) {
             throw new CartIsEmpty();
         }
+        if (hasDeactivatedItem(eventStore)) {
+            throw new CartHasDeactivatedItem();
+        }
         apply(new ItemsOrdered(nextVersion(), id(), items));
+    }
+
+    private boolean hasDeactivatedItem(EventStore eventStore) {
+        return items.stream()
+                .map(id -> Item.fromEvents(id, eventStore))
+                .anyMatch(Item::isDeactivated);
     }
 
     private void onEvent(ItemAddedToCart itemAddedToCart) {
