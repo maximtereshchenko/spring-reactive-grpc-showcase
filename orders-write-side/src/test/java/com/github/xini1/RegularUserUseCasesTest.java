@@ -12,6 +12,7 @@ import com.github.xini1.exception.CartHasDeactivatedItem;
 import com.github.xini1.exception.CartIsEmpty;
 import com.github.xini1.exception.CouldNotAddDeactivatedItemToCart;
 import com.github.xini1.exception.ItemIsNotFound;
+import com.github.xini1.exception.QuantityIsNotPositive;
 import com.github.xini1.exception.UserIsNotRegular;
 import com.github.xini1.usecase.User;
 import org.junit.jupiter.api.Test;
@@ -47,6 +48,18 @@ final class RegularUserUseCasesTest {
                 .isInstanceOf(ItemIsNotFound.class);
 
         assertThat(eventStore.events()).isEmpty();
+    }
+
+    @Test
+    void givenQuantityLessThan1_whenAddItemToCart_thenQuantityIsNotPositiveThrown() {
+        var itemId = module.createItemUseCase()
+                .create(userId, User.ADMIN, "item");
+        var useCase = module.addItemToCartUseCase();
+
+        assertThatThrownBy(() -> useCase.add(userId, User.REGULAR, itemId, -1))
+                .isInstanceOf(QuantityIsNotPositive.class);
+
+        assertThat(eventStore.events()).containsExactly(new ItemCreated(1, userId, itemId, "item"));
     }
 
     @Test
