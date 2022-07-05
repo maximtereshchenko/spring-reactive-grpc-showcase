@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.github.xini1.domain.Module;
 import com.github.xini1.event.cart.ItemAddedToCart;
+import com.github.xini1.event.cart.ItemRemovedFromCart;
 import com.github.xini1.event.cart.ItemsOrdered;
 import com.github.xini1.event.item.ItemCreated;
 import com.github.xini1.event.item.ItemDeactivated;
@@ -202,6 +203,23 @@ final class RegularUserUseCasesTest {
                 .containsExactly(
                         new ItemCreated(1, userId, itemId, "item"),
                         new ItemAddedToCart(1, userId, itemId, 1)
+                );
+    }
+
+    @Test
+    void givenQuantityIsLessOrEqualThanCartHas_whenRemoveItemFromCart_thenItemRemovedFromCartEventPublished() {
+        var itemId = module.createItemUseCase()
+                .create(userId, User.ADMIN, "item");
+        module.addItemToCartUseCase()
+                .add(userId, User.REGULAR, itemId, 2);
+        module.removeItemFromCartUseCase()
+                .remove(userId, User.REGULAR, itemId, 1);
+
+        assertThat(eventStore.events())
+                .containsExactly(
+                        new ItemCreated(1, userId, itemId, "item"),
+                        new ItemAddedToCart(1, userId, itemId, 2),
+                        new ItemRemovedFromCart(1, userId, itemId, 1)
                 );
     }
 }
