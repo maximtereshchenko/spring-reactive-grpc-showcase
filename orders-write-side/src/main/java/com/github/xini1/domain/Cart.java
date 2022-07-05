@@ -44,7 +44,9 @@ final class Cart extends AggregateRoot {
     }
 
     void remove(Item item, int quantity) {
-
+        if (quantity < 1) {
+            throw new QuantityIsNotPositive();
+        }
     }
 
     void order(EventStore eventStore) {
