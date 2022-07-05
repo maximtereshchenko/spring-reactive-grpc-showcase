@@ -11,7 +11,7 @@ import java.util.UUID;
  */
 public interface ViewCartUseCase {
 
-    CartView view(UUID userId, User regular);
+    CartView view(UUID userId, User user);
 
     final class CartView {
         private final Set<ItemView> itemViews;
