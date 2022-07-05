@@ -20,12 +20,12 @@ final class CartService implements AddItemToCartUseCase, OrderItemsInCartUseCase
     }
 
     @Override
-    public void add(UUID userId, User user, UUID itemId) {
+    public void add(UUID userId, User user, UUID itemId, int quantity) {
         if (user != User.REGULAR) {
             throw new UserIsNotRegular();
         }
         var cart = Cart.fromEvents(userId, eventStore);
-        cart.add(Item.fromEvents(itemId, eventStore));
+        cart.add(Item.fromEvents(itemId, eventStore), quantity);
         cart.save(eventStore);
     }
 

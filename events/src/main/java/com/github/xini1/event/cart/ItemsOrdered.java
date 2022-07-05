@@ -1,7 +1,7 @@
 package com.github.xini1.event.cart;
 
+import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -9,11 +9,11 @@ import java.util.UUID;
  */
 public final class ItemsOrdered extends CartEvent {
 
-    private final Set<UUID> items;
+    private final Map<UUID, Integer> items;
 
-    public ItemsOrdered(long version, UUID userId, Set<UUID> items) {
+    public ItemsOrdered(long version, UUID userId, Map<UUID, Integer> items) {
         super(version, userId);
-        this.items = Set.copyOf(items);
+        this.items = Map.copyOf(items);
     }
 
     @Override

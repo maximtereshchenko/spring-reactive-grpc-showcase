@@ -16,7 +16,7 @@ import com.github.xini1.exception.UserIsNotRegular;
 import com.github.xini1.usecase.User;
 import org.junit.jupiter.api.Test;
 
-import java.util.Set;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -33,7 +33,7 @@ final class RegularUserUseCasesTest {
     void givenUserIsAdmin_whenAddItemToCart_thenUserIsNotRegularThrown() {
         var useCase = module.addItemToCartUseCase();
 
-        assertThatThrownBy(() -> useCase.add(userId, User.ADMIN, nonExistentItemId))
+        assertThatThrownBy(() -> useCase.add(userId, User.ADMIN, nonExistentItemId, 1))
                 .isInstanceOf(UserIsNotRegular.class);
 
         assertThat(eventStore.events()).isEmpty();
@@ -43,7 +43,7 @@ final class RegularUserUseCasesTest {
     void givenItemDoNotExist_whenAddItemToCart_thenItemIsNotFoundThrown() {
         var useCase = module.addItemToCartUseCase();
 
-        assertThatThrownBy(() -> useCase.add(userId, User.REGULAR, nonExistentItemId))
+        assertThatThrownBy(() -> useCase.add(userId, User.REGULAR, nonExistentItemId, 1))
                 .isInstanceOf(ItemIsNotFound.class);
 
         assertThat(eventStore.events()).isEmpty();
@@ -57,7 +57,7 @@ final class RegularUserUseCasesTest {
                 .deactivate(userId, User.ADMIN, itemId);
         var useCase = module.addItemToCartUseCase();
 
-        assertThatThrownBy(() -> useCase.add(userId, User.REGULAR, itemId))
+        assertThatThrownBy(() -> useCase.add(userId, User.REGULAR, itemId, 1))
                 .isInstanceOf(CouldNotAddDeactivatedItemToCart.class);
 
         assertThat(eventStore.events())
@@ -73,12 +73,12 @@ final class RegularUserUseCasesTest {
                 .create(userId, User.ADMIN, "item");
 
         module.addItemToCartUseCase()
-                .add(userId, User.REGULAR, itemId);
+                .add(userId, User.REGULAR, itemId, 1);
 
         assertThat(eventStore.events())
                 .containsExactly(
                         new ItemCreated(1, userId, itemId, "item"),
-                        new ItemAddedToCart(1, userId, itemId)
+                        new ItemAddedToCart(1, userId, itemId, 1)
                 );
     }
 
@@ -107,7 +107,7 @@ final class RegularUserUseCasesTest {
         var itemId = module.createItemUseCase()
                 .create(userId, User.ADMIN, "item");
         module.addItemToCartUseCase()
-                .add(userId, User.REGULAR, itemId);
+                .add(userId, User.REGULAR, itemId, 1);
 
         module.orderItemsInCartUseCase()
                 .order(userId, User.REGULAR);
@@ -115,8 +115,8 @@ final class RegularUserUseCasesTest {
         assertThat(eventStore.events())
                 .containsExactly(
                         new ItemCreated(1, userId, itemId, "item"),
-                        new ItemAddedToCart(1, userId, itemId),
-                        new ItemsOrdered(2, userId, Set.of(itemId))
+                        new ItemAddedToCart(1, userId, itemId, 1),
+                        new ItemsOrdered(2, userId, Map.of(itemId, 1))
                 );
     }
 
@@ -125,7 +125,7 @@ final class RegularUserUseCasesTest {
         var itemId = module.createItemUseCase()
                 .create(userId, User.ADMIN, "item");
         module.addItemToCartUseCase()
-                .add(userId, User.REGULAR, itemId);
+                .add(userId, User.REGULAR, itemId, 1);
         module.deactivateItemUseCase()
                 .deactivate(userId, User.ADMIN, itemId);
         var useCase = module.orderItemsInCartUseCase();
@@ -136,7 +136,7 @@ final class RegularUserUseCasesTest {
         assertThat(eventStore.events())
                 .containsExactly(
                         new ItemCreated(1, userId, itemId, "item"),
-                        new ItemAddedToCart(1, userId, itemId),
+                        new ItemAddedToCart(1, userId, itemId, 1),
                         new ItemDeactivated(2, userId, itemId)
                 );
     }

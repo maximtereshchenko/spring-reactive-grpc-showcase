@@ -7,8 +7,8 @@ import com.github.xini1.exception.CartIsEmpty;
 import com.github.xini1.exception.CouldNotAddDeactivatedItemToCart;
 import com.github.xini1.port.EventStore;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -16,7 +16,7 @@ import java.util.UUID;
  */
 final class Cart extends AggregateRoot {
 
-    private final Set<UUID> items = new HashSet<>();
+    private final Map<UUID, Integer> items = new HashMap<>();
 
     Cart(UUID userId) {
         super(userId);
@@ -32,11 +32,11 @@ final class Cart extends AggregateRoot {
         return cart;
     }
 
-    void add(Item item) {
+    void add(Item item, int quantity) {
         if (item.isDeactivated()) {
             throw new CouldNotAddDeactivatedItemToCart();
         }
-        apply(new ItemAddedToCart(nextVersion(), id(), item.id()));
+        apply(new ItemAddedToCart(nextVersion(), id(), item.id(), quantity));
     }
 
     void order(EventStore eventStore) {
@@ -50,13 +50,21 @@ final class Cart extends AggregateRoot {
     }
 
     private boolean hasDeactivatedItem(EventStore eventStore) {
-        return items.stream()
+        return items.keySet()
+                .stream()
                 .map(id -> Item.fromEvents(id, eventStore))
                 .anyMatch(Item::isDeactivated);
     }
 
     private void onEvent(ItemAddedToCart itemAddedToCart) {
-        items.add(itemAddedToCart.itemId());
+        items.compute(itemAddedToCart.itemId(), (id, oldQuantity) -> sum(oldQuantity, itemAddedToCart.quantity()));
+    }
+
+    private Integer sum(Integer oldQuantity, int quantity) {
+        if (oldQuantity == null) {
+            return quantity;
+        }
+        return oldQuantity + quantity;
     }
 
     private void onEvent(ItemsOrdered itemsOrdered) {

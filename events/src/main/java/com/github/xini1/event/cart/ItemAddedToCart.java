@@ -9,19 +9,25 @@ import java.util.UUID;
 public final class ItemAddedToCart extends CartEvent {
 
     private final UUID itemId;
+    private final int quantity;
 
-    public ItemAddedToCart(long version, UUID userId, UUID itemId) {
+    public ItemAddedToCart(long version, UUID userId, UUID itemId, int quantity) {
         super(version, userId);
         this.itemId = itemId;
+        this.quantity = quantity;
     }
 
     public UUID itemId() {
         return itemId;
     }
 
+    public int quantity() {
+        return quantity;
+    }
+
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), itemId);
+        return Objects.hash(super.hashCode(), itemId, quantity);
     }
 
     @Override
@@ -36,13 +42,15 @@ public final class ItemAddedToCart extends CartEvent {
             return false;
         }
         var that = (ItemAddedToCart) object;
-        return Objects.equals(itemId, that.itemId);
+        return quantity == that.quantity &&
+                Objects.equals(itemId, that.itemId);
     }
 
     @Override
     public String toString() {
         return "ItemAddedToCart{" +
                 "itemId=" + itemId +
+                ", quantity=" + quantity +
                 "} " + super.toString();
     }
 }
