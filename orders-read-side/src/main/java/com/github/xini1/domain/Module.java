@@ -1,5 +1,7 @@
 package com.github.xini1.domain;
 
+import com.github.xini1.usecase.OnItemAddedToCartEventUseCase;
+import com.github.xini1.usecase.OnItemCreatedEventUseCase;
 import com.github.xini1.usecase.ViewCartUseCase;
 
 /**
@@ -15,5 +17,13 @@ public final class Module {
 
     public ViewCartUseCase viewCartUseCase() {
         return viewService;
+    }
+
+    public OnItemCreatedEventUseCase onItemCreatedEventUseCase() {
+        return null;
+    }
+
+    public OnItemAddedToCartEventUseCase onItemAddedToCartEventUseCase() {
+        return null;
     }
 }
