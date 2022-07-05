@@ -42,6 +42,6 @@ public final class Module {
     }
 
     public RemoveItemFromCartUseCase removeItemFromCartUseCase() {
-        return null;
+        return cartService;
     }
 }

@@ -4,6 +4,7 @@ import com.github.xini1.exception.UserIsNotRegular;
 import com.github.xini1.port.EventStore;
 import com.github.xini1.usecase.AddItemToCartUseCase;
 import com.github.xini1.usecase.OrderItemsInCartUseCase;
+import com.github.xini1.usecase.RemoveItemFromCartUseCase;
 import com.github.xini1.usecase.User;
 
 import java.util.UUID;
@@ -11,7 +12,7 @@ import java.util.UUID;
 /**
  * @author Maxim Tereshchenko
  */
-final class CartService implements AddItemToCartUseCase, OrderItemsInCartUseCase {
+final class CartService implements AddItemToCartUseCase, OrderItemsInCartUseCase, RemoveItemFromCartUseCase {
 
     private final EventStore eventStore;
 
@@ -37,5 +38,12 @@ final class CartService implements AddItemToCartUseCase, OrderItemsInCartUseCase
         var cart = Cart.fromEvents(userId, eventStore);
         cart.order(eventStore);
         cart.save(eventStore);
+    }
+
+    @Override
+    public void remove(UUID userId, User user, UUID itemId, int quantity) {
+        if (user != User.REGULAR) {
+            throw new UserIsNotRegular();
+        }
     }
 }
