@@ -8,6 +8,7 @@ import com.github.xini1.event.cart.ItemAddedToCart;
 import com.github.xini1.event.cart.ItemsOrdered;
 import com.github.xini1.event.item.ItemCreated;
 import com.github.xini1.event.item.ItemDeactivated;
+import com.github.xini1.exception.CartHasDeactivatedItem;
 import com.github.xini1.exception.CartIsEmpty;
 import com.github.xini1.exception.CouldNotAddDeactivatedItemToCart;
 import com.github.xini1.exception.ItemIsNotFound;
@@ -116,6 +117,27 @@ final class RegularUserUseCasesTest {
                         new ItemCreated(1, userId, itemId, "item"),
                         new ItemAddedToCart(1, userId, itemId),
                         new ItemsOrdered(2, userId, Set.of(itemId))
+                );
+    }
+
+    @Test
+    void givenCartHasDeactivatedItem_whenOrderItemsInCart_thenCartHasDeactivatedItemThrown() {
+        var itemId = module.createItemUseCase()
+                .create(userId, User.ADMIN, "item");
+        module.addItemToCartUseCase()
+                .add(userId, User.REGULAR, itemId);
+        module.deactivateItemUseCase()
+                .deactivate(userId, User.ADMIN, itemId);
+        var useCase = module.orderItemsInCartUseCase();
+
+        assertThatThrownBy(() -> useCase.order(userId, User.REGULAR))
+                .isInstanceOf(CartHasDeactivatedItem.class);
+
+        assertThat(eventStore.events())
+                .containsExactly(
+                        new ItemCreated(1, userId, itemId, "item"),
+                        new ItemAddedToCart(1, userId, itemId),
+                        new ItemDeactivated(2, userId, itemId)
                 );
     }
 }
