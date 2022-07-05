@@ -43,6 +43,10 @@ final class Cart extends AggregateRoot {
         apply(new ItemAddedToCart(nextVersion(), id(), item.id(), quantity));
     }
 
+    void remove(Item item, int quantity) {
+
+    }
+
     void order(EventStore eventStore) {
         if (items.isEmpty()) {
             throw new CartIsEmpty();

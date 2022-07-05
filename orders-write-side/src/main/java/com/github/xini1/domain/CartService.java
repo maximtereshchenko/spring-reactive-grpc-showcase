@@ -45,5 +45,8 @@ final class CartService implements AddItemToCartUseCase, OrderItemsInCartUseCase
         if (user != User.REGULAR) {
             throw new UserIsNotRegular();
         }
+        var cart = Cart.fromEvents(userId, eventStore);
+        cart.remove(Item.fromEvents(itemId, eventStore), quantity);
+        cart.save(eventStore);
     }
 }
