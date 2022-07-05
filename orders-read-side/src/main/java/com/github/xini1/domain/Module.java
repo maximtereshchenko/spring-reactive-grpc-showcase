@@ -10,9 +10,11 @@ import com.github.xini1.usecase.ViewCartUseCase;
 public final class Module {
 
     private final ViewService viewService;
+    private final UpdateService updateService;
 
     public Module() {
         viewService = new ViewService();
+        updateService = new UpdateService();
     }
 
     public ViewCartUseCase viewCartUseCase() {
@@ -20,10 +22,10 @@ public final class Module {
     }
 
     public OnItemCreatedEventUseCase onItemCreatedEventUseCase() {
-        return null;
+        return updateService;
     }
 
     public OnItemAddedToCartEventUseCase onItemAddedToCartEventUseCase() {
-        return null;
+        return updateService;
     }
 }
