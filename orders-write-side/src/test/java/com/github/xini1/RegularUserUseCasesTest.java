@@ -153,4 +153,14 @@ final class RegularUserUseCasesTest {
                         new ItemDeactivated(2, userId, itemId)
                 );
     }
+
+    @Test
+    void givenUserIsAdmin_whenRemoveItemFromCart_thenUserIsNotRegularThrown() {
+        var useCase = module.removeItemFromCartUseCase();
+
+        assertThatThrownBy(() -> useCase.remove(userId, User.ADMIN, nonExistentItemId, 1))
+                .isInstanceOf(UserIsNotRegular.class);
+
+        assertThat(eventStore.events()).isEmpty();
+    }
 }
