@@ -173,4 +173,16 @@ final class RegularUserUseCasesTest {
 
         assertThat(eventStore.events()).isEmpty();
     }
+
+    @Test
+    void givenQuantityLessThan1_whenRemoveItemFromCart_thenQuantityIsNotPositiveThrown() {
+        var itemId = module.createItemUseCase()
+                .create(userId, User.ADMIN, "item");
+        var useCase = module.removeItemFromCartUseCase();
+
+        assertThatThrownBy(() -> useCase.remove(userId, User.REGULAR, itemId, -1))
+                .isInstanceOf(QuantityIsNotPositive.class);
+
+        assertThat(eventStore.events()).containsExactly(new ItemCreated(1, userId, itemId, "item"));
+    }
 }
