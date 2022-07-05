@@ -11,7 +11,6 @@ import com.github.xini1.exception.ItemIsAlreadyActive;
 import com.github.xini1.exception.ItemIsAlreadyDeactivated;
 import com.github.xini1.exception.ItemIsNotFound;
 import com.github.xini1.exception.UserIsNotAdmin;
-import com.github.xini1.usecase.User;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;

@@ -1,11 +1,11 @@
 package com.github.xini1.domain;
 
+import com.github.xini1.User;
 import com.github.xini1.exception.UserIsNotAdmin;
 import com.github.xini1.port.EventStore;
 import com.github.xini1.usecase.ActivateItemUseCase;
 import com.github.xini1.usecase.CreateItemUseCase;
 import com.github.xini1.usecase.DeactivateItemUseCase;
-import com.github.xini1.usecase.User;
 
 import java.util.UUID;
 

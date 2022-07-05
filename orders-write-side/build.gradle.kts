@@ -1,5 +1,5 @@
 dependencies {
-    implementation(project("::events"))
+    implementation(project("::common"))
 
     testCompileOnly(libs.junit.jupiter.api)
     testRuntimeOnly(libs.junit.jupiter.engine)

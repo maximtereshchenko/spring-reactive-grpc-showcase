@@ -1,4 +1,4 @@
-package com.github.xini1.usecase;
+package com.github.xini1;
 
 /**
  * @author Maxim Tereshchenko

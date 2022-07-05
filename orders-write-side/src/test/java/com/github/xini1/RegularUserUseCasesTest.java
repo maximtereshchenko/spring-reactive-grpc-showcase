@@ -16,7 +16,6 @@ import com.github.xini1.exception.ItemIsNotFound;
 import com.github.xini1.exception.QuantityIsMoreThanCartHas;
 import com.github.xini1.exception.QuantityIsNotPositive;
 import com.github.xini1.exception.UserIsNotRegular;
-import com.github.xini1.usecase.User;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;

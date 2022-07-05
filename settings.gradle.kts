@@ -1,6 +1,6 @@
 rootProject.name = "spring-reactive-grpc-showcase"
 
-include("events")
+include("common")
 include("orders-write-side")
 include("orders-read-side")
 
