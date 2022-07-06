@@ -2,7 +2,7 @@ package com.github.xini1.view;
 
 import com.github.xini1.domain.Item;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -59,18 +59,17 @@ public final class Cart {
     }
 
     public Cart with(Item item, int quantity) {
-        var found = itemsInCart.stream()
-                .filter(itemInCart -> itemInCart.equalTo(item))
-                .findAny();
-        var copy = new HashSet<>(itemsInCart);
-        if (found.isPresent()) {
-            var itemInCart = found.get();
-            copy.remove(itemInCart);
-            copy.add(itemInCart.addQuantity(quantity));
+        var itemInCart = new ItemInCart(item, quantity);
+        var copy = new ArrayList<>(itemsInCart);
+        var index = copy.indexOf(itemInCart);
+
+        if (index == -1) {
+            copy.add(itemInCart);
         } else {
-            copy.add(new ItemInCart(item, quantity));
+            copy.set(index, itemInCart.addQuantity(copy.get(index).quantity));
         }
-        return new Cart(userId, copy);
+
+        return new Cart(userId, Set.copyOf(copy));
     }
 
     public static final class ItemInCart {
@@ -109,7 +108,7 @@ public final class Cart {
 
         @Override
         public String toString() {
-            return "Item{" +
+            return "ItemInCart{" +
                     "id=" + id +
                     ", name='" + name + '\'' +
                     ", quantity=" + quantity +
@@ -118,11 +117,6 @@ public final class Cart {
 
         private ItemInCart addQuantity(int quantity) {
             return new ItemInCart(id, name, this.quantity + quantity);
-        }
-
-        private boolean equalTo(Item item) {
-            return Objects.equals(id, item.getId()) &&
-                    Objects.equals(name, item.getName());
         }
     }
 }
