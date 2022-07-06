@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.github.xini1.domain.Module;
+import com.github.xini1.event.cart.ItemAddedToCart;
+import com.github.xini1.event.cart.ItemsOrdered;
 import com.github.xini1.event.item.ItemCreated;
 import com.github.xini1.exception.UserIsNotAdmin;
 import com.github.xini1.view.TopOrderedItem;
@@ -38,5 +40,15 @@ final class ViewTopOrderedItemsUseCaseTest {
 
         assertThat(module.viewTopOrderedItemsUseCase().view(User.ADMIN))
                 .containsExactly(new TopOrderedItem(itemId, "item", 0));
+    }
+
+    @Test
+    void givenItemsOrderedEvent_whenViewTopOrderedItems_thenThatItemsHaveCorrectTimesOrdered() {
+        module.onItemCreatedEventUseCase().onEvent(new ItemCreated(1, userId, itemId, "item"));
+        module.onItemAddedToCartEventUseCase().onEvent(new ItemAddedToCart(1, userId, itemId, 1));
+        module.onItemsOrderedEventUseCase().onEvent(new ItemsOrdered(2, userId));
+
+        assertThat(module.viewTopOrderedItemsUseCase().view(User.ADMIN))
+                .containsExactly(new TopOrderedItem(itemId, "item", 1));
     }
 }
