@@ -31,6 +31,6 @@ final class ViewService implements ViewCartUseCase, ViewItemsUseCase {
 
     @Override
     public Iterable<Item> view() {
-        return viewStore.items();
+        return viewStore.findAllItems();
     }
 }

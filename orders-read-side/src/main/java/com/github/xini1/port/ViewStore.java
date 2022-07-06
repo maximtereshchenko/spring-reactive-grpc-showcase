@@ -3,6 +3,7 @@ package com.github.xini1.port;
 import com.github.xini1.view.Cart;
 import com.github.xini1.view.Item;
 
+import java.util.Collection;
 import java.util.UUID;
 
 /**
@@ -18,5 +19,7 @@ public interface ViewStore {
 
     void save(Cart cart);
 
-    Iterable<Item> items();
+    Iterable<Item> findAllItems();
+
+    Collection<Cart> findCartsByItemId(UUID itemId);
 }

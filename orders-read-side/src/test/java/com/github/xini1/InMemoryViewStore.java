@@ -4,9 +4,11 @@ import com.github.xini1.port.ViewStore;
 import com.github.xini1.view.Cart;
 import com.github.xini1.view.Item;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * @author Maxim Tereshchenko
@@ -41,7 +43,20 @@ final class InMemoryViewStore implements ViewStore {
     }
 
     @Override
-    public Iterable<Item> items() {
+    public Iterable<Item> findAllItems() {
         return items.values();
+    }
+
+    @Override
+    public Collection<Cart> findCartsByItemId(UUID itemId) {
+        return carts.values()
+                .stream()
+                .filter(cart ->
+                        cart.getItemsInCart()
+                                .stream()
+                                .map(Cart.ItemInCart::getId)
+                                .anyMatch(id -> id.equals(itemId))
+                )
+                .collect(Collectors.toList());
     }
 }

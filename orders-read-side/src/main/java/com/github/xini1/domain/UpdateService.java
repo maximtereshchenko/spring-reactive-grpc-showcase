@@ -63,7 +63,12 @@ final class UpdateService implements OnItemCreatedEventUseCase, OnItemAddedToCar
 
     @Override
     public void onEvent(ItemDeactivated itemDeactivated) {
-        viewStore.save(viewStore.findItem(itemDeactivated.aggregateId()).deactivated());
+        var deactivatedItem = viewStore.findItem(itemDeactivated.aggregateId()).deactivated();
+        viewStore.save(deactivatedItem);
+        viewStore.findCartsByItemId(itemDeactivated.aggregateId())
+                .stream()
+                .map(cart -> cart.withDeactivated(deactivatedItem))
+                .forEach(viewStore::save);
     }
 
     @Override
