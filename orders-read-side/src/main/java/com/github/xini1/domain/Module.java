@@ -4,6 +4,7 @@ import com.github.xini1.port.ViewStore;
 import com.github.xini1.usecase.OnItemAddedToCartEventUseCase;
 import com.github.xini1.usecase.OnItemCreatedEventUseCase;
 import com.github.xini1.usecase.OnItemRemovedFromCartEventUseCase;
+import com.github.xini1.usecase.OnItemsOrderedEventUseCase;
 import com.github.xini1.usecase.ViewCartUseCase;
 
 /**
@@ -33,5 +34,9 @@ public final class Module {
 
     public OnItemRemovedFromCartEventUseCase onItemRemovedFromCartEventUseCase() {
         return updateService;
+    }
+
+    public OnItemsOrderedEventUseCase onItemsOrderedEventUseCase() {
+        return null;
     }
 }

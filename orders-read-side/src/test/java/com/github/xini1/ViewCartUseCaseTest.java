@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.github.xini1.domain.Module;
 import com.github.xini1.event.cart.ItemAddedToCart;
 import com.github.xini1.event.cart.ItemRemovedFromCart;
+import com.github.xini1.event.cart.ItemsOrdered;
 import com.github.xini1.event.item.ItemCreated;
 import com.github.xini1.exception.UserIsNotRegular;
 import com.github.xini1.view.Cart;
@@ -87,5 +88,14 @@ final class ViewCartUseCaseTest {
                                 new Cart.ItemInCart(itemId, "item", 1)
                         )
                 );
+    }
+
+    @Test
+    void givenItemOrderedEvent_whenViewCart_thenCartIsEmpty() {
+        module.onItemCreatedEventUseCase().onEvent(new ItemCreated(1, userId, itemId, "item"));
+        module.onItemAddedToCartEventUseCase().onEvent(new ItemAddedToCart(1, userId, itemId, 1));
+        module.onItemsOrderedEventUseCase().onEvent(new ItemsOrdered(2, userId));
+
+        assertThat(module.viewCartUseCase().view(userId, User.REGULAR)).isEqualTo(new Cart(userId));
     }
 }
