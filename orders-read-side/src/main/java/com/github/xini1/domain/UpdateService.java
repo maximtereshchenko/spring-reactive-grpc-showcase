@@ -66,6 +66,10 @@ final class UpdateService implements OnItemCreatedEventUseCase, OnItemAddedToCar
 
     @Override
     public void onEvent(ItemsOrdered itemsOrdered) {
+        var cart = viewStore.findCart(itemsOrdered.aggregateId());
+        if (cart.hasVersionGreaterOrEqualTo(itemsOrdered.version())) {
+            return;
+        }
         viewStore.save(new Cart(itemsOrdered.aggregateId(), itemsOrdered.version()));
     }
 
