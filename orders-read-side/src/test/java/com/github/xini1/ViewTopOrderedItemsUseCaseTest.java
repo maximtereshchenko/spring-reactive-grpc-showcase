@@ -4,7 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.github.xini1.domain.Module;
+import com.github.xini1.event.item.ItemCreated;
 import com.github.xini1.exception.UserIsNotAdmin;
+import com.github.xini1.view.TopOrderedItem;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
@@ -28,5 +30,13 @@ final class ViewTopOrderedItemsUseCaseTest {
     @Test
     void givenNoItemsOrdered_whenViewTopOrderedItems_thenIterableIsEmpty() {
         assertThat(module.viewTopOrderedItemsUseCase().view(User.ADMIN)).isEmpty();
+    }
+
+    @Test
+    void givenItemCreatedEvent_whenViewTopOrderedItems_thenThatItemHasZeroTimesOrdered() {
+        module.onItemCreatedEventUseCase().onEvent(new ItemCreated(1, userId, itemId, "item"));
+
+        assertThat(module.viewTopOrderedItemsUseCase().view(User.ADMIN))
+                .containsExactly(new TopOrderedItem(itemId, "item", 0));
     }
 }
