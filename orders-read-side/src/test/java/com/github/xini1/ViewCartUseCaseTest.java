@@ -8,6 +8,7 @@ import com.github.xini1.event.cart.ItemAddedToCart;
 import com.github.xini1.event.cart.ItemRemovedFromCart;
 import com.github.xini1.event.cart.ItemsOrdered;
 import com.github.xini1.event.item.ItemCreated;
+import com.github.xini1.event.item.ItemDeactivated;
 import com.github.xini1.exception.UserIsNotRegular;
 import com.github.xini1.view.Cart;
 import org.junit.jupiter.api.Test;
@@ -45,7 +46,22 @@ final class ViewCartUseCaseTest {
                 .isEqualTo(
                         new Cart(
                                 userId,
-                                new Cart.ItemInCart(itemId, "item", 1)
+                                new Cart.ItemInCart(itemId, "item", true, 1)
+                        )
+                );
+    }
+
+    @Test
+    void givenItemDeactivatedEvent_whenViewCart_thenItemInCartIsDeactivated() {
+        module.onItemCreatedEventUseCase().onEvent(new ItemCreated(1, userId, itemId, "item"));
+        module.onItemAddedToCartEventUseCase().onEvent(new ItemAddedToCart(1, userId, itemId, 1));
+        module.onItemDeactivatedEventUseCase().onEvent(new ItemDeactivated(2, userId, itemId));
+
+        assertThat(module.viewCartUseCase().view(userId, User.REGULAR))
+                .isEqualTo(
+                        new Cart(
+                                userId,
+                                new Cart.ItemInCart(itemId, "item", false, 1)
                         )
                 );
     }
@@ -61,7 +77,7 @@ final class ViewCartUseCaseTest {
                 .isEqualTo(
                         new Cart(
                                 userId,
-                                new Cart.ItemInCart(itemId, "item", 2)
+                                new Cart.ItemInCart(itemId, "item", true, 2)
                         )
                 );
     }
@@ -85,7 +101,7 @@ final class ViewCartUseCaseTest {
                 .isEqualTo(
                         new Cart(
                                 userId,
-                                new Cart.ItemInCart(itemId, "item", 1)
+                                new Cart.ItemInCart(itemId, "item", true, 1)
                         )
                 );
     }

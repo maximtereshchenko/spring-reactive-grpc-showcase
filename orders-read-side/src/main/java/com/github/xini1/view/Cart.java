@@ -26,10 +26,6 @@ public final class Cart {
         return userId;
     }
 
-    public Set<ItemInCart> getItemsInCart() {
-        return itemsInCart;
-    }
-
     @Override
     public int hashCode() {
         return Objects.hash(userId, itemsInCart);
@@ -89,16 +85,18 @@ public final class Cart {
 
         private final UUID id;
         private final String name;
+        private final boolean active;
         private final int quantity;
 
-        public ItemInCart(UUID id, String name, int quantity) {
+        public ItemInCart(UUID id, String name, boolean active, int quantity) {
             this.id = id;
             this.name = name;
+            this.active = active;
             this.quantity = quantity;
         }
 
         private ItemInCart(Item item, int quantity) {
-            this(item.getId(), item.getName(), quantity);
+            this(item.getId(), item.getName(), item.isActive(), quantity);
         }
 
         private ItemInCart(Item item) {
@@ -107,7 +105,7 @@ public final class Cart {
 
         @Override
         public int hashCode() {
-            return Objects.hash(id, name);
+            return Objects.hash(id, name, active);
         }
 
         @Override
@@ -118,9 +116,10 @@ public final class Cart {
             if (object == null || getClass() != object.getClass()) {
                 return false;
             }
-            var itemView = (ItemInCart) object;
-            return Objects.equals(id, itemView.id) &&
-                    Objects.equals(name, itemView.name);
+            var that = (ItemInCart) object;
+            return active == that.active &&
+                    Objects.equals(id, that.id) &&
+                    Objects.equals(name, that.name);
         }
 
         @Override
@@ -128,6 +127,7 @@ public final class Cart {
             return "ItemInCart{" +
                     "id=" + id +
                     ", name='" + name + '\'' +
+                    ", active=" + active +
                     ", quantity=" + quantity +
                     '}';
         }
@@ -137,7 +137,7 @@ public final class Cart {
         }
 
         private ItemInCart addQuantity(int quantity) {
-            return new ItemInCart(id, name, this.quantity + quantity);
+            return new ItemInCart(id, name, active, this.quantity + quantity);
         }
     }
 }

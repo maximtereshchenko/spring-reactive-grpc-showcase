@@ -32,6 +32,10 @@ public final class Item {
         return name;
     }
 
+    boolean isActive() {
+        return active;
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(id, name, active);
