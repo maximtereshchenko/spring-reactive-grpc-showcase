@@ -3,6 +3,7 @@ rootProject.name = "spring-reactive-grpc-showcase"
 include("common")
 include("orders-write-side")
 include("orders-read-side")
+include("users")
 
 dependencyResolutionManagement {
     versionCatalogs {
