@@ -52,6 +52,6 @@ public final class Module {
     }
 
     public OnItemActivatedEventUseCase onItemActivatedEventUseCase() {
-        return null;
+        return updateService;
     }
 }

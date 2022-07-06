@@ -63,4 +63,8 @@ public final class Item {
     public Item deactivated() {
         return new Item(id, name, false);
     }
+
+    public Item activated() {
+        return new Item(id, name, true);
+    }
 }

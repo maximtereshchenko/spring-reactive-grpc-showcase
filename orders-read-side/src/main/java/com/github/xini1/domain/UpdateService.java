@@ -3,9 +3,11 @@ package com.github.xini1.domain;
 import com.github.xini1.event.cart.ItemAddedToCart;
 import com.github.xini1.event.cart.ItemRemovedFromCart;
 import com.github.xini1.event.cart.ItemsOrdered;
+import com.github.xini1.event.item.ItemActivated;
 import com.github.xini1.event.item.ItemCreated;
 import com.github.xini1.event.item.ItemDeactivated;
 import com.github.xini1.port.ViewStore;
+import com.github.xini1.usecase.OnItemActivatedEventUseCase;
 import com.github.xini1.usecase.OnItemAddedToCartEventUseCase;
 import com.github.xini1.usecase.OnItemCreatedEventUseCase;
 import com.github.xini1.usecase.OnItemDeactivatedEventUseCase;
@@ -18,7 +20,8 @@ import com.github.xini1.view.Item;
  * @author Maxim Tereshchenko
  */
 final class UpdateService implements OnItemCreatedEventUseCase, OnItemAddedToCartEventUseCase,
-        OnItemRemovedFromCartEventUseCase, OnItemsOrderedEventUseCase, OnItemDeactivatedEventUseCase {
+        OnItemRemovedFromCartEventUseCase, OnItemsOrderedEventUseCase, OnItemDeactivatedEventUseCase,
+        OnItemActivatedEventUseCase {
 
     private final ViewStore viewStore;
 
@@ -61,5 +64,10 @@ final class UpdateService implements OnItemCreatedEventUseCase, OnItemAddedToCar
     @Override
     public void onEvent(ItemDeactivated itemDeactivated) {
         viewStore.save(viewStore.findItem(itemDeactivated.aggregateId()).deactivated());
+    }
+
+    @Override
+    public void onEvent(ItemActivated itemActivated) {
+        viewStore.save(viewStore.findItem(itemActivated.aggregateId()).activated());
     }
 }
