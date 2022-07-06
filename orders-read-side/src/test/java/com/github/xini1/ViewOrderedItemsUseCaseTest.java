@@ -1,9 +1,11 @@
 package com.github.xini1;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.github.xini1.domain.Module;
 import com.github.xini1.exception.UserIsNotRegular;
+import com.github.xini1.view.OrderedItems;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
@@ -27,6 +29,7 @@ final class ViewOrderedItemsUseCaseTest {
 
     @Test
     void givenUserWasNotOrderAnyItem_whenViewOrderedItems_thenOrderedItemsIsEmpty() {
-
+        assertThat(module.viewOrderedItemsUseCase().viewOrderedItems(userId, User.REGULAR))
+                .isEqualTo(new OrderedItems(userId));
     }
 }
