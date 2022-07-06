@@ -6,7 +6,6 @@ import com.github.xini1.view.Item;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -18,8 +17,8 @@ final class InMemoryViewStore implements ViewStore {
     private final Map<UUID, Cart> carts = new HashMap<>();
 
     @Override
-    public Optional<Item> findItem(UUID itemId) {
-        return Optional.ofNullable(items.get(itemId));
+    public Item findItem(UUID itemId) {
+        return items.get(itemId);
     }
 
     @Override

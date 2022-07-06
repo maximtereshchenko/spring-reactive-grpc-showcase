@@ -59,4 +59,8 @@ public final class Item {
                 ", active=" + active +
                 '}';
     }
+
+    public Item deactivated() {
+        return new Item(id, name, false);
+    }
 }
