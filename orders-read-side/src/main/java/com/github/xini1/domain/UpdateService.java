@@ -79,7 +79,7 @@ final class UpdateService implements OnItemCreatedEventUseCase, OnItemAddedToCar
         if (found.hasVersionLessThan(itemDeactivated.version())) {
             viewStore.save(found.deactivated(itemDeactivated.version()));
         }
-        viewStore.findCartsByItemIdAndItemVersionGreater(itemDeactivated.aggregateId(), itemDeactivated.version())
+        viewStore.findCartsByItemIdAndItemVersionLess(itemDeactivated.aggregateId(), itemDeactivated.version())
                 .stream()
                 .map(cart -> cart.withDeactivated(found.deactivated(itemDeactivated.version())))
                 .forEach(viewStore::save);
@@ -91,7 +91,7 @@ final class UpdateService implements OnItemCreatedEventUseCase, OnItemAddedToCar
         if (found.hasVersionLessThan(itemActivated.version())) {
             viewStore.save(found.activated(itemActivated.version()));
         }
-        viewStore.findCartsByItemIdAndItemVersionGreater(itemActivated.aggregateId(), itemActivated.version())
+        viewStore.findCartsByItemIdAndItemVersionLess(itemActivated.aggregateId(), itemActivated.version())
                 .stream()
                 .map(cart -> cart.withActivated(found.activated(itemActivated.version())))
                 .forEach(viewStore::save);

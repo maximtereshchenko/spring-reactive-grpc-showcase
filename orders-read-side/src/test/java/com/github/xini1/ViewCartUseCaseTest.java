@@ -185,7 +185,7 @@ final class ViewCartUseCaseTest {
     }
 
     @Test
-    void givenItemInVersionGreaterOrEqualToItemsOrderedEventVersion_whenViewCart_thenCartWasNotChanged() {
+    void givenItemInCartVersionGreaterOrEqualToItemDeactivatedEventVersion_whenViewCart_thenCartWasNotChanged() {
         module.onItemCreatedEventUseCase().onEvent(new ItemCreated(1, userId, itemId, "item"));
         module.onItemAddedToCartEventUseCase().onEvent(new ItemAddedToCart(1, userId, itemId, 1));
         module.onItemDeactivatedEventUseCase().onEvent(new ItemDeactivated(1, userId, itemId));
@@ -196,6 +196,23 @@ final class ViewCartUseCaseTest {
                                 userId,
                                 1,
                                 new Cart.ItemInCart(itemId, "item", true, 1, 1)
+                        )
+                );
+    }
+
+    @Test
+    void givenItemInCartVersionGreaterOrEqualToItemActivatedEventVersion_whenViewCart_thenCartWasNotChanged() {
+        module.onItemCreatedEventUseCase().onEvent(new ItemCreated(1, userId, itemId, "item"));
+        module.onItemAddedToCartEventUseCase().onEvent(new ItemAddedToCart(1, userId, itemId, 1));
+        module.onItemDeactivatedEventUseCase().onEvent(new ItemDeactivated(2, userId, itemId));
+        module.onItemActivatedEventUseCase().onEvent(new ItemActivated(2, userId, itemId));
+
+        assertThat(module.viewCartUseCase().view(userId, User.REGULAR))
+                .isEqualTo(
+                        new Cart(
+                                userId,
+                                1,
+                                new Cart.ItemInCart(itemId, "item", false, 1, 2)
                         )
                 );
     }

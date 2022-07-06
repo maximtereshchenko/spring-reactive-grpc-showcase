@@ -99,14 +99,14 @@ public final class Cart {
     public Cart withDeactivated(Item deactivatedItem) {
         var copy = new ArrayList<>(itemsInCart);
         var index = indexOf(copy, deactivatedItem);
-        copy.set(index, copy.get(index).deactivated());
+        copy.set(index, copy.get(index).deactivated(deactivatedItem.getVersion()));
         return new Cart(userId, Set.copyOf(copy), version);
     }
 
     public Cart withActivated(Item activatedItem) {
         var copy = new ArrayList<>(itemsInCart);
         var index = indexOf(copy, activatedItem);
-        copy.set(index, copy.get(index).activated());
+        copy.set(index, copy.get(index).activated(activatedItem.getVersion()));
         return new Cart(userId, Set.copyOf(copy), version);
     }
 
@@ -194,11 +194,11 @@ public final class Cart {
                     '}';
         }
 
-        private ItemInCart activated() {
+        private ItemInCart activated(long version) {
             return new ItemInCart(id, name, true, quantity, version);
         }
 
-        private ItemInCart deactivated() {
+        private ItemInCart deactivated(long version) {
             return new ItemInCart(id, name, false, quantity, version);
         }
 
