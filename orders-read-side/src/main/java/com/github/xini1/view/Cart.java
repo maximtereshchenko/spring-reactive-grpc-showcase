@@ -1,7 +1,5 @@
 package com.github.xini1.view;
 
-import com.github.xini1.domain.Item;
-
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Set;

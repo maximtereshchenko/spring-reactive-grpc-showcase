@@ -1,6 +1,6 @@
 package com.github.xini1.usecase;
 
-import com.github.xini1.domain.Item;
+import com.github.xini1.view.Item;
 
 /**
  * @author Maxim Tereshchenko

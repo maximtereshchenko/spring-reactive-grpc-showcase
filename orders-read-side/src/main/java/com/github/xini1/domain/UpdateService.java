@@ -11,6 +11,7 @@ import com.github.xini1.usecase.OnItemCreatedEventUseCase;
 import com.github.xini1.usecase.OnItemRemovedFromCartEventUseCase;
 import com.github.xini1.usecase.OnItemsOrderedEventUseCase;
 import com.github.xini1.view.Cart;
+import com.github.xini1.view.Item;
 
 /**
  * @author Maxim Tereshchenko

@@ -6,6 +6,7 @@ import com.github.xini1.port.ViewStore;
 import com.github.xini1.usecase.ViewCartUseCase;
 import com.github.xini1.usecase.ViewItemsUseCase;
 import com.github.xini1.view.Cart;
+import com.github.xini1.view.Item;
 
 import java.util.UUID;
 
