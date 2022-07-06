@@ -7,6 +7,7 @@ import com.github.xini1.domain.Module;
 import com.github.xini1.event.cart.ItemAddedToCart;
 import com.github.xini1.event.cart.ItemRemovedFromCart;
 import com.github.xini1.event.cart.ItemsOrdered;
+import com.github.xini1.event.item.ItemActivated;
 import com.github.xini1.event.item.ItemCreated;
 import com.github.xini1.event.item.ItemDeactivated;
 import com.github.xini1.exception.UserIsNotRegular;
@@ -62,6 +63,22 @@ final class ViewCartUseCaseTest {
                         new Cart(
                                 userId,
                                 new Cart.ItemInCart(itemId, "item", false, 1)
+                        )
+                );
+    }
+
+    @Test
+    void givenItemActivatedEvent_whenViewCart_thenItemInCartIsActivated() {
+        module.onItemCreatedEventUseCase().onEvent(new ItemCreated(1, userId, itemId, "item"));
+        module.onItemAddedToCartEventUseCase().onEvent(new ItemAddedToCart(1, userId, itemId, 1));
+        module.onItemDeactivatedEventUseCase().onEvent(new ItemDeactivated(2, userId, itemId));
+        module.onItemActivatedEventUseCase().onEvent(new ItemActivated(3, userId, itemId));
+
+        assertThat(module.viewCartUseCase().view(userId, User.REGULAR))
+                .isEqualTo(
+                        new Cart(
+                                userId,
+                                new Cart.ItemInCart(itemId, "item", true, 1)
                         )
                 );
     }
