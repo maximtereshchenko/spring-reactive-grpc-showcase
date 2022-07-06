@@ -19,6 +19,10 @@ public final class OrderedItems {
         this.orders = List.copyOf(orders);
     }
 
+    public OrderedItems(UUID userId) {
+        this(userId, List.of());
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(userId, orders);

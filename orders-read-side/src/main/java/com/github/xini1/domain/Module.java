@@ -62,6 +62,6 @@ public final class Module {
     }
 
     public ViewOrderedItemsUseCase viewOrderedItemsUseCase() {
-        return null;
+        return viewService;
     }
 }

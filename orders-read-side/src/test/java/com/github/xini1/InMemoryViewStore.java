@@ -3,6 +3,7 @@ package com.github.xini1;
 import com.github.xini1.port.ViewStore;
 import com.github.xini1.view.Cart;
 import com.github.xini1.view.Item;
+import com.github.xini1.view.OrderedItems;
 import com.github.xini1.view.TopOrderedItem;
 
 import java.util.Collection;
@@ -20,6 +21,7 @@ final class InMemoryViewStore implements ViewStore {
     private final Map<UUID, Item> items = new HashMap<>();
     private final Map<UUID, Cart> carts = new HashMap<>();
     private final Map<UUID, TopOrderedItem> topOrderedItems = new HashMap<>();
+    private final Map<UUID, OrderedItems> orderedItems = new HashMap<>();
 
     @Override
     public Item findItem(UUID itemId) {
@@ -80,5 +82,14 @@ final class InMemoryViewStore implements ViewStore {
     @Override
     public void save(TopOrderedItem topOrderedItem) {
         topOrderedItems.put(topOrderedItem.getId(), topOrderedItem);
+    }
+
+    @Override
+    public OrderedItems findOrderedItems(UUID userId) {
+        var items = orderedItems.get(userId);
+        if (items == null) {
+            return new OrderedItems(userId);
+        }
+        return items;
     }
 }

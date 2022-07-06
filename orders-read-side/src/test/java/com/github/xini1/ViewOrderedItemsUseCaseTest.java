@@ -21,7 +21,7 @@ final class ViewOrderedItemsUseCaseTest {
     void givenUserIsNotRegular_whenViewOrderedItems_thenUserIsNotRegularThrown() {
         var useCase = module.viewOrderedItemsUseCase();
 
-        assertThatThrownBy(() -> useCase.view(userId, User.ADMIN))
+        assertThatThrownBy(() -> useCase.viewOrderedItems(userId, User.ADMIN))
                 .isInstanceOf(UserIsNotRegular.class);
     }
 

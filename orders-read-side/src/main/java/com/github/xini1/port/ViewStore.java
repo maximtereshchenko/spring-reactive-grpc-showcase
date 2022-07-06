@@ -2,6 +2,7 @@ package com.github.xini1.port;
 
 import com.github.xini1.view.Cart;
 import com.github.xini1.view.Item;
+import com.github.xini1.view.OrderedItems;
 import com.github.xini1.view.TopOrderedItem;
 
 import java.util.Collection;
@@ -29,4 +30,6 @@ public interface ViewStore {
     TopOrderedItem findTopOrderedItem(UUID itemId);
 
     void save(TopOrderedItem topOrderedItem);
+
+    OrderedItems findOrderedItems(UUID userId);
 }

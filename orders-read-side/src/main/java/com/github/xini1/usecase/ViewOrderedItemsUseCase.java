@@ -10,5 +10,5 @@ import java.util.UUID;
  */
 public interface ViewOrderedItemsUseCase {
 
-    OrderedItems view(UUID userId, User admin);
+    OrderedItems viewOrderedItems(UUID userId, User user);
 }
