@@ -47,4 +47,20 @@ final class ViewCartUseCaseTest {
                         )
                 );
     }
+
+    @Test
+    void givenCartHasItem_whenViewCart_thenCartHasMoreOfThatItem() {
+        module.onItemCreatedEventUseCase().onEvent(new ItemCreated(1, userId, itemId, "item"));
+        var itemAddedToCart = new ItemAddedToCart(1, userId, itemId, 1);
+        module.onItemAddedToCartEventUseCase().onEvent(itemAddedToCart);
+        module.onItemAddedToCartEventUseCase().onEvent(itemAddedToCart);
+
+        assertThat(module.viewCartUseCase().view(userId, User.REGULAR))
+                .isEqualTo(
+                        new Cart(
+                                userId,
+                                new Cart.ItemInCart(itemId, "item", 2)
+                        )
+                );
+    }
 }
