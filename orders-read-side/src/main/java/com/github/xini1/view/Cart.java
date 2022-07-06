@@ -110,6 +110,10 @@ public final class Cart {
         return new Cart(userId, Set.copyOf(copy), version);
     }
 
+    public boolean hasVersionGreaterOrEqualTo(long version) {
+        return this.version >= version;
+    }
+
     private int indexOf(List<ItemInCart> items, Item item) {
         for (var i = 0; i < items.size(); i++) {
             var itemInCart = items.get(i);
