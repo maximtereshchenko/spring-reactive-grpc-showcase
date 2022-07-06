@@ -29,7 +29,8 @@ final class ViewItemsUseCaseTest {
     void givenItemCreatedEvent_whenViewItems_thenIterableHasThatItem() {
         module.onItemCreatedEventUseCase().onEvent(new ItemCreated(1, userId, itemId, "item"));
 
-        assertThat(module.viewItemsUseCase().view()).containsExactly(new Item(itemId, "item", true, 1));
+        assertThat(module.viewItemsUseCase().view())
+                .containsExactly(new Item(itemId, "item", true, 1));
     }
 
     @Test
@@ -37,7 +38,8 @@ final class ViewItemsUseCaseTest {
         module.onItemCreatedEventUseCase().onEvent(new ItemCreated(1, userId, itemId, "item"));
         module.onItemDeactivatedEventUseCase().onEvent(new ItemDeactivated(2, userId, itemId));
 
-        assertThat(module.viewItemsUseCase().view()).containsExactly(new Item(itemId, "item", false, 2));
+        assertThat(module.viewItemsUseCase().view())
+                .containsExactly(new Item(itemId, "item", false, 2));
     }
 
     @Test
@@ -46,6 +48,26 @@ final class ViewItemsUseCaseTest {
         module.onItemDeactivatedEventUseCase().onEvent(new ItemDeactivated(2, userId, itemId));
         module.onItemActivatedEventUseCase().onEvent(new ItemActivated(3, userId, itemId));
 
-        assertThat(module.viewItemsUseCase().view()).containsExactly(new Item(itemId, "item", true, 3));
+        assertThat(module.viewItemsUseCase().view())
+                .containsExactly(new Item(itemId, "item", true, 3));
+    }
+
+    @Test
+    void givenItemHasVersionGreaterOrEqualToItemDeactivatedEventVersion_whenViewItems_thenItemWasNotChanged() {
+        module.onItemCreatedEventUseCase().onEvent(new ItemCreated(1, userId, itemId, "item"));
+        module.onItemDeactivatedEventUseCase().onEvent(new ItemDeactivated(1, userId, itemId));
+
+        assertThat(module.viewItemsUseCase().view())
+                .containsExactly(new Item(itemId, "item", true, 1));
+    }
+
+    @Test
+    void givenItemHasVersionGreaterOrEqualToItemActivatedEventVersion_whenViewItems_thenItemWasNotChanged() {
+        module.onItemCreatedEventUseCase().onEvent(new ItemCreated(1, userId, itemId, "item"));
+        module.onItemDeactivatedEventUseCase().onEvent(new ItemDeactivated(2, userId, itemId));
+        module.onItemActivatedEventUseCase().onEvent(new ItemActivated(2, userId, itemId));
+
+        assertThat(module.viewItemsUseCase().view())
+                .containsExactly(new Item(itemId, "item", false, 2));
     }
 }
