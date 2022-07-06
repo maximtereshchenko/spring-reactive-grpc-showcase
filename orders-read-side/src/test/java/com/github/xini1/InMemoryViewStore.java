@@ -3,8 +3,10 @@ package com.github.xini1;
 import com.github.xini1.port.ViewStore;
 import com.github.xini1.view.Cart;
 import com.github.xini1.view.Item;
+import com.github.xini1.view.TopOrderedItem;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -17,6 +19,7 @@ final class InMemoryViewStore implements ViewStore {
 
     private final Map<UUID, Item> items = new HashMap<>();
     private final Map<UUID, Cart> carts = new HashMap<>();
+    private final Map<UUID, TopOrderedItem> topOrderedItems = new HashMap<>();
 
     @Override
     public Item findItem(UUID itemId) {
@@ -58,6 +61,14 @@ final class InMemoryViewStore implements ViewStore {
                                 .map(Cart.ItemInCart::getId)
                                 .anyMatch(id -> id.equals(itemId))
                 )
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Iterable<TopOrderedItem> findAllTopOrderedItems() {
+        return topOrderedItems.values()
+                .stream()
+                .sorted(Comparator.comparingLong(TopOrderedItem::getTimesOrdered).reversed())
                 .collect(Collectors.toList());
     }
 }

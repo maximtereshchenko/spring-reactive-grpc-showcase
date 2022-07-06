@@ -9,11 +9,23 @@ public final class TopOrderedItem {
 
     private final UUID id;
     private final String name;
-    private final long ordered;
+    private final long timesOrdered;
 
-    public TopOrderedItem(UUID id, String name, long ordered) {
+    public TopOrderedItem(UUID id, String name, long timesOrdered) {
         this.id = id;
         this.name = name;
-        this.ordered = ordered;
+        this.timesOrdered = timesOrdered;
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public long getTimesOrdered() {
+        return timesOrdered;
     }
 }
