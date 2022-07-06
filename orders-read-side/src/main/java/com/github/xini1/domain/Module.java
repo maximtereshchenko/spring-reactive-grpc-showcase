@@ -6,6 +6,7 @@ import com.github.xini1.usecase.OnItemCreatedEventUseCase;
 import com.github.xini1.usecase.OnItemRemovedFromCartEventUseCase;
 import com.github.xini1.usecase.OnItemsOrderedEventUseCase;
 import com.github.xini1.usecase.ViewCartUseCase;
+import com.github.xini1.usecase.ViewItemsUseCase;
 
 /**
  * @author Maxim Tereshchenko
@@ -38,5 +39,9 @@ public final class Module {
 
     public OnItemsOrderedEventUseCase onItemsOrderedEventUseCase() {
         return updateService;
+    }
+
+    public ViewItemsUseCase viewItemsUseCase() {
+        return null;
     }
 }
