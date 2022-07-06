@@ -35,7 +35,8 @@ final class UpdateService implements OnItemCreatedEventUseCase, OnItemAddedToCar
                 viewStore.findCart(itemAddedToCart.aggregateId())
                         .with(
                                 viewStore.findItem(itemAddedToCart.itemId()),
-                                itemAddedToCart.quantity()
+                                itemAddedToCart.quantity(),
+                                itemAddedToCart.version()
                         )
         );
     }
@@ -51,14 +52,15 @@ final class UpdateService implements OnItemCreatedEventUseCase, OnItemAddedToCar
                 viewStore.findCart(itemRemovedFromCart.aggregateId())
                         .without(
                                 viewStore.findItem(itemRemovedFromCart.itemId()),
-                                itemRemovedFromCart.quantity()
+                                itemRemovedFromCart.quantity(),
+                                itemRemovedFromCart.version()
                         )
         );
     }
 
     @Override
     public void onEvent(ItemsOrdered itemsOrdered) {
-        viewStore.save(new Cart(itemsOrdered.aggregateId()));
+        viewStore.save(new Cart(itemsOrdered.aggregateId(), itemsOrdered.version()));
     }
 
     @Override
@@ -73,6 +75,11 @@ final class UpdateService implements OnItemCreatedEventUseCase, OnItemAddedToCar
 
     @Override
     public void onEvent(ItemActivated itemActivated) {
-        viewStore.save(viewStore.findItem(itemActivated.aggregateId()).activated());
+        var activatedItem = viewStore.findItem(itemActivated.aggregateId()).activated();
+        viewStore.save(activatedItem);
+        viewStore.findCartsByItemId(itemActivated.aggregateId())
+                .stream()
+                .map(cart -> cart.withActivated(activatedItem))
+                .forEach(viewStore::save);
     }
 }

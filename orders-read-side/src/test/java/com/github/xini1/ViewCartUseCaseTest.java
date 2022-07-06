@@ -47,6 +47,7 @@ final class ViewCartUseCaseTest {
                 .isEqualTo(
                         new Cart(
                                 userId,
+                                1,
                                 new Cart.ItemInCart(itemId, "item", true, 1)
                         )
                 );
@@ -62,6 +63,7 @@ final class ViewCartUseCaseTest {
                 .isEqualTo(
                         new Cart(
                                 userId,
+                                1,
                                 new Cart.ItemInCart(itemId, "item", false, 1)
                         )
                 );
@@ -78,6 +80,7 @@ final class ViewCartUseCaseTest {
                 .isEqualTo(
                         new Cart(
                                 userId,
+                                1,
                                 new Cart.ItemInCart(itemId, "item", true, 1)
                         )
                 );
@@ -87,12 +90,13 @@ final class ViewCartUseCaseTest {
     void givenCartHasItem_whenViewCart_thenCartHasMoreOfThatItem() {
         module.onItemCreatedEventUseCase().onEvent(new ItemCreated(1, userId, itemId, "item"));
         module.onItemAddedToCartEventUseCase().onEvent(new ItemAddedToCart(1, userId, itemId, 1));
-        module.onItemAddedToCartEventUseCase().onEvent(new ItemAddedToCart(1, userId, itemId, 2));
+        module.onItemAddedToCartEventUseCase().onEvent(new ItemAddedToCart(2, userId, itemId, 2));
 
         assertThat(module.viewCartUseCase().view(userId, User.REGULAR))
                 .isEqualTo(
                         new Cart(
                                 userId,
+                                2,
                                 new Cart.ItemInCart(itemId, "item", true, 3)
                         )
                 );
@@ -104,7 +108,7 @@ final class ViewCartUseCaseTest {
         module.onItemAddedToCartEventUseCase().onEvent(new ItemAddedToCart(1, userId, itemId, 1));
         module.onItemRemovedFromCartEventUseCase().onEvent(new ItemRemovedFromCart(2, userId, itemId, 1));
 
-        assertThat(module.viewCartUseCase().view(userId, User.REGULAR)).isEqualTo(new Cart(userId));
+        assertThat(module.viewCartUseCase().view(userId, User.REGULAR)).isEqualTo(new Cart(userId, 2));
     }
 
     @Test
@@ -117,6 +121,7 @@ final class ViewCartUseCaseTest {
                 .isEqualTo(
                         new Cart(
                                 userId,
+                                2,
                                 new Cart.ItemInCart(itemId, "item", true, 1)
                         )
                 );
@@ -128,6 +133,22 @@ final class ViewCartUseCaseTest {
         module.onItemAddedToCartEventUseCase().onEvent(new ItemAddedToCart(1, userId, itemId, 1));
         module.onItemsOrderedEventUseCase().onEvent(new ItemsOrdered(2, userId));
 
-        assertThat(module.viewCartUseCase().view(userId, User.REGULAR)).isEqualTo(new Cart(userId));
+        assertThat(module.viewCartUseCase().view(userId, User.REGULAR)).isEqualTo(new Cart(userId, 2));
+    }
+
+    @Test
+    void givenCartVersionLessOrEqualEventVersion_whenViewCart_thenCartWasNotChanged() {
+        module.onItemCreatedEventUseCase().onEvent(new ItemCreated(1, userId, itemId, "item"));
+        module.onItemAddedToCartEventUseCase().onEvent(new ItemAddedToCart(1, userId, itemId, 1));
+        module.onItemAddedToCartEventUseCase().onEvent(new ItemAddedToCart(1, userId, itemId, 1));
+
+        assertThat(module.viewCartUseCase().view(userId, User.REGULAR))
+                .isEqualTo(
+                        new Cart(
+                                userId,
+                                1,
+                                new Cart.ItemInCart(itemId, "item", true, 1)
+                        )
+                );
     }
 }

@@ -13,14 +13,20 @@ public final class Cart {
 
     private final UUID userId;
     private final Set<ItemInCart> itemsInCart;
+    private final long version;
 
-    public Cart(UUID userId, Set<ItemInCart> itemsInCart) {
+    public Cart(UUID userId, Set<ItemInCart> itemsInCart, long version) {
         this.userId = userId;
         this.itemsInCart = Set.copyOf(itemsInCart);
+        this.version = version;
     }
 
-    public Cart(UUID userId, ItemInCart... itemsInCart) {
-        this(userId, Set.of(itemsInCart));
+    public Cart(UUID userId, long version, ItemInCart... itemsInCart) {
+        this(userId, Set.of(itemsInCart), version);
+    }
+
+    public Cart(UUID userId) {
+        this(userId, 0);
     }
 
     public UUID getUserId() {
@@ -31,9 +37,13 @@ public final class Cart {
         return itemsInCart;
     }
 
+    public long getVersion() {
+        return version;
+    }
+
     @Override
     public int hashCode() {
-        return Objects.hash(userId, itemsInCart);
+        return Objects.hash(userId, itemsInCart, version);
     }
 
     @Override
@@ -45,7 +55,8 @@ public final class Cart {
             return false;
         }
         var cart = (Cart) object;
-        return Objects.equals(userId, cart.userId) &&
+        return version == cart.version &&
+                Objects.equals(userId, cart.userId) &&
                 Objects.equals(itemsInCart, cart.itemsInCart);
     }
 
@@ -54,10 +65,11 @@ public final class Cart {
         return "Cart{" +
                 "userId=" + userId +
                 ", itemsInCart=" + itemsInCart +
+                ", version=" + version +
                 '}';
     }
 
-    public Cart with(Item item, int quantity) {
+    public Cart with(Item item, int quantity, long version) {
         var copy = new ArrayList<>(itemsInCart);
         var index = indexOf(copy, item);
 
@@ -67,10 +79,10 @@ public final class Cart {
             copy.set(index, copy.get(index).addQuantity(quantity));
         }
 
-        return new Cart(userId, Set.copyOf(copy));
+        return new Cart(userId, Set.copyOf(copy), version);
     }
 
-    public Cart without(Item item, int quantity) {
+    public Cart without(Item item, int quantity, long version) {
         var copy = new ArrayList<>(itemsInCart);
         var index = indexOf(copy, item);
         var present = copy.get(index);
@@ -81,14 +93,21 @@ public final class Cart {
             copy.set(index, present.removeQuantity(quantity));
         }
 
-        return new Cart(userId, Set.copyOf(copy));
+        return new Cart(userId, Set.copyOf(copy), version);
     }
 
     public Cart withDeactivated(Item deactivatedItem) {
         var copy = new ArrayList<>(itemsInCart);
         var index = indexOf(copy, deactivatedItem);
         copy.set(index, copy.get(index).deactivated());
-        return new Cart(userId, Set.copyOf(copy));
+        return new Cart(userId, Set.copyOf(copy), version);
+    }
+
+    public Cart withActivated(Item activatedItem) {
+        var copy = new ArrayList<>(itemsInCart);
+        var index = indexOf(copy, activatedItem);
+        copy.set(index, copy.get(index).activated());
+        return new Cart(userId, Set.copyOf(copy), version);
     }
 
     private int indexOf(List<ItemInCart> items, Item item) {
@@ -163,6 +182,10 @@ public final class Cart {
                     ", active=" + active +
                     ", quantity=" + quantity +
                     '}';
+        }
+
+        private ItemInCart activated() {
+            return new ItemInCart(id, name, true, quantity);
         }
 
         private ItemInCart deactivated() {
