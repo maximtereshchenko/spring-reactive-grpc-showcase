@@ -19,8 +19,8 @@ public final class OrderedItems {
         this.orders = List.copyOf(orders);
     }
 
-    public OrderedItems(UUID userId) {
-        this(userId, List.of());
+    public OrderedItems(UUID userId, Order... orders) {
+        this(userId, List.of(orders));
     }
 
     @Override
@@ -57,6 +57,10 @@ public final class OrderedItems {
         public Order(Instant timestamp, Collection<ItemInOrder> items) {
             this.timestamp = timestamp;
             this.items = List.copyOf(items);
+        }
+
+        public Order(Instant timestamp, ItemInOrder... items) {
+            this(timestamp, List.of(items));
         }
 
         @Override
