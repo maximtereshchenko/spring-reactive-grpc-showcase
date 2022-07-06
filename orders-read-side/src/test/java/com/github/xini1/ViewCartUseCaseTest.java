@@ -167,4 +167,20 @@ final class ViewCartUseCaseTest {
                         )
                 );
     }
+
+    @Test
+    void givenCartVersionLessOrEqualToItemsOrderedEventVersion_whenViewCart_thenCartWasNotChanged() {
+        module.onItemCreatedEventUseCase().onEvent(new ItemCreated(1, userId, itemId, "item"));
+        module.onItemAddedToCartEventUseCase().onEvent(new ItemAddedToCart(1, userId, itemId, 1));
+        module.onItemsOrderedEventUseCase().onEvent(new ItemsOrdered(1, userId));
+
+        assertThat(module.viewCartUseCase().view(userId, User.REGULAR))
+                .isEqualTo(
+                        new Cart(
+                                userId,
+                                1,
+                                new Cart.ItemInCart(itemId, "item", true, 1)
+                        )
+                );
+    }
 }
