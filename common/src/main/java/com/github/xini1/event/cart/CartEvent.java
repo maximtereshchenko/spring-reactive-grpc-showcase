@@ -1,10 +1,8 @@
 package com.github.xini1.event.cart;
 
-import com.github.xini1.event.EventType;
-import com.github.xini1.event.VersionedEvent;
+import com.github.xini1.event.*;
 
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * @author Maxim Tereshchenko

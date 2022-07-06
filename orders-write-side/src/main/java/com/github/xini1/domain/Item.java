@@ -1,14 +1,10 @@
 package com.github.xini1.domain;
 
-import com.github.xini1.event.item.ItemActivated;
-import com.github.xini1.event.item.ItemCreated;
-import com.github.xini1.event.item.ItemDeactivated;
-import com.github.xini1.exception.ItemIsAlreadyActive;
-import com.github.xini1.exception.ItemIsAlreadyDeactivated;
-import com.github.xini1.exception.ItemIsNotFound;
-import com.github.xini1.port.EventStore;
+import com.github.xini1.event.item.*;
+import com.github.xini1.exception.*;
+import com.github.xini1.port.*;
 
-import java.util.UUID;
+import java.util.*;
 
 /**
  * @author Maxim Tereshchenko
@@ -19,9 +15,9 @@ final class Item extends AggregateRoot {
 
     Item(UUID itemId) {
         super(itemId);
-        register(ItemCreated.class, this::onEvent);
-        register(ItemDeactivated.class, this::onEvent);
-        register(ItemActivated.class, this::onEvent);
+        register(ItemCreated.class, event -> {});
+        register(ItemDeactivated.class, event -> state = new Deactivated());
+        register(ItemActivated.class, event -> state = new Active());
     }
 
     static Item create(UUID userId, String name) {
@@ -53,18 +49,6 @@ final class Item extends AggregateRoot {
 
     boolean isDeactivated() {
         return state.isDeactivated();
-    }
-
-    private void onEvent(ItemCreated itemCreated) {
-        //empty
-    }
-
-    private void onEvent(ItemDeactivated itemDeactivated) {
-        state = new Deactivated();
-    }
-
-    private void onEvent(ItemActivated itemActivated) {
-        state = new Active();
     }
 
     private interface State {

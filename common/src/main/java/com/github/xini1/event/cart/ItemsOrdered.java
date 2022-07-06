@@ -1,6 +1,6 @@
 package com.github.xini1.event.cart;
 
-import java.util.UUID;
+import java.util.*;
 
 /**
  * @author Maxim Tereshchenko

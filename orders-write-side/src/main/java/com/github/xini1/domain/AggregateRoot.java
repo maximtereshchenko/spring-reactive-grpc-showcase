@@ -1,14 +1,10 @@
 package com.github.xini1.domain;
 
-import com.github.xini1.event.Event;
-import com.github.xini1.port.EventStore;
+import com.github.xini1.event.*;
+import com.github.xini1.port.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.function.Consumer;
+import java.util.*;
+import java.util.function.*;
 
 /**
  * @author Maxim Tereshchenko

@@ -1,6 +1,6 @@
 package com.github.xini1.event;
 
-import java.util.Objects;
+import java.util.*;
 
 /**
  * @author Maxim Tereshchenko

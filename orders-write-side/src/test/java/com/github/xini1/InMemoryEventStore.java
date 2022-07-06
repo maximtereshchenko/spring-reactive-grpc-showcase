@@ -1,16 +1,12 @@
 package com.github.xini1;
 
-import com.github.xini1.event.Event;
-import com.github.xini1.event.EventType;
-import com.github.xini1.event.cart.CartEvent;
-import com.github.xini1.event.item.ItemEvent;
-import com.github.xini1.port.EventStore;
+import com.github.xini1.event.*;
+import com.github.xini1.event.cart.*;
+import com.github.xini1.event.item.*;
+import com.github.xini1.port.*;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
+import java.util.*;
+import java.util.stream.*;
 
 /**
  * @author Maxim Tereshchenko

@@ -1,7 +1,7 @@
 package com.github.xini1.usecase;
 
-import com.github.xini1.User;
-import com.github.xini1.view.TopOrderedItem;
+import com.github.xini1.*;
+import com.github.xini1.view.*;
 
 /**
  * @author Maxim Tereshchenko

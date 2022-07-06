@@ -1,17 +1,10 @@
 package com.github.xini1;
 
-import com.github.xini1.port.ViewStore;
-import com.github.xini1.view.Cart;
-import com.github.xini1.view.Item;
-import com.github.xini1.view.OrderedItems;
-import com.github.xini1.view.TopOrderedItem;
+import com.github.xini1.port.*;
+import com.github.xini1.view.*;
 
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-import java.util.stream.Collectors;
+import java.util.*;
+import java.util.stream.*;
 
 /**
  * @author Maxim Tereshchenko

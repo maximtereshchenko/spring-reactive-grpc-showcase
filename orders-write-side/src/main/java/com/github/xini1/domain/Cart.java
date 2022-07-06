@@ -1,19 +1,10 @@
 package com.github.xini1.domain;
 
-import com.github.xini1.event.cart.ItemAddedToCart;
-import com.github.xini1.event.cart.ItemRemovedFromCart;
-import com.github.xini1.event.cart.ItemsOrdered;
-import com.github.xini1.exception.CartHasDeactivatedItem;
-import com.github.xini1.exception.CartIsEmpty;
-import com.github.xini1.exception.CouldNotAddDeactivatedItemToCart;
-import com.github.xini1.exception.QuantityIsMoreThanCartHas;
-import com.github.xini1.exception.QuantityIsNotPositive;
-import com.github.xini1.port.EventStore;
+import com.github.xini1.event.cart.*;
+import com.github.xini1.exception.*;
+import com.github.xini1.port.*;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * @author Maxim Tereshchenko
@@ -25,7 +16,7 @@ final class Cart extends AggregateRoot {
     Cart(UUID userId) {
         super(userId);
         register(ItemAddedToCart.class, this::onEvent);
-        register(ItemsOrdered.class, this::onEvent);
+        register(ItemsOrdered.class, event -> items.clear());
         register(ItemRemovedFromCart.class, this::onEvent);
     }
 
@@ -79,10 +70,6 @@ final class Cart extends AggregateRoot {
             return quantity;
         }
         return oldQuantity + quantity;
-    }
-
-    private void onEvent(ItemsOrdered itemsOrdered) {
-        items.clear();
     }
 
     private void onEvent(ItemAddedToCart itemAddedToCart) {

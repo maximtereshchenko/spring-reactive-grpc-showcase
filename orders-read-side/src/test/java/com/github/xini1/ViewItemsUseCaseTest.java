@@ -1,15 +1,13 @@
 package com.github.xini1;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.github.xini1.domain.Module;
-import com.github.xini1.event.item.ItemActivated;
-import com.github.xini1.event.item.ItemCreated;
-import com.github.xini1.event.item.ItemDeactivated;
-import com.github.xini1.view.Item;
-import org.junit.jupiter.api.Test;
+import com.github.xini1.event.item.*;
+import com.github.xini1.view.*;
+import org.junit.jupiter.api.*;
 
-import java.util.UUID;
+import java.util.*;
+
+import static org.assertj.core.api.Assertions.*;
 
 /**
  * @author Maxim Tereshchenko

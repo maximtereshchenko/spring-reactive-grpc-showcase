@@ -1,18 +1,9 @@
 package com.github.xini1.domain;
 
-import com.github.xini1.port.ViewStore;
-import com.github.xini1.usecase.OnItemActivatedEventUseCase;
-import com.github.xini1.usecase.OnItemAddedToCartEventUseCase;
-import com.github.xini1.usecase.OnItemCreatedEventUseCase;
-import com.github.xini1.usecase.OnItemDeactivatedEventUseCase;
-import com.github.xini1.usecase.OnItemRemovedFromCartEventUseCase;
-import com.github.xini1.usecase.OnItemsOrderedEventUseCase;
-import com.github.xini1.usecase.ViewCartUseCase;
-import com.github.xini1.usecase.ViewItemsUseCase;
-import com.github.xini1.usecase.ViewOrderedItemsUseCase;
-import com.github.xini1.usecase.ViewTopOrderedItemsUseCase;
+import com.github.xini1.port.*;
+import com.github.xini1.usecase.*;
 
-import java.time.Clock;
+import java.time.*;
 
 /**
  * @author Maxim Tereshchenko

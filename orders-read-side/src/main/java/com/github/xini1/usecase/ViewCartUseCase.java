@@ -1,9 +1,9 @@
 package com.github.xini1.usecase;
 
-import com.github.xini1.User;
-import com.github.xini1.view.Cart;
+import com.github.xini1.*;
+import com.github.xini1.view.*;
 
-import java.util.UUID;
+import java.util.*;
 
 /**
  * @author Maxim Tereshchenko

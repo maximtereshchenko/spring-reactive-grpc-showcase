@@ -1,20 +1,15 @@
 package com.github.xini1;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 import com.github.xini1.domain.Module;
-import com.github.xini1.event.cart.ItemAddedToCart;
-import com.github.xini1.event.cart.ItemRemovedFromCart;
-import com.github.xini1.event.cart.ItemsOrdered;
-import com.github.xini1.event.item.ItemActivated;
-import com.github.xini1.event.item.ItemCreated;
-import com.github.xini1.event.item.ItemDeactivated;
-import com.github.xini1.exception.UserIsNotRegular;
-import com.github.xini1.view.Cart;
-import org.junit.jupiter.api.Test;
+import com.github.xini1.event.cart.*;
+import com.github.xini1.event.item.*;
+import com.github.xini1.exception.*;
+import com.github.xini1.view.*;
+import org.junit.jupiter.api.*;
 
-import java.util.UUID;
+import java.util.*;
+
+import static org.assertj.core.api.Assertions.*;
 
 /**
  * @author Maxim Tereshchenko

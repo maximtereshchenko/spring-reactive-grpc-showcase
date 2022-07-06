@@ -1,9 +1,8 @@
 package com.github.xini1.view;
 
-import com.github.xini1.event.item.ItemCreated;
+import com.github.xini1.event.item.*;
 
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * @author Maxim Tereshchenko

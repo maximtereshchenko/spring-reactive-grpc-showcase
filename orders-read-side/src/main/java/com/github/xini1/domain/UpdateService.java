@@ -1,25 +1,13 @@
 package com.github.xini1.domain;
 
-import com.github.xini1.event.cart.ItemAddedToCart;
-import com.github.xini1.event.cart.ItemRemovedFromCart;
-import com.github.xini1.event.cart.ItemsOrdered;
-import com.github.xini1.event.item.ItemActivated;
-import com.github.xini1.event.item.ItemCreated;
-import com.github.xini1.event.item.ItemDeactivated;
-import com.github.xini1.port.ViewStore;
-import com.github.xini1.usecase.OnItemActivatedEventUseCase;
-import com.github.xini1.usecase.OnItemAddedToCartEventUseCase;
-import com.github.xini1.usecase.OnItemCreatedEventUseCase;
-import com.github.xini1.usecase.OnItemDeactivatedEventUseCase;
-import com.github.xini1.usecase.OnItemRemovedFromCartEventUseCase;
-import com.github.xini1.usecase.OnItemsOrderedEventUseCase;
-import com.github.xini1.view.Cart;
-import com.github.xini1.view.Item;
-import com.github.xini1.view.OrderedItems;
-import com.github.xini1.view.TopOrderedItem;
+import com.github.xini1.event.cart.*;
+import com.github.xini1.event.item.*;
+import com.github.xini1.port.*;
+import com.github.xini1.usecase.*;
+import com.github.xini1.view.*;
 
-import java.time.Clock;
-import java.util.stream.Collectors;
+import java.time.*;
+import java.util.stream.*;
 
 /**
  * @author Maxim Tereshchenko

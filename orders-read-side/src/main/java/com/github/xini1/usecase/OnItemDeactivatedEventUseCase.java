@@ -1,6 +1,6 @@
 package com.github.xini1.usecase;
 
-import com.github.xini1.event.item.ItemDeactivated;
+import com.github.xini1.event.item.*;
 
 /**
  * @author Maxim Tereshchenko

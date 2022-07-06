@@ -1,13 +1,11 @@
 package com.github.xini1.domain;
 
-import com.github.xini1.User;
-import com.github.xini1.exception.UserIsNotRegular;
-import com.github.xini1.port.EventStore;
-import com.github.xini1.usecase.AddItemToCartUseCase;
-import com.github.xini1.usecase.OrderItemsInCartUseCase;
-import com.github.xini1.usecase.RemoveItemFromCartUseCase;
+import com.github.xini1.*;
+import com.github.xini1.exception.*;
+import com.github.xini1.port.*;
+import com.github.xini1.usecase.*;
 
-import java.util.UUID;
+import java.util.*;
 
 /**
  * @author Maxim Tereshchenko
