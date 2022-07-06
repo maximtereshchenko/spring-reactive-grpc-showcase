@@ -12,14 +12,16 @@ public final class Item {
 
     private final UUID id;
     private final String name;
+    private final boolean active;
 
-    public Item(UUID id, String name) {
+    public Item(UUID id, String name, boolean active) {
         this.id = id;
         this.name = name;
+        this.active = active;
     }
 
     public Item(ItemCreated itemCreated) {
-        this(itemCreated.aggregateId(), itemCreated.name());
+        this(itemCreated.aggregateId(), itemCreated.name(), true);
     }
 
     public UUID getId() {
@@ -32,7 +34,7 @@ public final class Item {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name);
+        return Objects.hash(id, name, active);
     }
 
     @Override
@@ -43,9 +45,10 @@ public final class Item {
         if (object == null || getClass() != object.getClass()) {
             return false;
         }
-        var itemView = (Item) object;
-        return Objects.equals(id, itemView.id) &&
-                Objects.equals(name, itemView.name);
+        var item = (Item) object;
+        return active == item.active &&
+                Objects.equals(id, item.id) &&
+                Objects.equals(name, item.name);
     }
 
     @Override
@@ -53,6 +56,7 @@ public final class Item {
         return "Item{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
+                ", active=" + active +
                 '}';
     }
 }

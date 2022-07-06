@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.github.xini1.domain.Module;
 import com.github.xini1.event.item.ItemCreated;
+import com.github.xini1.event.item.ItemDeactivated;
 import com.github.xini1.view.Item;
 import org.junit.jupiter.api.Test;
 
@@ -27,6 +28,14 @@ final class ViewItemsUseCaseTest {
     void givenItemCreatedEvent_whenViewItems_thenIterableHasThatItem() {
         module.onItemCreatedEventUseCase().onEvent(new ItemCreated(1, userId, itemId, "item"));
 
-        assertThat(module.viewItemsUseCase().view()).containsExactly(new Item(itemId, "item"));
+        assertThat(module.viewItemsUseCase().view()).containsExactly(new Item(itemId, "item", true));
+    }
+
+    @Test
+    void givenItemDeactivatedEvent_whenViewItems_thenIterableHasDeactivatedItem() {
+        module.onItemCreatedEventUseCase().onEvent(new ItemCreated(1, userId, itemId, "item"));
+        module.onItemDeactivatedEventUseCase().onEvent(new ItemDeactivated(1, userId, itemId));
+
+        assertThat(module.viewItemsUseCase().view()).containsExactly(new Item(itemId, "item", false));
     }
 }
