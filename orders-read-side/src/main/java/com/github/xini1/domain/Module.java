@@ -32,6 +32,6 @@ public final class Module {
     }
 
     public OnItemRemovedFromCartEventUseCase onItemRemovedFromCartEventUseCase() {
-        return null;
+        return updateService;
     }
 }

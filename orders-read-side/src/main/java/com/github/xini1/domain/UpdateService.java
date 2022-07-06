@@ -1,16 +1,18 @@
 package com.github.xini1.domain;
 
 import com.github.xini1.event.cart.ItemAddedToCart;
+import com.github.xini1.event.cart.ItemRemovedFromCart;
 import com.github.xini1.event.item.ItemCreated;
 import com.github.xini1.exception.ItemIsNotFound;
 import com.github.xini1.port.ViewStore;
 import com.github.xini1.usecase.OnItemAddedToCartEventUseCase;
 import com.github.xini1.usecase.OnItemCreatedEventUseCase;
+import com.github.xini1.usecase.OnItemRemovedFromCartEventUseCase;
 
 /**
  * @author Maxim Tereshchenko
  */
-final class UpdateService implements OnItemCreatedEventUseCase, OnItemAddedToCartEventUseCase {
+final class UpdateService implements OnItemCreatedEventUseCase, OnItemAddedToCartEventUseCase, OnItemRemovedFromCartEventUseCase {
 
     private final ViewStore viewStore;
 
@@ -33,5 +35,17 @@ final class UpdateService implements OnItemCreatedEventUseCase, OnItemAddedToCar
     @Override
     public void onEvent(ItemCreated itemCreated) {
         viewStore.save(new Item(itemCreated));
+    }
+
+    @Override
+    public void onEvent(ItemRemovedFromCart itemRemovedFromCart) {
+        viewStore.save(
+                viewStore.findCart(itemRemovedFromCart.aggregateId())
+                        .without(
+                                viewStore.findItem(itemRemovedFromCart.itemId())
+                                        .orElseThrow(ItemIsNotFound::new),
+                                itemRemovedFromCart.quantity()
+                        )
+        );
     }
 }

@@ -72,6 +72,21 @@ public final class Cart {
         return new Cart(userId, Set.copyOf(copy));
     }
 
+    public Cart without(Item item, int quantity) {
+        var itemInCart = new ItemInCart(item);
+        var copy = new ArrayList<>(itemsInCart);
+        var index = copy.indexOf(itemInCart);
+        var present = copy.get(index);
+
+        if (present.quantity == quantity) {
+            copy.remove(present);
+        } else {
+            copy.set(index, present.removeQuantity(quantity));
+        }
+
+        return new Cart(userId, Set.copyOf(copy));
+    }
+
     public static final class ItemInCart {
 
         private final UUID id;
@@ -86,6 +101,10 @@ public final class Cart {
 
         private ItemInCart(Item item, int quantity) {
             this(item.getId(), item.getName(), quantity);
+        }
+
+        private ItemInCart(Item item) {
+            this(item, 0);
         }
 
         @Override
@@ -113,6 +132,10 @@ public final class Cart {
                     ", name='" + name + '\'' +
                     ", quantity=" + quantity +
                     '}';
+        }
+
+        private ItemInCart removeQuantity(int quantity) {
+            return addQuantity(-quantity);
         }
 
         private ItemInCart addQuantity(int quantity) {
