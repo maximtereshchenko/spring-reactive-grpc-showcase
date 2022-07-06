@@ -18,7 +18,6 @@ import com.github.xini1.exception.QuantityIsNotPositive;
 import com.github.xini1.exception.UserIsNotRegular;
 import org.junit.jupiter.api.Test;
 
-import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -130,7 +129,7 @@ final class RegularUserUseCasesTest {
                 .containsExactly(
                         new ItemCreated(1, userId, itemId, "item"),
                         new ItemAddedToCart(1, userId, itemId, 1),
-                        new ItemsOrdered(2, userId, Map.of(itemId, 1))
+                        new ItemsOrdered(2, userId)
                 );
     }
 

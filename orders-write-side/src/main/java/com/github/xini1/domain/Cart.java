@@ -64,7 +64,7 @@ final class Cart extends AggregateRoot {
         if (hasDeactivatedItem(eventStore)) {
             throw new CartHasDeactivatedItem();
         }
-        apply(new ItemsOrdered(nextVersion(), id(), items));
+        apply(new ItemsOrdered(nextVersion(), id()));
     }
 
     private boolean hasDeactivatedItem(EventStore eventStore) {

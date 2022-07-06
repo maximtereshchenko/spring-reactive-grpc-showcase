@@ -37,6 +37,6 @@ public final class Module {
     }
 
     public OnItemsOrderedEventUseCase onItemsOrderedEventUseCase() {
-        return null;
+        return updateService;
     }
 }
