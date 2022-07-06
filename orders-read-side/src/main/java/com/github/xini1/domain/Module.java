@@ -9,6 +9,7 @@ import com.github.xini1.usecase.OnItemRemovedFromCartEventUseCase;
 import com.github.xini1.usecase.OnItemsOrderedEventUseCase;
 import com.github.xini1.usecase.ViewCartUseCase;
 import com.github.xini1.usecase.ViewItemsUseCase;
+import com.github.xini1.usecase.ViewTopOrderedItemsUseCase;
 
 /**
  * @author Maxim Tereshchenko
@@ -53,5 +54,9 @@ public final class Module {
 
     public OnItemActivatedEventUseCase onItemActivatedEventUseCase() {
         return updateService;
+    }
+
+    public ViewTopOrderedItemsUseCase viewTopOrderedItemsUseCase() {
+        return null;
     }
 }
