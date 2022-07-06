@@ -9,6 +9,7 @@ import com.github.xini1.usecase.OnItemRemovedFromCartEventUseCase;
 import com.github.xini1.usecase.OnItemsOrderedEventUseCase;
 import com.github.xini1.usecase.ViewCartUseCase;
 import com.github.xini1.usecase.ViewItemsUseCase;
+import com.github.xini1.usecase.ViewOrderedItemsUseCase;
 import com.github.xini1.usecase.ViewTopOrderedItemsUseCase;
 
 /**
@@ -58,5 +59,9 @@ public final class Module {
 
     public ViewTopOrderedItemsUseCase viewTopOrderedItemsUseCase() {
         return viewService;
+    }
+
+    public ViewOrderedItemsUseCase viewOrderedItemsUseCase() {
+        return null;
     }
 }

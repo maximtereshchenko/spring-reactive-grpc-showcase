@@ -1,6 +1,7 @@
 package com.github.xini1.view;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -12,17 +13,17 @@ import java.util.UUID;
 public final class Cart {
 
     private final UUID userId;
-    private final Set<ItemInCart> itemsInCart;
+    private final Collection<ItemInCart> itemsInCart;
     private final long version;
 
-    public Cart(UUID userId, Set<ItemInCart> itemsInCart, long version) {
+    public Cart(UUID userId, Collection<ItemInCart> itemsInCart, long version) {
         this.userId = userId;
-        this.itemsInCart = Set.copyOf(itemsInCart);
+        this.itemsInCart = List.copyOf(itemsInCart);
         this.version = version;
     }
 
     public Cart(UUID userId, long version, ItemInCart... itemsInCart) {
-        this(userId, Set.of(itemsInCart), version);
+        this(userId, List.of(itemsInCart), version);
     }
 
     public Cart(UUID userId) {
@@ -33,7 +34,7 @@ public final class Cart {
         return userId;
     }
 
-    public Set<ItemInCart> getItemsInCart() {
+    public Collection<ItemInCart> getItemsInCart() {
         return itemsInCart;
     }
 
