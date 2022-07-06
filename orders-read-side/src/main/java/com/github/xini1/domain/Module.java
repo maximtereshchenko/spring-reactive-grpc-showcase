@@ -12,6 +12,8 @@ import com.github.xini1.usecase.ViewItemsUseCase;
 import com.github.xini1.usecase.ViewOrderedItemsUseCase;
 import com.github.xini1.usecase.ViewTopOrderedItemsUseCase;
 
+import java.time.Clock;
+
 /**
  * @author Maxim Tereshchenko
  */
@@ -20,9 +22,13 @@ public final class Module {
     private final ViewService viewService;
     private final UpdateService updateService;
 
-    public Module(ViewStore viewStore) {
+    public Module(ViewStore viewStore, Clock clock) {
         viewService = new ViewService(viewStore);
-        updateService = new UpdateService(viewStore);
+        updateService = new UpdateService(viewStore, clock);
+    }
+
+    public Module(ViewStore viewStore) {
+        this(viewStore, Clock.systemDefaultZone());
     }
 
     public ViewCartUseCase viewCartUseCase() {

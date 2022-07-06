@@ -92,4 +92,9 @@ final class InMemoryViewStore implements ViewStore {
         }
         return items;
     }
+
+    @Override
+    public void save(OrderedItems orderedItems) {
+        this.orderedItems.put(orderedItems.getUserId(), orderedItems);
+    }
 }

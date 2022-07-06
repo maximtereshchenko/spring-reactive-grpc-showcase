@@ -1,6 +1,7 @@
 package com.github.xini1.view;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -21,6 +22,20 @@ public final class OrderedItems {
 
     public OrderedItems(UUID userId, Order... orders) {
         this(userId, List.of(orders));
+    }
+
+    public UUID getUserId() {
+        return userId;
+    }
+
+    public List<Order> getOrders() {
+        return orders;
+    }
+
+    public OrderedItems withOrder(Order order) {
+        var copy = new ArrayList<>(orders);
+        copy.add(order);
+        return new OrderedItems(userId, copy);
     }
 
     @Override
@@ -92,17 +107,21 @@ public final class OrderedItems {
 
     public static final class ItemInOrder {
 
-        private final UUID itemId;
+        private final UUID id;
         private final int quantity;
 
-        public ItemInOrder(UUID itemId, int quantity) {
-            this.itemId = itemId;
+        public ItemInOrder(UUID id, int quantity) {
+            this.id = id;
             this.quantity = quantity;
+        }
+
+        public ItemInOrder(Cart.ItemInCart itemInCart) {
+            this(itemInCart.getId(), itemInCart.getQuantity());
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(itemId, quantity);
+            return Objects.hash(id, quantity);
         }
 
         @Override
@@ -115,13 +134,13 @@ public final class OrderedItems {
             }
             var that = (ItemInOrder) object;
             return quantity == that.quantity &&
-                    Objects.equals(itemId, that.itemId);
+                    Objects.equals(id, that.id);
         }
 
         @Override
         public String toString() {
             return "ItemInOrder{" +
-                    "itemId=" + itemId +
+                    "itemId=" + id +
                     ", quantity=" + quantity +
                     '}';
         }

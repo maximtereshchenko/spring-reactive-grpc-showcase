@@ -15,7 +15,11 @@ import com.github.xini1.usecase.OnItemRemovedFromCartEventUseCase;
 import com.github.xini1.usecase.OnItemsOrderedEventUseCase;
 import com.github.xini1.view.Cart;
 import com.github.xini1.view.Item;
+import com.github.xini1.view.OrderedItems;
 import com.github.xini1.view.TopOrderedItem;
+
+import java.time.Clock;
+import java.util.stream.Collectors;
 
 /**
  * @author Maxim Tereshchenko
@@ -25,9 +29,11 @@ final class UpdateService implements OnItemCreatedEventUseCase, OnItemAddedToCar
         OnItemActivatedEventUseCase {
 
     private final ViewStore viewStore;
+    private final Clock clock;
 
-    UpdateService(ViewStore viewStore) {
+    UpdateService(ViewStore viewStore, Clock clock) {
         this.viewStore = viewStore;
+        this.clock = clock;
     }
 
     @Override
@@ -78,6 +84,18 @@ final class UpdateService implements OnItemCreatedEventUseCase, OnItemAddedToCar
                 .stream()
                 .map(this::topOrderedItemWithAddedQuantity)
                 .forEach(viewStore::save);
+        viewStore.save(
+                viewStore.findOrderedItems(itemsOrdered.aggregateId())
+                        .withOrder(
+                                new OrderedItems.Order(
+                                        clock.instant(),
+                                        cart.getItemsInCart()
+                                                .stream()
+                                                .map(OrderedItems.ItemInOrder::new)
+                                                .collect(Collectors.toList())
+                                )
+                        )
+        );
     }
 
     @Override

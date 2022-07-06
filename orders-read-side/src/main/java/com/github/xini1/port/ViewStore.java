@@ -32,4 +32,6 @@ public interface ViewStore {
     void save(TopOrderedItem topOrderedItem);
 
     OrderedItems findOrderedItems(UUID userId);
+
+    void save(OrderedItems orderedItems);
 }

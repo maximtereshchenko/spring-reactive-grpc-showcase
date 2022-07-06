@@ -22,7 +22,7 @@ import java.util.UUID;
 final class ViewOrderedItemsUseCaseTest {
 
     private final Clock clock = Clock.fixed(Instant.MIN, ZoneOffset.UTC);
-    private final Module module = new Module(new InMemoryViewStore());
+    private final Module module = new Module(new InMemoryViewStore(), clock);
     private final UUID itemId = UUID.fromString("00000000-000-0000-0000-000000000001");
     private final UUID userId = UUID.fromString("00000000-000-0000-0000-000000000002");
 
