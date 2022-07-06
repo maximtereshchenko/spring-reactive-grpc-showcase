@@ -21,5 +21,5 @@ public interface ViewStore {
 
     Iterable<Item> findAllItems();
 
-    Collection<Cart> findCartsByItemId(UUID itemId);
+    Collection<Cart> findCartsByItemIdAndItemVersionGreater(UUID itemId, long version);
 }

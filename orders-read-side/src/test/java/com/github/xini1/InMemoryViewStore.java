@@ -48,12 +48,13 @@ final class InMemoryViewStore implements ViewStore {
     }
 
     @Override
-    public Collection<Cart> findCartsByItemId(UUID itemId) {
+    public Collection<Cart> findCartsByItemIdAndItemVersionGreater(UUID itemId, long version) {
         return carts.values()
                 .stream()
                 .filter(cart ->
                         cart.getItemsInCart()
                                 .stream()
+                                .filter(itemInCart -> itemInCart.hasVersionLessThan(version))
                                 .map(Cart.ItemInCart::getId)
                                 .anyMatch(id -> id.equals(itemId))
                 )

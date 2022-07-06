@@ -130,16 +130,18 @@ public final class Cart {
         private final String name;
         private final boolean active;
         private final int quantity;
+        private final long version;
 
-        public ItemInCart(UUID id, String name, boolean active, int quantity) {
+        public ItemInCart(UUID id, String name, boolean active, int quantity, long version) {
             this.id = id;
             this.name = name;
             this.active = active;
             this.quantity = quantity;
+            this.version = version;
         }
 
         private ItemInCart(Item item, int quantity) {
-            this(item.getId(), item.getName(), item.isActive(), quantity);
+            this(item.getId(), item.getName(), item.isActive(), quantity, item.getVersion());
         }
 
         public UUID getId() {
@@ -156,6 +158,10 @@ public final class Cart {
 
         public int getQuantity() {
             return quantity;
+        }
+
+        public boolean hasVersionLessThan(long version) {
+            return this.version < version;
         }
 
         @Override
@@ -189,11 +195,11 @@ public final class Cart {
         }
 
         private ItemInCart activated() {
-            return new ItemInCart(id, name, true, quantity);
+            return new ItemInCart(id, name, true, quantity, version);
         }
 
         private ItemInCart deactivated() {
-            return new ItemInCart(id, name, false, quantity);
+            return new ItemInCart(id, name, false, quantity, version);
         }
 
         private ItemInCart removeQuantity(int quantity) {
@@ -201,7 +207,7 @@ public final class Cart {
         }
 
         private ItemInCart addQuantity(int quantity) {
-            return new ItemInCart(id, name, active, this.quantity + quantity);
+            return new ItemInCart(id, name, active, this.quantity + quantity, version);
         }
     }
 }

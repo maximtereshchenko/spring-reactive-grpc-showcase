@@ -29,23 +29,23 @@ final class ViewItemsUseCaseTest {
     void givenItemCreatedEvent_whenViewItems_thenIterableHasThatItem() {
         module.onItemCreatedEventUseCase().onEvent(new ItemCreated(1, userId, itemId, "item"));
 
-        assertThat(module.viewItemsUseCase().view()).containsExactly(new Item(itemId, "item", true));
+        assertThat(module.viewItemsUseCase().view()).containsExactly(new Item(itemId, "item", true, 1));
     }
 
     @Test
     void givenItemDeactivatedEvent_whenViewItems_thenIterableHasDeactivatedItem() {
         module.onItemCreatedEventUseCase().onEvent(new ItemCreated(1, userId, itemId, "item"));
-        module.onItemDeactivatedEventUseCase().onEvent(new ItemDeactivated(1, userId, itemId));
+        module.onItemDeactivatedEventUseCase().onEvent(new ItemDeactivated(2, userId, itemId));
 
-        assertThat(module.viewItemsUseCase().view()).containsExactly(new Item(itemId, "item", false));
+        assertThat(module.viewItemsUseCase().view()).containsExactly(new Item(itemId, "item", false, 2));
     }
 
     @Test
     void givenItemActivatedEvent_whenViewItems_thenIterableHasActivatedItem() {
         module.onItemCreatedEventUseCase().onEvent(new ItemCreated(1, userId, itemId, "item"));
-        module.onItemDeactivatedEventUseCase().onEvent(new ItemDeactivated(1, userId, itemId));
-        module.onItemActivatedEventUseCase().onEvent(new ItemActivated(1, userId, itemId));
+        module.onItemDeactivatedEventUseCase().onEvent(new ItemDeactivated(2, userId, itemId));
+        module.onItemActivatedEventUseCase().onEvent(new ItemActivated(3, userId, itemId));
 
-        assertThat(module.viewItemsUseCase().view()).containsExactly(new Item(itemId, "item", true));
+        assertThat(module.viewItemsUseCase().view()).containsExactly(new Item(itemId, "item", true, 3));
     }
 }

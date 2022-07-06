@@ -48,7 +48,7 @@ final class ViewCartUseCaseTest {
                         new Cart(
                                 userId,
                                 1,
-                                new Cart.ItemInCart(itemId, "item", true, 1)
+                                new Cart.ItemInCart(itemId, "item", true, 1, 1)
                         )
                 );
     }
@@ -64,7 +64,7 @@ final class ViewCartUseCaseTest {
                         new Cart(
                                 userId,
                                 1,
-                                new Cart.ItemInCart(itemId, "item", false, 1)
+                                new Cart.ItemInCart(itemId, "item", false, 1, 2)
                         )
                 );
     }
@@ -81,7 +81,7 @@ final class ViewCartUseCaseTest {
                         new Cart(
                                 userId,
                                 1,
-                                new Cart.ItemInCart(itemId, "item", true, 1)
+                                new Cart.ItemInCart(itemId, "item", true, 1, 3)
                         )
                 );
     }
@@ -97,7 +97,7 @@ final class ViewCartUseCaseTest {
                         new Cart(
                                 userId,
                                 2,
-                                new Cart.ItemInCart(itemId, "item", true, 3)
+                                new Cart.ItemInCart(itemId, "item", true, 3, 1)
                         )
                 );
     }
@@ -122,7 +122,7 @@ final class ViewCartUseCaseTest {
                         new Cart(
                                 userId,
                                 2,
-                                new Cart.ItemInCart(itemId, "item", true, 1)
+                                new Cart.ItemInCart(itemId, "item", true, 1, 1)
                         )
                 );
     }
@@ -147,7 +147,7 @@ final class ViewCartUseCaseTest {
                         new Cart(
                                 userId,
                                 1,
-                                new Cart.ItemInCart(itemId, "item", true, 1)
+                                new Cart.ItemInCart(itemId, "item", true, 1, 1)
                         )
                 );
     }
@@ -163,7 +163,7 @@ final class ViewCartUseCaseTest {
                         new Cart(
                                 userId,
                                 1,
-                                new Cart.ItemInCart(itemId, "item", true, 1)
+                                new Cart.ItemInCart(itemId, "item", true, 1, 1)
                         )
                 );
     }
@@ -179,7 +179,7 @@ final class ViewCartUseCaseTest {
                         new Cart(
                                 userId,
                                 1,
-                                new Cart.ItemInCart(itemId, "item", true, 1)
+                                new Cart.ItemInCart(itemId, "item", true, 1, 1)
                         )
                 );
     }
@@ -195,7 +195,7 @@ final class ViewCartUseCaseTest {
                         new Cart(
                                 userId,
                                 1,
-                                new Cart.ItemInCart(itemId, "item", true, 1)
+                                new Cart.ItemInCart(itemId, "item", true, 1, 1)
                         )
                 );
     }
