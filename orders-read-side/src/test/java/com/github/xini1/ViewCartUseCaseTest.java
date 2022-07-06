@@ -73,4 +73,19 @@ final class ViewCartUseCaseTest {
 
         assertThat(module.viewCartUseCase().view(userId, User.REGULAR)).isEqualTo(new Cart(userId));
     }
+
+    @Test
+    void givenCartHasItem_whenViewCart_thenCartHasLessOfThatItem() {
+        module.onItemCreatedEventUseCase().onEvent(new ItemCreated(1, userId, itemId, "item"));
+        module.onItemAddedToCartEventUseCase().onEvent(new ItemAddedToCart(1, userId, itemId, 2));
+        module.onItemRemovedFromCartEventUseCase().onEvent(new ItemRemovedFromCart(2, userId, itemId, 1));
+
+        assertThat(module.viewCartUseCase().view(userId, User.REGULAR))
+                .isEqualTo(
+                        new Cart(
+                                userId,
+                                new Cart.ItemInCart(itemId, "item", 1)
+                        )
+                );
+    }
 }
