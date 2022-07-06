@@ -74,6 +74,10 @@ final class UpdateService implements OnItemCreatedEventUseCase, OnItemAddedToCar
             return;
         }
         viewStore.save(new Cart(itemsOrdered.aggregateId(), itemsOrdered.version()));
+        cart.getItemsInCart()
+                .stream()
+                .map(this::topOrderedItemWithAddedQuantity)
+                .forEach(viewStore::save);
     }
 
     @Override
@@ -98,5 +102,9 @@ final class UpdateService implements OnItemCreatedEventUseCase, OnItemAddedToCar
                 .stream()
                 .map(cart -> cart.withActivated(found.activated(itemActivated.version())))
                 .forEach(viewStore::save);
+    }
+
+    private TopOrderedItem topOrderedItemWithAddedQuantity(Cart.ItemInCart itemInCart) {
+        return viewStore.findTopOrderedItem(itemInCart.getId()).addTimesOrdered(itemInCart.getQuantity());
     }
 }

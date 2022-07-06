@@ -73,6 +73,11 @@ final class InMemoryViewStore implements ViewStore {
     }
 
     @Override
+    public TopOrderedItem findTopOrderedItem(UUID itemId) {
+        return topOrderedItems.get(itemId);
+    }
+
+    @Override
     public void save(TopOrderedItem topOrderedItem) {
         topOrderedItems.put(topOrderedItem.getId(), topOrderedItem);
     }

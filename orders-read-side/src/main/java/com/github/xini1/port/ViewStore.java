@@ -26,5 +26,7 @@ public interface ViewStore {
 
     Iterable<TopOrderedItem> findAllTopOrderedItems();
 
+    TopOrderedItem findTopOrderedItem(UUID itemId);
+
     void save(TopOrderedItem topOrderedItem);
 }

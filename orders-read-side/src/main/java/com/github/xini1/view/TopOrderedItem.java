@@ -61,4 +61,8 @@ public final class TopOrderedItem {
                 ", timesOrdered=" + timesOrdered +
                 '}';
     }
+
+    public TopOrderedItem addTimesOrdered(int quantity) {
+        return new TopOrderedItem(id, name, timesOrdered + quantity);
+    }
 }
