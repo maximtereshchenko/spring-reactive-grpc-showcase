@@ -18,4 +18,6 @@ public interface ViewStore {
     void save(Item item);
 
     void save(Cart cart);
+
+    Iterable<Item> items();
 }

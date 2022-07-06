@@ -40,4 +40,9 @@ final class InMemoryViewStore implements ViewStore {
     public void save(Cart cart) {
         carts.put(cart.getUserId(), cart);
     }
+
+    @Override
+    public Iterable<Item> items() {
+        return items.values();
+    }
 }

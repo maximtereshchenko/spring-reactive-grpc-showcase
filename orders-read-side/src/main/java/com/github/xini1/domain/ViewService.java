@@ -4,6 +4,7 @@ import com.github.xini1.User;
 import com.github.xini1.exception.UserIsNotRegular;
 import com.github.xini1.port.ViewStore;
 import com.github.xini1.usecase.ViewCartUseCase;
+import com.github.xini1.usecase.ViewItemsUseCase;
 import com.github.xini1.view.Cart;
 
 import java.util.UUID;
@@ -11,7 +12,7 @@ import java.util.UUID;
 /**
  * @author Maxim Tereshchenko
  */
-final class ViewService implements ViewCartUseCase {
+final class ViewService implements ViewCartUseCase, ViewItemsUseCase {
 
     private final ViewStore viewStore;
 
@@ -25,5 +26,10 @@ final class ViewService implements ViewCartUseCase {
             throw new UserIsNotRegular();
         }
         return viewStore.findCart(userId);
+    }
+
+    @Override
+    public Iterable<Item> view() {
+        return viewStore.items();
     }
 }

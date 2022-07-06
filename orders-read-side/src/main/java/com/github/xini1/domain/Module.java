@@ -42,6 +42,6 @@ public final class Module {
     }
 
     public ViewItemsUseCase viewItemsUseCase() {
-        return null;
+        return viewService;
     }
 }
