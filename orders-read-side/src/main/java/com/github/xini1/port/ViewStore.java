@@ -25,4 +25,6 @@ public interface ViewStore {
     Collection<Cart> findCartsByItemIdAndItemVersionLess(UUID itemId, long version);
 
     Iterable<TopOrderedItem> findAllTopOrderedItems();
+
+    void save(TopOrderedItem topOrderedItem);
 }

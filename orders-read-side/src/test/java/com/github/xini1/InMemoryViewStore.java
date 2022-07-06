@@ -71,4 +71,9 @@ final class InMemoryViewStore implements ViewStore {
                 .sorted(Comparator.comparingLong(TopOrderedItem::getTimesOrdered).reversed())
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public void save(TopOrderedItem topOrderedItem) {
+        topOrderedItems.put(topOrderedItem.getId(), topOrderedItem);
+    }
 }

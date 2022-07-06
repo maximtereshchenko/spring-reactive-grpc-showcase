@@ -15,6 +15,7 @@ import com.github.xini1.usecase.OnItemRemovedFromCartEventUseCase;
 import com.github.xini1.usecase.OnItemsOrderedEventUseCase;
 import com.github.xini1.view.Cart;
 import com.github.xini1.view.Item;
+import com.github.xini1.view.TopOrderedItem;
 
 /**
  * @author Maxim Tereshchenko
@@ -46,7 +47,9 @@ final class UpdateService implements OnItemCreatedEventUseCase, OnItemAddedToCar
 
     @Override
     public void onEvent(ItemCreated itemCreated) {
-        viewStore.save(new Item(itemCreated));
+        var item = new Item(itemCreated);
+        viewStore.save(item);
+        viewStore.save(new TopOrderedItem(item));
     }
 
     @Override

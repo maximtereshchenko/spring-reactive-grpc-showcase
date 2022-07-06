@@ -1,5 +1,6 @@
 package com.github.xini1.view;
 
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -17,6 +18,10 @@ public final class TopOrderedItem {
         this.timesOrdered = timesOrdered;
     }
 
+    public TopOrderedItem(Item item) {
+        this(item.getId(), item.getName(), 0);
+    }
+
     public UUID getId() {
         return id;
     }
@@ -27,5 +32,33 @@ public final class TopOrderedItem {
 
     public long getTimesOrdered() {
         return timesOrdered;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, timesOrdered);
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+        if (object == null || getClass() != object.getClass()) {
+            return false;
+        }
+        var that = (TopOrderedItem) object;
+        return timesOrdered == that.timesOrdered &&
+                Objects.equals(id, that.id) &&
+                Objects.equals(name, that.name);
+    }
+
+    @Override
+    public String toString() {
+        return "TopOrderedItem{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", timesOrdered=" + timesOrdered +
+                '}';
     }
 }
