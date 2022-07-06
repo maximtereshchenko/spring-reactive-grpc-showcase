@@ -1,6 +1,7 @@
 package com.github.xini1.domain;
 
 import com.github.xini1.User;
+import com.github.xini1.exception.UserIsNotAdmin;
 import com.github.xini1.exception.UserIsNotRegular;
 import com.github.xini1.port.ViewStore;
 import com.github.xini1.usecase.ViewCartUseCase;
@@ -38,6 +39,9 @@ final class ViewService implements ViewCartUseCase, ViewItemsUseCase, ViewTopOrd
 
     @Override
     public Iterable<TopOrderedItem> view(User user) {
+        if (user != User.ADMIN) {
+            throw new UserIsNotAdmin();
+        }
         return viewStore.findAllTopOrderedItems();
     }
 }
