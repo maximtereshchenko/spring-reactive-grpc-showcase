@@ -18,7 +18,8 @@ JWT.
 "Orders (write side)" is responsible for creating new items for purchase, activating/deactivating items, adding/removing
 items to/from user's cart, ordering items in cart.
 
-"Orders (read side)" is responsible for viewing information about user's cart, closed orders, top ordered items.
+"Orders (read side)" is responsible for viewing information about available items, user's cart, previously ordered
+items, top ordered items.
 
 To build these services Spring Reactor will be used alongside with gRPC for communication between them. Apache
 Kafka and MongoDB were chosen mostly of their reactive driver support.
@@ -34,6 +35,7 @@ Kafka and MongoDB were chosen mostly of their reactive driver support.
 7) Any user can view all items.
 8) Regular user can view his cart.
 9) Admin can view top ordered items.
+10) Regular user can view his previous ordered items.
 
 # What have I learnt?
 
