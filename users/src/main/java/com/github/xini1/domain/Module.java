@@ -7,7 +7,9 @@ import com.github.xini1.usecase.*;
  */
 public final class Module {
 
+    private final UserService userService = new UserService();
+
     public LoginUseCase loginUseCase() {
-        return null;
+        return userService;
     }
 }
