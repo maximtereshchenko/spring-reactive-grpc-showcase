@@ -4,6 +4,7 @@ include("common")
 include("orders-write-side")
 include("orders-read-side")
 include("users")
+include("api-gateway")
 
 dependencyResolutionManagement {
     versionCatalogs {
