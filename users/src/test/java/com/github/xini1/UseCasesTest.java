@@ -20,4 +20,11 @@ final class UseCasesTest {
         assertThatThrownBy(() -> useCase.login("username", "password"))
                 .isInstanceOf(IncorrectLoginOrPassword.class);
     }
+
+    @Test
+    void givenUserWithLoginAndPasswordExists_whenLogin_thenJwtReturned() {
+        module.registerUseCase().register("username", "password", User.REGULAR);
+
+        assertThat(module.loginUseCase().login("username", "password")).isEqualTo("jwt");
+    }
 }

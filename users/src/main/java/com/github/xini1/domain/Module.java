@@ -12,4 +12,8 @@ public final class Module {
     public LoginUseCase loginUseCase() {
         return userService;
     }
+
+    public RegisterUseCase registerUseCase() {
+        return null;
+    }
 }
