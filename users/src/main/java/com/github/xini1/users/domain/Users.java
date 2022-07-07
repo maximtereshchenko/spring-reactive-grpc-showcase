@@ -28,4 +28,8 @@ final class Users {
         return userStore.findByUsernameAndPasswordHash(username, passwordHash)
                 .map(User::new);
     }
+
+    User find(UUID userId) {
+        return new User(userStore.find(userId));
+    }
 }

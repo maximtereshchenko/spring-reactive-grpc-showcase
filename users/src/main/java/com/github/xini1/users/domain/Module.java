@@ -27,4 +27,8 @@ public final class Module {
     public RegisterUseCase registerUseCase() {
         return userService;
     }
+
+    public DecodeJwtUseCase decodeJwtUseCase() {
+        return userService;
+    }
 }

@@ -29,6 +29,11 @@ final class InMemoryUserStore implements UserStore {
                 .findAny();
     }
 
+    @Override
+    public Dto find(UUID userId) {
+        return map.get(userId);
+    }
+
     private boolean usernameExists(Dto dto) {
         return map.values()
                 .stream()

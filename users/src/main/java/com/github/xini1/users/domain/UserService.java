@@ -10,7 +10,7 @@ import java.util.*;
 /**
  * @author Maxim Tereshchenko
  */
-final class UserService implements LoginUseCase, RegisterUseCase {
+final class UserService implements LoginUseCase, RegisterUseCase, DecodeJwtUseCase {
 
     private final Users users;
     private final TokenProvider tokenProvider;
@@ -34,5 +34,10 @@ final class UserService implements LoginUseCase, RegisterUseCase {
         var user = User.create(username, password, userType, hashingAlgorithm);
         users.save(user);
         return user.id();
+    }
+
+    @Override
+    public Response decode(String jwt) {
+        return users.find(tokenProvider.decode(jwt)).info();
     }
 }

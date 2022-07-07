@@ -14,6 +14,8 @@ public interface UserStore {
 
     Optional<Dto> findByUsernameAndPasswordHash(String username, String passwordHash);
 
+    Dto find(UUID userId);
+
     final class Dto {
         private final UUID id;
         private final String username;

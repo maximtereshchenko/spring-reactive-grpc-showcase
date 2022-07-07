@@ -8,4 +8,6 @@ import java.util.*;
 public interface TokenProvider {
 
     String sign(UUID userId);
+
+    UUID decode(String jwt);
 }

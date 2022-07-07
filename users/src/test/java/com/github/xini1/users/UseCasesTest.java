@@ -4,6 +4,7 @@ import com.github.xini1.common.*;
 import com.github.xini1.common.event.user.*;
 import com.github.xini1.users.domain.Module;
 import com.github.xini1.users.exception.*;
+import com.github.xini1.users.usecase.*;
 import org.junit.jupiter.api.*;
 
 import static org.assertj.core.api.Assertions.*;
@@ -17,7 +18,7 @@ final class UseCasesTest {
     private final Module module = new Module(
             new InMemoryUserStore(),
             eventStore,
-            userId -> "jwt",
+            new PlainStringTokenProvider(),
             password -> password
     );
 
@@ -33,7 +34,7 @@ final class UseCasesTest {
     void givenUserWithLoginAndPasswordExists_whenLogin_thenJwtReturned() {
         var userId = module.registerUseCase().register("username", "password", UserType.REGULAR);
 
-        assertThat(module.loginUseCase().login("username", "password")).isEqualTo("jwt");
+        assertThat(module.loginUseCase().login("username", "password")).isEqualTo(userId.toString());
         assertThat(eventStore.events()).containsExactly(new UserRegistered(1, userId, "username"));
     }
 
@@ -60,5 +61,14 @@ final class UseCasesTest {
 
         assertThatThrownBy(() -> useCase.register("username", "password2", UserType.REGULAR))
                 .isInstanceOf(UsernameIsTaken.class);
+    }
+
+    @Test
+    void givenJwt_whenDecodeJwt_thenUserIdReturned() {
+        var userId = module.registerUseCase().register("username", "password", UserType.REGULAR);
+        var jwt = module.loginUseCase().login("username", "password");
+
+        assertThat(module.decodeJwtUseCase().decode(jwt))
+                .isEqualTo(new DecodeJwtUseCase.Response(userId, UserType.REGULAR));
     }
 }

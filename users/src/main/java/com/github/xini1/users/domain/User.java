@@ -3,6 +3,7 @@ package com.github.xini1.users.domain;
 import com.github.xini1.common.*;
 import com.github.xini1.users.exception.*;
 import com.github.xini1.users.port.*;
+import com.github.xini1.users.usecase.*;
 
 import java.util.*;
 
@@ -51,5 +52,9 @@ final class User {
 
     String jwt(TokenProvider tokenProvider) {
         return tokenProvider.sign(id);
+    }
+
+    DecodeJwtUseCase.Response info() {
+        return new DecodeJwtUseCase.Response(id, userType);
     }
 }
