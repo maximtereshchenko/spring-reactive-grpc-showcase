@@ -1,5 +1,6 @@
 package com.github.xini1.users.domain;
 
+import com.github.xini1.common.event.*;
 import com.github.xini1.common.event.user.*;
 import com.github.xini1.users.port.*;
 
@@ -11,16 +12,16 @@ import java.util.*;
 final class Users {
 
     private final UserStore userStore;
-    private final EventStore eventStore;
+    private final BasicEventStore basicEventStore;
 
-    Users(UserStore userStore, EventStore eventStore) {
+    Users(UserStore userStore, BasicEventStore basicEventStore) {
         this.userStore = userStore;
-        this.eventStore = eventStore;
+        this.basicEventStore = basicEventStore;
     }
 
     void save(User user) {
         userStore.save(user.dto());
-        eventStore.publish(new UserRegistered(1, user.id(), user.name()));
+        basicEventStore.publish(new UserRegistered(1, user.id(), user.name()));
     }
 
     Optional<User> findByUsernameAndPasswordHash(String username, String passwordHash) {

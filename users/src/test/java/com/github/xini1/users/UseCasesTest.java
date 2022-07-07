@@ -38,7 +38,27 @@ final class UseCasesTest {
     }
 
     @Test
-    void givenPasswordIsNotEmpty_whenRegister_thenUserRegisteredEventPublished() {
-        //TODO
+    void givenPasswordIsEmpty_whenRegister_thenPasswordIsEmptyThrown() {
+        var useCase = module.registerUseCase();
+
+        assertThatThrownBy(() -> useCase.register("username", "", UserType.REGULAR))
+                .isInstanceOf(PasswordIsEmpty.class);
+    }
+
+    @Test
+    void givenUsernameIsEmpty_whenRegister_thenUsernameIsEmptyThrown() {
+        var useCase = module.registerUseCase();
+
+        assertThatThrownBy(() -> useCase.register("", "password", UserType.REGULAR))
+                .isInstanceOf(UsernameIsEmpty.class);
+    }
+
+    @Test
+    void givenUserWithSuchNameExists_whenRegister_thenUsernameIsTakenThrown() {
+        var useCase = module.registerUseCase();
+        useCase.register("username", "password1", UserType.REGULAR);
+
+        assertThatThrownBy(() -> useCase.register("username", "password2", UserType.REGULAR))
+                .isInstanceOf(UsernameIsTaken.class);
     }
 }

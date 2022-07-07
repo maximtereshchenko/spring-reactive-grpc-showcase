@@ -31,7 +31,7 @@ final class UserService implements LoginUseCase, RegisterUseCase {
 
     @Override
     public UUID register(String username, String password, UserType userType) {
-        var user = new User(username, hashingAlgorithm.hash(password), userType);
+        var user = User.create(username, password, userType, hashingAlgorithm);
         users.save(user);
         return user.id();
     }

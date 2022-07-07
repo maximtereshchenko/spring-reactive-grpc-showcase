@@ -1,6 +1,7 @@
 package com.github.xini1.users.port;
 
 import com.github.xini1.common.*;
+import com.github.xini1.users.exception.*;
 
 import java.util.*;
 
@@ -9,7 +10,7 @@ import java.util.*;
  */
 public interface UserStore {
 
-    void save(Dto dto);
+    void save(Dto dto) throws UsernameIsTaken;
 
     Optional<Dto> findByUsernameAndPasswordHash(String username, String passwordHash);
 

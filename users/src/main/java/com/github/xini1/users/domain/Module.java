@@ -1,5 +1,6 @@
 package com.github.xini1.users.domain;
 
+import com.github.xini1.common.event.*;
 import com.github.xini1.users.port.*;
 import com.github.xini1.users.usecase.*;
 
@@ -12,11 +13,11 @@ public final class Module {
 
     public Module(
             UserStore userStore,
-            EventStore eventStore,
+            BasicEventStore basicEventStore,
             TokenProvider tokenProvider,
             HashingAlgorithm hashingAlgorithm
     ) {
-        userService = new UserService(new Users(userStore, eventStore), tokenProvider, hashingAlgorithm);
+        userService = new UserService(new Users(userStore, basicEventStore), tokenProvider, hashingAlgorithm);
     }
 
     public LoginUseCase loginUseCase() {

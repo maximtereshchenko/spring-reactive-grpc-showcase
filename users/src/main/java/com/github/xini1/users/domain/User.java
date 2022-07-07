@@ -1,6 +1,7 @@
 package com.github.xini1.users.domain;
 
 import com.github.xini1.common.*;
+import com.github.xini1.users.exception.*;
 import com.github.xini1.users.port.*;
 
 import java.util.*;
@@ -15,19 +16,25 @@ final class User {
     private final String passwordHash;
     private final UserType userType;
 
-    User(UUID id, String name, String passwordHash, UserType userType) {
+    private User(UUID id, String name, String passwordHash, UserType userType) {
         this.id = id;
         this.name = name;
         this.passwordHash = passwordHash;
         this.userType = userType;
     }
 
-    User(String name, String passwordHash, UserType userType) {
-        this(UUID.randomUUID(), name, passwordHash, userType);
-    }
-
     public User(UserStore.Dto dto) {
         this(dto.getId(), dto.getUsername(), dto.getPasswordHash(), dto.getUserType());
+    }
+
+    static User create(String name, String password, UserType userType, HashingAlgorithm hashingAlgorithm) {
+        if (name.isBlank()) {
+            throw new UsernameIsEmpty();
+        }
+        if (password.isBlank()) {
+            throw new PasswordIsEmpty();
+        }
+        return new User(UUID.randomUUID(), name, hashingAlgorithm.hash(password), userType);
     }
 
     UUID id() {
