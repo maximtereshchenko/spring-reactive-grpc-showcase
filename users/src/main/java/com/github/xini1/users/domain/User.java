@@ -14,28 +14,28 @@ final class User {
 
     private final UUID id;
     private final String name;
-    private final String passwordHash;
+    private final String password;
     private final UserType userType;
 
-    private User(UUID id, String name, String passwordHash, UserType userType) {
+    private User(UUID id, String name, String password, UserType userType) {
         this.id = id;
         this.name = name;
-        this.passwordHash = passwordHash;
+        this.password = password;
         this.userType = userType;
     }
 
     public User(UserStore.Dto dto) {
-        this(dto.getId(), dto.getUsername(), dto.getPasswordHash(), dto.getUserType());
+        this(dto.getId(), dto.getUsername(), dto.getPassword(), dto.getUserType());
     }
 
-    static User create(String name, String password, UserType userType, HashingAlgorithm hashingAlgorithm) {
+    static User create(String name, String password, UserType userType) {
         if (name.isBlank()) {
             throw new UsernameIsEmpty();
         }
         if (password.isBlank()) {
             throw new PasswordIsEmpty();
         }
-        return new User(UUID.randomUUID(), name, hashingAlgorithm.hash(password), userType);
+        return new User(UUID.randomUUID(), name, password, userType);
     }
 
     UUID id() {
@@ -47,7 +47,7 @@ final class User {
     }
 
     UserStore.Dto dto() {
-        return new UserStore.Dto(id, name, passwordHash, userType);
+        return new UserStore.Dto(id, name, password, userType);
     }
 
     String jwt(TokenProvider tokenProvider) {

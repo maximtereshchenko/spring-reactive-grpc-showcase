@@ -13,19 +13,23 @@ final class InMemoryUserStore implements UserStore {
     private final Map<UUID, Dto> map = new HashMap<>();
 
     @Override
-    public void save(Dto dto) throws UsernameIsTaken {
+    public void save(Dto dto, HashingAlgorithm hashingAlgorithm) throws UsernameIsTaken {
         if (usernameExists(dto)) {
-            throw new UsernameIsTaken();
+            throw new UsernameIsTaken(dto.getUsername());
         }
         map.put(dto.getId(), dto);
     }
 
     @Override
-    public Optional<Dto> findByUsernameAndPasswordHash(String username, String passwordHash) {
+    public Optional<Dto> findByUsernameAndPassword(
+            String username,
+            String password,
+            HashingAlgorithm hashingAlgorithm
+    ) {
         return map.values()
                 .stream()
                 .filter(dto -> dto.getUsername().equals(username))
-                .filter(dto -> dto.getPasswordHash().equals(passwordHash))
+                .filter(dto -> dto.getPassword().equals(password))
                 .findAny();
     }
 

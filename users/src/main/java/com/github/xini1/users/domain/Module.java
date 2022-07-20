@@ -17,7 +17,7 @@ public final class Module {
             TokenProvider tokenProvider,
             HashingAlgorithm hashingAlgorithm
     ) {
-        userService = new UserService(new Users(userStore, basicEventStore), tokenProvider, hashingAlgorithm);
+        userService = new UserService(new Users(userStore, basicEventStore, hashingAlgorithm), tokenProvider);
     }
 
     public LoginUseCase loginUseCase() {

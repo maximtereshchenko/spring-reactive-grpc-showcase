@@ -13,19 +13,21 @@ final class Users {
 
     private final UserStore userStore;
     private final BasicEventStore basicEventStore;
+    private final HashingAlgorithm hashingAlgorithm;
 
-    Users(UserStore userStore, BasicEventStore basicEventStore) {
+    Users(UserStore userStore, BasicEventStore basicEventStore, HashingAlgorithm hashingAlgorithm) {
         this.userStore = userStore;
         this.basicEventStore = basicEventStore;
+        this.hashingAlgorithm = hashingAlgorithm;
     }
 
     void save(User user) {
-        userStore.save(user.dto());
+        userStore.save(user.dto(), hashingAlgorithm);
         basicEventStore.publish(new UserRegistered(1, user.id(), user.name()));
     }
 
-    Optional<User> findByUsernameAndPasswordHash(String username, String passwordHash) {
-        return userStore.findByUsernameAndPasswordHash(username, passwordHash)
+    Optional<User> findByUsernameAndPasswordHash(String username, String password) {
+        return userStore.findByUsernameAndPassword(username, password, hashingAlgorithm)
                 .map(User::new);
     }
 

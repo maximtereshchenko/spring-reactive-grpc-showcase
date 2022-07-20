@@ -1,0 +1,37 @@
+syntax = "proto3";
+option java_multiple_files = true;
+package com.github.xini1.users.rpc;
+
+message RegisterRequest {
+    string username = 1;
+    string password = 2;
+    string userType = 3;
+}
+
+message IdResponse {
+    string id = 1;
+}
+
+message LoginRequest {
+    string username = 1;
+    string password = 2;
+}
+
+message JwtResponse {
+    string jwt = 1;
+}
+
+message DecodeJwtRequest {
+    string jwt = 1;
+}
+
+message DecodedJwtResponse {
+    string userId = 1;
+    string userType = 2;
+}
+
+service UserService {
+    rpc register(RegisterRequest) returns (IdResponse);
+    rpc login(LoginRequest) returns (JwtResponse);
+    rpc decode(DecodeJwtRequest) returns (DecodedJwtResponse);
+}

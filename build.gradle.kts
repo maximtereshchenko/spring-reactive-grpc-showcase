@@ -7,6 +7,4 @@ subprojects {
     repositories {
         mavenCentral()
     }
-
-    apply(plugin = "java")
 }

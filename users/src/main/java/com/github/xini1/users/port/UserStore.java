@@ -10,22 +10,22 @@ import java.util.*;
  */
 public interface UserStore {
 
-    void save(Dto dto) throws UsernameIsTaken;
+    void save(Dto dto, HashingAlgorithm hashingAlgorithm) throws UsernameIsTaken;
 
-    Optional<Dto> findByUsernameAndPasswordHash(String username, String passwordHash);
+    Optional<Dto> findByUsernameAndPassword(String username, String password, HashingAlgorithm hashingAlgorithm);
 
     Dto find(UUID userId);
 
     final class Dto {
         private final UUID id;
         private final String username;
-        private final String passwordHash;
+        private final String password;
         private final UserType userType;
 
-        public Dto(UUID id, String username, String passwordHash, UserType userType) {
+        public Dto(UUID id, String username, String password, UserType userType) {
             this.id = id;
             this.username = username;
-            this.passwordHash = passwordHash;
+            this.password = password;
             this.userType = userType;
         }
 
@@ -37,8 +37,8 @@ public interface UserStore {
             return username;
         }
 
-        public String getPasswordHash() {
-            return passwordHash;
+        public String getPassword() {
+            return password;
         }
 
         public UserType getUserType() {

@@ -19,7 +19,7 @@ final class UseCasesTest {
             new InMemoryUserStore(),
             eventStore,
             new PlainStringTokenProvider(),
-            password -> password
+            new NoHashingAlgorithm()
     );
 
     @Test

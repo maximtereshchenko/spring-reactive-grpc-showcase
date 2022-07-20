@@ -14,24 +14,22 @@ final class UserService implements LoginUseCase, RegisterUseCase, DecodeJwtUseCa
 
     private final Users users;
     private final TokenProvider tokenProvider;
-    private final HashingAlgorithm hashingAlgorithm;
 
-    UserService(Users users, TokenProvider tokenProvider, HashingAlgorithm hashingAlgorithm) {
+    UserService(Users users, TokenProvider tokenProvider) {
         this.users = users;
         this.tokenProvider = tokenProvider;
-        this.hashingAlgorithm = hashingAlgorithm;
     }
 
     @Override
     public String login(String username, String password) {
-        return users.findByUsernameAndPasswordHash(username, hashingAlgorithm.hash(password))
+        return users.findByUsernameAndPasswordHash(username, password)
                 .map(user -> user.jwt(tokenProvider))
                 .orElseThrow(IncorrectUsernameOrPassword::new);
     }
 
     @Override
     public UUID register(String username, String password, UserType userType) {
-        var user = User.create(username, password, userType, hashingAlgorithm);
+        var user = User.create(username, password, userType);
         users.save(user);
         return user.id();
     }

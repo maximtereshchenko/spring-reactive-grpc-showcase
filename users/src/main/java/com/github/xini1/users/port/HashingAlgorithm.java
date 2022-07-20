@@ -5,5 +5,7 @@ package com.github.xini1.users.port;
  */
 public interface HashingAlgorithm {
 
-    String hash(String password);
+    String hash(String password, byte[] salt);
+
+    byte[] salt();
 }

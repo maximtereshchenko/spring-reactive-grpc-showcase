@@ -8,6 +8,7 @@ import java.util.*;
  * @author Maxim Tereshchenko
  */
 public interface DecodeJwtUseCase {
+
     Response decode(String jwt);
 
     final class Response {
