@@ -16,8 +16,25 @@ public final class ItemCreated extends ItemEvent {
         this.name = name;
     }
 
+    public ItemCreated(Map<String, String> properties) {
+        this(
+                Long.parseLong(properties.get("version")),
+                UUID.fromString(properties.get("userId")),
+                UUID.fromString(properties.get("itemId")),
+                properties.get("name")
+        );
+    }
+
     public String name() {
         return name;
+    }
+
+    @Override
+    public Map<String, String> asMap() {
+        var map = new HashMap<>(super.asMap());
+        map.put("userId", userId.toString());
+        map.put("name", name);
+        return Map.copyOf(map);
     }
 
     @Override

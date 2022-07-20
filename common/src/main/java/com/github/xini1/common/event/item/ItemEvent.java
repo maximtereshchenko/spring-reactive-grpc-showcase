@@ -27,6 +27,13 @@ public abstract class ItemEvent extends VersionedEvent {
     }
 
     @Override
+    public Map<String, String> asMap() {
+        var map = new HashMap<>(super.asMap());
+        map.put("itemId", itemId.toString());
+        return Map.copyOf(map);
+    }
+
+    @Override
     public int hashCode() {
         return Objects.hash(itemId);
     }

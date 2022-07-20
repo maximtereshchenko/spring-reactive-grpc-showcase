@@ -16,12 +16,30 @@ public final class ItemAddedToCart extends CartEvent {
         this.quantity = quantity;
     }
 
+    public ItemAddedToCart(Map<String, String> properties) {
+        this(
+                Long.parseLong(properties.get("version")),
+                UUID.fromString(properties.get("userId")),
+                UUID.fromString(properties.get("itemId")),
+                Integer.parseInt(properties.get("quantity"))
+        );
+    }
+
+
     public UUID itemId() {
         return itemId;
     }
 
     public int quantity() {
         return quantity;
+    }
+
+    @Override
+    public Map<String, String> asMap() {
+        var map = new HashMap<>(super.asMap());
+        map.put("itemId", itemId.toString());
+        map.put("quantity", String.valueOf(quantity));
+        return Map.copyOf(map);
     }
 
     @Override

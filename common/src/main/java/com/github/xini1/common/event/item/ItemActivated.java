@@ -14,6 +14,14 @@ public final class ItemActivated extends ItemEvent {
         this.userId = userId;
     }
 
+    public ItemActivated(Map<String, String> properties) {
+        this(
+                Long.parseLong(properties.get("version")),
+                UUID.fromString(properties.get("userId")),
+                UUID.fromString(properties.get("itemId"))
+        );
+    }
+
     public UUID userId() {
         return userId;
     }
@@ -21,6 +29,13 @@ public final class ItemActivated extends ItemEvent {
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), userId);
+    }
+
+    @Override
+    public Map<String, String> asMap() {
+        var map = new HashMap<>(super.asMap());
+        map.put("userId", userId.toString());
+        return Map.copyOf(map);
     }
 
     @Override

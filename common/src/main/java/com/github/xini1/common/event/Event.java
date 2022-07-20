@@ -12,4 +12,6 @@ public interface Event {
     EventType type();
 
     long version();
+
+    Map<String, String> asMap();
 }

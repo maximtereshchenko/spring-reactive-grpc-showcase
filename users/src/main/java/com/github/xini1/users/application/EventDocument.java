@@ -16,19 +16,21 @@ final class EventDocument {
     private UUID aggregateId;
     private EventType type;
     private long version;
+    private String data;
 
     EventDocument() {
     }
 
-    public EventDocument(Event event) {
+    public EventDocument(Event event, String data) {
         this.aggregateId = event.aggregateId();
         this.type = event.type();
         this.version = event.version();
+        this.data = data;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(aggregateId, type, version);
+        return Objects.hash(aggregateId, type, version, data);
     }
 
     @Override
@@ -42,7 +44,8 @@ final class EventDocument {
         var that = (EventDocument) object;
         return version == that.version &&
                 Objects.equals(aggregateId, that.aggregateId) &&
-                type == that.type;
+                type == that.type &&
+                Objects.equals(data, that.data);
     }
 
     @Override
@@ -51,7 +54,16 @@ final class EventDocument {
                 "aggregateId=" + aggregateId +
                 ", type=" + type +
                 ", version=" + version +
+                ", data='" + data + '\'' +
                 '}';
+    }
+
+    String getData() {
+        return data;
+    }
+
+    void setData(String data) {
+        this.data = data;
     }
 
     UUID getAggregateId() {

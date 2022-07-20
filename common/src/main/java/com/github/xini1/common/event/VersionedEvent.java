@@ -19,6 +19,11 @@ public abstract class VersionedEvent implements Event {
     }
 
     @Override
+    public Map<String, String> asMap() {
+        return Map.of("version", String.valueOf(version));
+    }
+
+    @Override
     public int hashCode() {
         return Objects.hash(version);
     }

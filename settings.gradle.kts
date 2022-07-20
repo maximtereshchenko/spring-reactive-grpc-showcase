@@ -39,11 +39,15 @@ dependencyResolutionManagement {
                 .versionRef("testcontainers")
             library("testcontainers-mongodb", "org.testcontainers", "mongodb")
                 .versionRef("testcontainers")
+            library("testcontainers-kafka", "org.testcontainers", "kafka")
+                .versionRef("testcontainers")
 
             library("assertj", "org.assertj:assertj-core:3.23.1")
             library("protoc-compiler", "com.google.protobuf:protoc:3.0.0")
             library("annotation-api", "javax.annotation:javax.annotation-api:1.3.2")
             library("jwt", "com.auth0:java-jwt:4.0.0")
+            library("spring-kafka", "org.springframework.kafka:spring-kafka:2.8.8")
+            library("reactor-kafka", "io.projectreactor.kafka:reactor-kafka:1.3.11")
 
             plugin("protobuf", "com.google.protobuf").version("0.8.19")
         }

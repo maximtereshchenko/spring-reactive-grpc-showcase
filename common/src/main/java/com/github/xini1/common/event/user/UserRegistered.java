@@ -18,6 +18,22 @@ public final class UserRegistered extends VersionedEvent {
         this.username = username;
     }
 
+    public UserRegistered(Map<String, String> properties) {
+        this(
+                Long.parseLong(properties.get("version")),
+                UUID.fromString(properties.get("userId")),
+                properties.get("username")
+        );
+    }
+
+    @Override
+    public Map<String, String> asMap() {
+        var map = new HashMap<>(super.asMap());
+        map.put("userId", userId.toString());
+        map.put("username", username);
+        return Map.copyOf(map);
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), userId, username);
