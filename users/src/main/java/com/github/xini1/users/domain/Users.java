@@ -23,7 +23,7 @@ final class Users {
 
     void save(User user) {
         userStore.save(user.dto(), hashingAlgorithm);
-        basicEventStore.publish(new UserRegistered(1, user.id(), user.name()));
+        basicEventStore.publish(new UserRegistered(user.id(), user.name(), 1));
     }
 
     Optional<User> findByUsernameAndPasswordHash(String username, String password) {

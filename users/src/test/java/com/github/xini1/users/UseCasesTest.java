@@ -35,7 +35,7 @@ final class UseCasesTest {
         var userId = module.registerUseCase().register("username", "password", UserType.REGULAR);
 
         assertThat(module.loginUseCase().login("username", "password")).isEqualTo(userId.toString());
-        assertThat(eventStore.events()).containsExactly(new UserRegistered(1, userId, "username"));
+        assertThat(eventStore.events()).containsExactly(new UserRegistered(userId, "username", 1));
     }
 
     @Test

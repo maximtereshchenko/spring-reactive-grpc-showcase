@@ -34,6 +34,7 @@ abstract class AggregateRoot {
 
     void apply(Event event) {
         handlers.get(event.getClass()).accept(event);
+        version = event.version();
         newEvents.add(event);
     }
 

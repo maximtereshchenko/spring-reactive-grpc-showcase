@@ -22,21 +22,21 @@ final class InMemoryEventStore implements EventStore {
 
     @Override
     public List<ItemEvent> itemEvents(UUID itemId) {
-        return find(EventType.ITEM, itemId, ItemEvent.class);
+        return find(EventType.itemEvents(), itemId, ItemEvent.class);
     }
 
     @Override
     public List<CartEvent> cartEvents(UUID userId) {
-        return find(EventType.CART, userId, CartEvent.class);
+        return find(EventType.cartEvents(), userId, CartEvent.class);
     }
 
     List<Event> events() {
         return events;
     }
 
-    private <T extends Event> List<T> find(EventType eventType, UUID aggregateId, Class<T> resultType) {
+    private <T extends Event> List<T> find(Collection<EventType> eventTypes, UUID aggregateId, Class<T> resultType) {
         return events.stream()
-                .filter(event -> event.type() == eventType)
+                .filter(event -> eventTypes.contains(event.type()))
                 .filter(event -> event.aggregateId().equals(aggregateId))
                 .sorted(Comparator.comparingLong(Event::version))
                 .map(resultType::cast)

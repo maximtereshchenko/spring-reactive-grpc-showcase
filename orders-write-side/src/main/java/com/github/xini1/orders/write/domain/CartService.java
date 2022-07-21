@@ -19,7 +19,8 @@ final class CartService implements AddItemToCartUseCase, OrderItemsInCartUseCase
     }
 
     @Override
-    public void add(UUID userId, UserType userType, UUID itemId, int quantity) {
+    public void add(UUID userId, UserType userType, UUID itemId, int quantity)
+            throws UserIsNotRegular, ItemIsNotFound, QuantityIsNotPositive, CouldNotAddDeactivatedItemToCart {
         if (userType != UserType.REGULAR) {
             throw new UserIsNotRegular();
         }
@@ -29,7 +30,7 @@ final class CartService implements AddItemToCartUseCase, OrderItemsInCartUseCase
     }
 
     @Override
-    public void order(UUID userId, UserType userType) {
+    public void order(UUID userId, UserType userType) throws UserIsNotRegular, CartIsEmpty {
         if (userType != UserType.REGULAR) {
             throw new UserIsNotRegular();
         }
@@ -39,7 +40,8 @@ final class CartService implements AddItemToCartUseCase, OrderItemsInCartUseCase
     }
 
     @Override
-    public void remove(UUID userId, UserType userType, UUID itemId, int quantity) {
+    public void remove(UUID userId, UserType userType, UUID itemId, int quantity)
+            throws UserIsNotRegular, ItemIsNotFound, QuantityIsNotPositive, QuantityIsMoreThanCartHas {
         if (userType != UserType.REGULAR) {
             throw new UserIsNotRegular();
         }

@@ -1,37 +1,59 @@
 package com.github.xini1.common.event.item;
 
+import com.github.xini1.common.event.*;
+
 import java.util.*;
 
 /**
  * @author Maxim Tereshchenko
  */
-public final class ItemDeactivated extends ItemEvent {
+public final class ItemDeactivated implements ItemEvent {
 
+    private final UUID itemId;
     private final UUID userId;
+    private final long version;
 
-    public ItemDeactivated(long version, UUID userId, UUID itemId) {
-        super(version, itemId);
+    public ItemDeactivated(UUID itemId, UUID userId, long version) {
+        this.itemId = itemId;
         this.userId = userId;
+        this.version = version;
     }
 
     public ItemDeactivated(Map<String, String> properties) {
         this(
-                Long.parseLong(properties.get("version")),
                 UUID.fromString(properties.get("userId")),
-                UUID.fromString(properties.get("itemId"))
+                UUID.fromString(properties.get("itemId")),
+                Long.parseLong(properties.get("version"))
+        );
+    }
+
+    @Override
+    public UUID aggregateId() {
+        return itemId;
+    }
+
+    @Override
+    public EventType type() {
+        return EventType.ITEM_DEACTIVATED;
+    }
+
+    @Override
+    public long version() {
+        return version;
+    }
+
+    @Override
+    public Map<String, String> asMap() {
+        return Map.of(
+                "itemId", itemId.toString(),
+                "userId", userId.toString(),
+                "version", String.valueOf(version)
         );
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), userId);
-    }
-
-    @Override
-    public Map<String, String> asMap() {
-        var map = new HashMap<>(super.asMap());
-        map.put("userId", userId.toString());
-        return Map.copyOf(map);
+        return Objects.hash(itemId, userId, version);
     }
 
     @Override
@@ -42,17 +64,18 @@ public final class ItemDeactivated extends ItemEvent {
         if (object == null || getClass() != object.getClass()) {
             return false;
         }
-        if (!super.equals(object)) {
-            return false;
-        }
         var that = (ItemDeactivated) object;
-        return Objects.equals(userId, that.userId);
+        return version == that.version &&
+                Objects.equals(itemId, that.itemId) &&
+                Objects.equals(userId, that.userId);
     }
 
     @Override
     public String toString() {
         return "ItemDeactivated{" +
-                "userId=" + userId +
-                "} " + super.toString();
+                "itemId=" + itemId +
+                ", userId=" + userId +
+                ", version=" + version +
+                '}';
     }
 }

@@ -1,0 +1,55 @@
+syntax = "proto3";
+option java_multiple_files = true;
+package com.github.xini1.orders.write.rpc;
+
+message Empty {}
+
+message ActivateItemRequest {
+    string userId = 1;
+    string userType = 2;
+    string itemId = 3;
+}
+
+message AddItemToCartRequest {
+    string userId = 1;
+    string userType = 2;
+    string itemId = 3;
+    int32 quantity = 4;
+}
+
+message CreateItemRequest {
+    string userId = 1;
+    string userType = 2;
+    string name = 3;
+}
+
+message ItemIdResponse {
+    string itemId = 1;
+}
+
+message DeactivateItemRequest {
+    string userId = 1;
+    string userType = 2;
+    string itemId = 3;
+}
+
+message OrderItemsInCartRequest {
+    string userId = 1;
+    string userType = 2;
+}
+
+message RemoveItemFromCartRequest {
+    string userId = 1;
+    string userType = 2;
+    string itemId = 3;
+    int32 quantity = 4;
+}
+
+service OrderWriteService {
+    rpc activate(ActivateItemRequest) returns (Empty);
+    rpc add(AddItemToCartRequest) returns (Empty);
+    rpc create(CreateItemRequest) returns (ItemIdResponse);
+    rpc deactivate(DeactivateItemRequest) returns (Empty);
+    rpc order(OrderItemsInCartRequest) returns (Empty);
+    rpc remove(RemoveItemFromCartRequest) returns (Empty);
+}

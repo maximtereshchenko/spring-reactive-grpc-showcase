@@ -7,36 +7,53 @@ import java.util.*;
 /**
  * @author Maxim Tereshchenko
  */
-public final class UserRegistered extends VersionedEvent {
+public final class UserRegistered implements UserEvent {
 
     private final UUID userId;
     private final String username;
+    private final long version;
 
-    public UserRegistered(long version, UUID userId, String username) {
-        super(version);
+    public UserRegistered(UUID userId, String username, long version) {
         this.userId = userId;
         this.username = username;
+        this.version = version;
     }
 
     public UserRegistered(Map<String, String> properties) {
         this(
-                Long.parseLong(properties.get("version")),
                 UUID.fromString(properties.get("userId")),
-                properties.get("username")
+                properties.get("username"),
+                Long.parseLong(properties.get("version"))
         );
     }
 
     @Override
+    public UUID aggregateId() {
+        return userId;
+    }
+
+    @Override
+    public EventType type() {
+        return EventType.USER_REGISTERED;
+    }
+
+    @Override
+    public long version() {
+        return version;
+    }
+
+    @Override
     public Map<String, String> asMap() {
-        var map = new HashMap<>(super.asMap());
-        map.put("userId", userId.toString());
-        map.put("username", username);
-        return Map.copyOf(map);
+        return Map.of(
+                "userId", userId.toString(),
+                "username", username,
+                "version", String.valueOf(version)
+        );
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), userId, username);
+        return Objects.hash(userId, username, version);
     }
 
     @Override
@@ -47,11 +64,9 @@ public final class UserRegistered extends VersionedEvent {
         if (object == null || getClass() != object.getClass()) {
             return false;
         }
-        if (!super.equals(object)) {
-            return false;
-        }
         var that = (UserRegistered) object;
-        return Objects.equals(userId, that.userId) &&
+        return version == that.version &&
+                Objects.equals(userId, that.userId) &&
                 Objects.equals(username, that.username);
     }
 
@@ -60,17 +75,7 @@ public final class UserRegistered extends VersionedEvent {
         return "UserRegistered{" +
                 "userId=" + userId +
                 ", username='" + username + '\'' +
-                "} " + super.toString();
+                ", version=" + version +
+                '}';
     }
-
-    @Override
-    public UUID aggregateId() {
-        return userId;
-    }
-
-    @Override
-    public EventType type() {
-        return EventType.USER;
-    }
-
 }

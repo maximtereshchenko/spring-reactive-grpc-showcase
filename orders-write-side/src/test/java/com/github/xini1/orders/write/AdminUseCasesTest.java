@@ -17,8 +17,8 @@ final class AdminUseCasesTest {
 
     private final InMemoryEventStore eventStore = new InMemoryEventStore();
     private final Module module = new Module(eventStore);
-    private final UUID userId = UUID.fromString("00000000-000-0000-0000-000000000001");
-    private final UUID nonExistentItemId = UUID.fromString("00000000-000-0000-0000-000000000002");
+    private final UUID userId = UUID.fromString("00000000-0000-0000-0000-000000000001");
+    private final UUID nonExistentItemId = UUID.fromString("00000000-0000-0000-0000-000000000002");
 
     @Test
     void givenUserIsAdmin_whenCreateItem_thenItemCreatedEventPublished() {
@@ -26,7 +26,7 @@ final class AdminUseCasesTest {
                 .create(userId, UserType.ADMIN, "item");
 
         assertThat(eventStore.events())
-                .containsExactly(new ItemCreated(1, userId, itemId, "item"));
+                .containsExactly(new ItemCreated(itemId, userId, "item", 1));
     }
 
     @Test
@@ -71,8 +71,8 @@ final class AdminUseCasesTest {
 
         assertThat(eventStore.events())
                 .containsExactly(
-                        new ItemCreated(1, userId, itemId, "item"),
-                        new ItemDeactivated(2, userId, itemId)
+                        new ItemCreated(itemId, userId, "item", 1),
+                        new ItemDeactivated(itemId, userId, 2)
                 );
     }
 
@@ -86,8 +86,8 @@ final class AdminUseCasesTest {
 
         assertThat(eventStore.events())
                 .containsExactly(
-                        new ItemCreated(1, userId, itemId, "item"),
-                        new ItemDeactivated(2, userId, itemId)
+                        new ItemCreated(itemId, userId, "item", 1),
+                        new ItemDeactivated(itemId, userId, 2)
                 );
     }
 
@@ -121,7 +121,7 @@ final class AdminUseCasesTest {
                 .isInstanceOf(ItemIsAlreadyActive.class);
 
         assertThat(eventStore.events())
-                .containsExactly(new ItemCreated(1, userId, itemId, "item"));
+                .containsExactly(new ItemCreated(itemId, userId, "item", 1));
     }
 
     @Test
@@ -135,9 +135,9 @@ final class AdminUseCasesTest {
 
         assertThat(eventStore.events())
                 .containsExactly(
-                        new ItemCreated(1, userId, itemId, "item"),
-                        new ItemDeactivated(2, userId, itemId),
-                        new ItemActivated(3, userId, itemId)
+                        new ItemCreated(itemId, userId, "item", 1),
+                        new ItemDeactivated(itemId, userId, 2),
+                        new ItemActivated(itemId, userId, 3)
                 );
     }
 }

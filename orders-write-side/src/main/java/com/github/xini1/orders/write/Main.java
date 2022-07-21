@@ -1,6 +1,6 @@
-package com.github.xini1.users;
+package com.github.xini1.orders.write;
 
-import com.github.xini1.users.application.*;
+import com.github.xini1.orders.write.application.*;
 import org.springframework.boot.*;
 import org.springframework.boot.autoconfigure.*;
 import org.springframework.context.annotation.*;

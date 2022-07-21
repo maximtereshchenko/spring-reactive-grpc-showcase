@@ -14,7 +14,7 @@ import reactor.kafka.sender.*;
  */
 @Configuration
 @EnableReactiveMongoRepositories(basePackageClasses = UserRepository.class)
-public class ApplicationConfiguration {
+public class SpringConfiguration {
 
     @Bean
     RpcServer rpcServer(

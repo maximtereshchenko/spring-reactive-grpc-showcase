@@ -142,7 +142,7 @@ final class IntegrationTest {
 
     private EventDocument expectedEventDocument() {
         var eventDocument = new EventDocument();
-        eventDocument.setType(EventType.USER);
+        eventDocument.setEventType(EventType.USER_REGISTERED);
         eventDocument.setAggregateId(UUID.fromString(userId));
         eventDocument.setVersion(1);
         eventDocument.setData(expectedEventJson());

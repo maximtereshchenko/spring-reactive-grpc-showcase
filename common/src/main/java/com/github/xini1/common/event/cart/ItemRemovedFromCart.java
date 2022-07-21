@@ -1,27 +1,32 @@
 package com.github.xini1.common.event.cart;
 
+import com.github.xini1.common.event.*;
+
 import java.util.*;
 
 /**
  * @author Maxim Tereshchenko
  */
-public final class ItemRemovedFromCart extends CartEvent {
+public final class ItemRemovedFromCart implements CartEvent {
 
+    private final UUID userId;
     private final UUID itemId;
     private final int quantity;
+    private final long version;
 
-    public ItemRemovedFromCart(long version, UUID userId, UUID itemId, int quantity) {
-        super(version, userId);
+    public ItemRemovedFromCart(UUID userId, UUID itemId, int quantity, long version) {
+        this.userId = userId;
         this.itemId = itemId;
         this.quantity = quantity;
+        this.version = version;
     }
 
     public ItemRemovedFromCart(Map<String, String> properties) {
         this(
-                Long.parseLong(properties.get("version")),
                 UUID.fromString(properties.get("userId")),
                 UUID.fromString(properties.get("itemId")),
-                Integer.parseInt(properties.get("quantity"))
+                Integer.parseInt(properties.get("quantity")),
+                Long.parseLong(properties.get("version"))
         );
     }
 
@@ -34,16 +39,33 @@ public final class ItemRemovedFromCart extends CartEvent {
     }
 
     @Override
+    public UUID aggregateId() {
+        return userId;
+    }
+
+    @Override
+    public EventType type() {
+        return EventType.ITEM_REMOVED_FROM_CART;
+    }
+
+    @Override
+    public long version() {
+        return version;
+    }
+
+    @Override
     public Map<String, String> asMap() {
-        var map = new HashMap<>(super.asMap());
-        map.put("itemId", itemId.toString());
-        map.put("quantity", String.valueOf(quantity));
-        return Map.copyOf(map);
+        return Map.of(
+                "userId", userId.toString(),
+                "itemId", itemId.toString(),
+                "quantity", String.valueOf(quantity),
+                "version", String.valueOf(version)
+        );
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), itemId, quantity);
+        return Objects.hash(userId, itemId, quantity, version);
     }
 
     @Override
@@ -54,19 +76,21 @@ public final class ItemRemovedFromCart extends CartEvent {
         if (object == null || getClass() != object.getClass()) {
             return false;
         }
-        if (!super.equals(object)) {
-            return false;
-        }
         var that = (ItemRemovedFromCart) object;
         return quantity == that.quantity &&
+                version == that.version &&
+                Objects.equals(userId, that.userId) &&
                 Objects.equals(itemId, that.itemId);
     }
 
     @Override
     public String toString() {
         return "ItemRemovedFromCart{" +
-                "itemId=" + itemId +
+                "userId=" + userId +
+                ", itemId=" + itemId +
                 ", quantity=" + quantity +
-                "} " + super.toString();
+                ", version=" + version +
+                '}';
     }
+
 }

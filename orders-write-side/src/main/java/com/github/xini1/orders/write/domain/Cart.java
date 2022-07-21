@@ -35,7 +35,7 @@ final class Cart extends AggregateRoot {
         if (quantity < 1) {
             throw new QuantityIsNotPositive();
         }
-        apply(new ItemAddedToCart(nextVersion(), id(), item.id(), quantity));
+        apply(new ItemAddedToCart(id(), item.id(), quantity, nextVersion()));
     }
 
     void remove(Item item, int quantity) {
@@ -45,7 +45,7 @@ final class Cart extends AggregateRoot {
         if (quantity > items.getOrDefault(item.id(), 0)) {
             throw new QuantityIsMoreThanCartHas();
         }
-        apply(new ItemRemovedFromCart(nextVersion(), id(), item.id(), quantity));
+        apply(new ItemRemovedFromCart(id(), item.id(), quantity, nextVersion()));
     }
 
     void order(EventStore eventStore) {
@@ -55,7 +55,7 @@ final class Cart extends AggregateRoot {
         if (hasDeactivatedItem(eventStore)) {
             throw new CartHasDeactivatedItem();
         }
-        apply(new ItemsOrdered(nextVersion(), id()));
+        apply(new ItemsOrdered(id(), nextVersion()));
     }
 
     private boolean hasDeactivatedItem(EventStore eventStore) {

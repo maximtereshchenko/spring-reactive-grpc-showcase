@@ -15,8 +15,8 @@ import static org.assertj.core.api.Assertions.*;
 final class ViewItemsUseCaseTest {
 
     private final Module module = new Module(new InMemoryViewStore());
-    private final UUID itemId = UUID.fromString("00000000-000-0000-0000-000000000001");
-    private final UUID userId = UUID.fromString("00000000-000-0000-0000-000000000002");
+    private final UUID itemId = UUID.fromString("00000000-0000-0000-0000-000000000001");
+    private final UUID userId = UUID.fromString("00000000-0000-0000-0000-000000000002");
 
     @Test
     void givenNoItemCreatedEvent_whenViewItems_thenIterableIsEmpty() {
@@ -25,7 +25,7 @@ final class ViewItemsUseCaseTest {
 
     @Test
     void givenItemCreatedEvent_whenViewItems_thenIterableHasThatItem() {
-        module.onItemCreatedEventUseCase().onEvent(new ItemCreated(1, userId, itemId, "item"));
+        module.onItemCreatedEventUseCase().onEvent(new ItemCreated(itemId, userId, "item", 1));
 
         assertThat(module.viewItemsUseCase().view())
                 .containsExactly(new Item(itemId, "item", true, 1));
@@ -33,8 +33,8 @@ final class ViewItemsUseCaseTest {
 
     @Test
     void givenItemDeactivatedEvent_whenViewItems_thenIterableHasDeactivatedItem() {
-        module.onItemCreatedEventUseCase().onEvent(new ItemCreated(1, userId, itemId, "item"));
-        module.onItemDeactivatedEventUseCase().onEvent(new ItemDeactivated(2, userId, itemId));
+        module.onItemCreatedEventUseCase().onEvent(new ItemCreated(itemId, userId, "item", 1));
+        module.onItemDeactivatedEventUseCase().onEvent(new ItemDeactivated(itemId, userId, 2));
 
         assertThat(module.viewItemsUseCase().view())
                 .containsExactly(new Item(itemId, "item", false, 2));
@@ -42,9 +42,9 @@ final class ViewItemsUseCaseTest {
 
     @Test
     void givenItemActivatedEvent_whenViewItems_thenIterableHasActivatedItem() {
-        module.onItemCreatedEventUseCase().onEvent(new ItemCreated(1, userId, itemId, "item"));
-        module.onItemDeactivatedEventUseCase().onEvent(new ItemDeactivated(2, userId, itemId));
-        module.onItemActivatedEventUseCase().onEvent(new ItemActivated(3, userId, itemId));
+        module.onItemCreatedEventUseCase().onEvent(new ItemCreated(itemId, userId, "item", 1));
+        module.onItemDeactivatedEventUseCase().onEvent(new ItemDeactivated(itemId, userId, 2));
+        module.onItemActivatedEventUseCase().onEvent(new ItemActivated(itemId, userId, 3));
 
         assertThat(module.viewItemsUseCase().view())
                 .containsExactly(new Item(itemId, "item", true, 3));
@@ -52,8 +52,8 @@ final class ViewItemsUseCaseTest {
 
     @Test
     void givenItemHasVersionGreaterOrEqualToItemDeactivatedEventVersion_whenViewItems_thenItemWasNotChanged() {
-        module.onItemCreatedEventUseCase().onEvent(new ItemCreated(1, userId, itemId, "item"));
-        module.onItemDeactivatedEventUseCase().onEvent(new ItemDeactivated(1, userId, itemId));
+        module.onItemCreatedEventUseCase().onEvent(new ItemCreated(itemId, userId, "item", 1));
+        module.onItemDeactivatedEventUseCase().onEvent(new ItemDeactivated(itemId, userId, 1));
 
         assertThat(module.viewItemsUseCase().view())
                 .containsExactly(new Item(itemId, "item", true, 1));
@@ -61,9 +61,9 @@ final class ViewItemsUseCaseTest {
 
     @Test
     void givenItemHasVersionGreaterOrEqualToItemActivatedEventVersion_whenViewItems_thenItemWasNotChanged() {
-        module.onItemCreatedEventUseCase().onEvent(new ItemCreated(1, userId, itemId, "item"));
-        module.onItemDeactivatedEventUseCase().onEvent(new ItemDeactivated(2, userId, itemId));
-        module.onItemActivatedEventUseCase().onEvent(new ItemActivated(2, userId, itemId));
+        module.onItemCreatedEventUseCase().onEvent(new ItemCreated(itemId, userId, "item", 1));
+        module.onItemDeactivatedEventUseCase().onEvent(new ItemDeactivated(itemId, userId, 2));
+        module.onItemActivatedEventUseCase().onEvent(new ItemActivated(itemId, userId, 2));
 
         assertThat(module.viewItemsUseCase().view())
                 .containsExactly(new Item(itemId, "item", false, 2));

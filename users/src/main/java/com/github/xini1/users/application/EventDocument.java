@@ -2,6 +2,7 @@ package com.github.xini1.users.application;
 
 import com.github.xini1.common.event.*;
 import org.springframework.data.annotation.*;
+import org.springframework.data.mongodb.core.index.*;
 import org.springframework.data.mongodb.core.mapping.*;
 
 import java.util.*;
@@ -10,11 +11,12 @@ import java.util.*;
  * @author Maxim Tereshchenko
  */
 @Document(collection = "events")
+@CompoundIndex(def = "{'aggregateId': 1, 'version': 1}", unique = true)
 final class EventDocument {
 
     @Id
     private UUID aggregateId;
-    private EventType type;
+    private EventType eventType;
     private long version;
     private String data;
 
@@ -23,14 +25,14 @@ final class EventDocument {
 
     public EventDocument(Event event, String data) {
         this.aggregateId = event.aggregateId();
-        this.type = event.type();
+        this.eventType = event.type();
         this.version = event.version();
         this.data = data;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(aggregateId, type, version, data);
+        return Objects.hash(aggregateId, eventType, version, data);
     }
 
     @Override
@@ -44,7 +46,7 @@ final class EventDocument {
         var that = (EventDocument) object;
         return version == that.version &&
                 Objects.equals(aggregateId, that.aggregateId) &&
-                type == that.type &&
+                eventType == that.eventType &&
                 Objects.equals(data, that.data);
     }
 
@@ -52,7 +54,7 @@ final class EventDocument {
     public String toString() {
         return "EventDocument{" +
                 "aggregateId=" + aggregateId +
-                ", type=" + type +
+                ", type=" + eventType +
                 ", version=" + version +
                 ", data='" + data + '\'' +
                 '}';
@@ -74,12 +76,12 @@ final class EventDocument {
         this.aggregateId = aggregateId;
     }
 
-    EventType getType() {
-        return type;
+    EventType getEventType() {
+        return eventType;
     }
 
-    void setType(EventType type) {
-        this.type = type;
+    void setEventType(EventType eventType) {
+        this.eventType = eventType;
     }
 
     long getVersion() {

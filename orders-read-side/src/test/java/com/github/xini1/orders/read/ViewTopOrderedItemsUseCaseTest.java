@@ -18,8 +18,8 @@ import static org.assertj.core.api.Assertions.*;
 final class ViewTopOrderedItemsUseCaseTest {
 
     private final Module module = new Module(new InMemoryViewStore());
-    private final UUID userId = UUID.fromString("00000000-000-0000-0000-000000000001");
-    private final UUID itemId = UUID.fromString("00000000-000-0000-0000-000000000002");
+    private final UUID userId = UUID.fromString("00000000-0000-0000-0000-000000000001");
+    private final UUID itemId = UUID.fromString("00000000-0000-0000-0000-000000000002");
 
     @Test
     void givenUserIsNotAdmin_whenViewTopOrderedItems_thenUserIsNotAdminThrown() {
@@ -35,7 +35,7 @@ final class ViewTopOrderedItemsUseCaseTest {
 
     @Test
     void givenItemCreatedEvent_whenViewTopOrderedItems_thenThatItemHasZeroTimesOrdered() {
-        module.onItemCreatedEventUseCase().onEvent(new ItemCreated(1, userId, itemId, "item"));
+        module.onItemCreatedEventUseCase().onEvent(new ItemCreated(itemId, userId, "item", 1));
 
         assertThat(module.viewTopOrderedItemsUseCase().view(UserType.ADMIN))
                 .containsExactly(new TopOrderedItem(itemId, "item", 0));
@@ -43,9 +43,9 @@ final class ViewTopOrderedItemsUseCaseTest {
 
     @Test
     void givenItemsOrderedEvent_whenViewTopOrderedItems_thenThatItemsHaveCorrectTimesOrdered() {
-        module.onItemCreatedEventUseCase().onEvent(new ItemCreated(1, userId, itemId, "item"));
-        module.onItemAddedToCartEventUseCase().onEvent(new ItemAddedToCart(1, userId, itemId, 1));
-        module.onItemsOrderedEventUseCase().onEvent(new ItemsOrdered(2, userId));
+        module.onItemCreatedEventUseCase().onEvent(new ItemCreated(itemId, userId, "item", 1));
+        module.onItemAddedToCartEventUseCase().onEvent(new ItemAddedToCart(userId, itemId, 1, 1));
+        module.onItemsOrderedEventUseCase().onEvent(new ItemsOrdered(userId, 2));
 
         assertThat(module.viewTopOrderedItemsUseCase().view(UserType.ADMIN))
                 .containsExactly(new TopOrderedItem(itemId, "item", 1));

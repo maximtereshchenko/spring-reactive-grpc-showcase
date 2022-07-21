@@ -22,7 +22,7 @@ final class Item extends AggregateRoot {
 
     static Item create(UUID userId, String name) {
         var item = new Item(UUID.randomUUID());
-        item.apply(new ItemCreated(item.nextVersion(), userId, item.id(), name));
+        item.apply(new ItemCreated(item.id(), userId, name, item.nextVersion()));
         return item;
     }
 
@@ -39,12 +39,12 @@ final class Item extends AggregateRoot {
 
     void deactivate(UUID userId) {
         state.onDeactivation();
-        apply(new ItemDeactivated(nextVersion(), userId, id()));
+        apply(new ItemDeactivated(id(), userId, nextVersion()));
     }
 
     void activate(UUID userId) {
         state.onActivation();
-        apply(new ItemActivated(nextVersion(), userId, id()));
+        apply(new ItemActivated(id(), userId, nextVersion()));
     }
 
     boolean isDeactivated() {

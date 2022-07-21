@@ -41,9 +41,12 @@ final class UserRpcService extends UserServiceGrpc.UserServiceImplBase {
                             .build()
             );
             responseObserver.onCompleted();
-        } catch (IllegalArgumentException | UsernameIsTaken e) {
+        } catch (IllegalArgumentException e) {
             LOGGER.warn("Could not register user", e);
             responseObserver.onError(new StatusException(Status.INVALID_ARGUMENT));
+        } catch (UsernameIsTaken e) {
+            LOGGER.warn("Username is taken", e);
+            responseObserver.onError(new StatusException(Status.FAILED_PRECONDITION));
         }
     }
 

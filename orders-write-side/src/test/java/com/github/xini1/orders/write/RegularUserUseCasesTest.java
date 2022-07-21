@@ -18,8 +18,8 @@ final class RegularUserUseCasesTest {
 
     private final InMemoryEventStore eventStore = new InMemoryEventStore();
     private final Module module = new Module(eventStore);
-    private final UUID userId = UUID.fromString("00000000-000-0000-0000-000000000001");
-    private final UUID nonExistentItemId = UUID.fromString("00000000-000-0000-0000-000000000002");
+    private final UUID userId = UUID.fromString("00000000-0000-0000-0000-000000000001");
+    private final UUID nonExistentItemId = UUID.fromString("00000000-0000-0000-0000-000000000002");
 
     @Test
     void givenUserIsAdmin_whenAddItemToCart_thenUserIsNotRegularThrown() {
@@ -50,7 +50,7 @@ final class RegularUserUseCasesTest {
         assertThatThrownBy(() -> useCase.add(userId, UserType.REGULAR, itemId, -1))
                 .isInstanceOf(QuantityIsNotPositive.class);
 
-        assertThat(eventStore.events()).containsExactly(new ItemCreated(1, userId, itemId, "item"));
+        assertThat(eventStore.events()).containsExactly(new ItemCreated(itemId, userId, "item", 1));
     }
 
     @Test
@@ -66,8 +66,8 @@ final class RegularUserUseCasesTest {
 
         assertThat(eventStore.events())
                 .containsExactly(
-                        new ItemCreated(1, userId, itemId, "item"),
-                        new ItemDeactivated(2, userId, itemId)
+                        new ItemCreated(itemId, userId, "item", 1),
+                        new ItemDeactivated(itemId, userId, 2)
                 );
     }
 
@@ -81,8 +81,8 @@ final class RegularUserUseCasesTest {
 
         assertThat(eventStore.events())
                 .containsExactly(
-                        new ItemCreated(1, userId, itemId, "item"),
-                        new ItemAddedToCart(1, userId, itemId, 1)
+                        new ItemCreated(itemId, userId, "item", 1),
+                        new ItemAddedToCart(userId, itemId, 1, 1)
                 );
     }
 
@@ -118,9 +118,9 @@ final class RegularUserUseCasesTest {
 
         assertThat(eventStore.events())
                 .containsExactly(
-                        new ItemCreated(1, userId, itemId, "item"),
-                        new ItemAddedToCart(1, userId, itemId, 1),
-                        new ItemsOrdered(2, userId)
+                        new ItemCreated(itemId, userId, "item", 1),
+                        new ItemAddedToCart(userId, itemId, 1, 1),
+                        new ItemsOrdered(userId, 2)
                 );
     }
 
@@ -139,9 +139,9 @@ final class RegularUserUseCasesTest {
 
         assertThat(eventStore.events())
                 .containsExactly(
-                        new ItemCreated(1, userId, itemId, "item"),
-                        new ItemAddedToCart(1, userId, itemId, 1),
-                        new ItemDeactivated(2, userId, itemId)
+                        new ItemCreated(itemId, userId, "item", 1),
+                        new ItemAddedToCart(userId, itemId, 1, 1),
+                        new ItemDeactivated(itemId, userId, 2)
                 );
     }
 
@@ -174,7 +174,7 @@ final class RegularUserUseCasesTest {
         assertThatThrownBy(() -> useCase.remove(userId, UserType.REGULAR, itemId, -1))
                 .isInstanceOf(QuantityIsNotPositive.class);
 
-        assertThat(eventStore.events()).containsExactly(new ItemCreated(1, userId, itemId, "item"));
+        assertThat(eventStore.events()).containsExactly(new ItemCreated(itemId, userId, "item", 1));
     }
 
     @Test
@@ -190,8 +190,8 @@ final class RegularUserUseCasesTest {
 
         assertThat(eventStore.events())
                 .containsExactly(
-                        new ItemCreated(1, userId, itemId, "item"),
-                        new ItemAddedToCart(1, userId, itemId, 1)
+                        new ItemCreated(itemId, userId, "item", 1),
+                        new ItemAddedToCart(userId, itemId, 1, 1)
                 );
     }
 
@@ -206,9 +206,9 @@ final class RegularUserUseCasesTest {
 
         assertThat(eventStore.events())
                 .containsExactly(
-                        new ItemCreated(1, userId, itemId, "item"),
-                        new ItemAddedToCart(1, userId, itemId, 2),
-                        new ItemRemovedFromCart(1, userId, itemId, 1)
+                        new ItemCreated(itemId, userId, "item", 1),
+                        new ItemAddedToCart(userId, itemId, 2, 1),
+                        new ItemRemovedFromCart(userId, itemId, 1, 2)
                 );
     }
 }

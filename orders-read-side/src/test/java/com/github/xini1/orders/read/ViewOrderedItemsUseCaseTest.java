@@ -20,8 +20,8 @@ final class ViewOrderedItemsUseCaseTest {
 
     private final Clock clock = Clock.fixed(Instant.MIN, ZoneOffset.UTC);
     private final Module module = new Module(new InMemoryViewStore(), clock);
-    private final UUID itemId = UUID.fromString("00000000-000-0000-0000-000000000001");
-    private final UUID userId = UUID.fromString("00000000-000-0000-0000-000000000002");
+    private final UUID itemId = UUID.fromString("00000000-0000-0000-0000-000000000001");
+    private final UUID userId = UUID.fromString("00000000-0000-0000-0000-000000000002");
 
     @Test
     void givenUserIsNotRegular_whenViewOrderedItems_thenUserIsNotRegularThrown() {
@@ -39,9 +39,9 @@ final class ViewOrderedItemsUseCaseTest {
 
     @Test
     void givenItemsOrderedEvent_whenViewOrderedItems_thenOrderedItemsHaveExactlyTheseItems() {
-        module.onItemCreatedEventUseCase().onEvent(new ItemCreated(1, userId, itemId, "item"));
-        module.onItemAddedToCartEventUseCase().onEvent(new ItemAddedToCart(1, userId, itemId, 1));
-        module.onItemsOrderedEventUseCase().onEvent(new ItemsOrdered(2, userId));
+        module.onItemCreatedEventUseCase().onEvent(new ItemCreated(itemId, userId, "item", 1));
+        module.onItemAddedToCartEventUseCase().onEvent(new ItemAddedToCart(userId, itemId, 1, 1));
+        module.onItemsOrderedEventUseCase().onEvent(new ItemsOrdered(userId, 2));
 
         assertThat(module.viewOrderedItemsUseCase().viewOrderedItems(userId, UserType.REGULAR))
                 .isEqualTo(

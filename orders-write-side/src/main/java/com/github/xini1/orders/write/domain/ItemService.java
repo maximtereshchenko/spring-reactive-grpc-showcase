@@ -19,7 +19,7 @@ final class ItemService implements CreateItemUseCase, DeactivateItemUseCase, Act
     }
 
     @Override
-    public UUID create(UUID userId, UserType userType, String name) {
+    public UUID create(UUID userId, UserType userType, String name) throws UserIsNotAdmin {
         if (userType != UserType.ADMIN) {
             throw new UserIsNotAdmin();
         }
@@ -29,7 +29,8 @@ final class ItemService implements CreateItemUseCase, DeactivateItemUseCase, Act
     }
 
     @Override
-    public void deactivate(UUID userId, UserType userType, UUID itemId) {
+    public void deactivate(UUID userId, UserType userType, UUID itemId)
+            throws UserIsNotAdmin, ItemIsAlreadyDeactivated, ItemIsNotFound {
         if (userType != UserType.ADMIN) {
             throw new UserIsNotAdmin();
         }
@@ -39,7 +40,8 @@ final class ItemService implements CreateItemUseCase, DeactivateItemUseCase, Act
     }
 
     @Override
-    public void activate(UUID userId, UserType userType, UUID itemId) {
+    public void activate(UUID userId, UserType userType, UUID itemId)
+            throws UserIsNotAdmin, ItemIsNotFound, ItemIsAlreadyActive {
         if (userType != UserType.ADMIN) {
             throw new UserIsNotAdmin();
         }

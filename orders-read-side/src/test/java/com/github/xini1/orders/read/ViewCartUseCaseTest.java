@@ -18,8 +18,8 @@ import static org.assertj.core.api.Assertions.*;
 final class ViewCartUseCaseTest {
 
     private final Module module = new Module(new InMemoryViewStore());
-    private final UUID userId = UUID.fromString("00000000-000-0000-0000-000000000001");
-    private final UUID itemId = UUID.fromString("00000000-000-0000-0000-000000000002");
+    private final UUID userId = UUID.fromString("00000000-0000-0000-0000-000000000001");
+    private final UUID itemId = UUID.fromString("00000000-0000-0000-0000-000000000002");
 
     @Test
     void givenUserIsNotRegular_whenViewCart_thenUserIsNotRegularThrown() {
@@ -36,8 +36,8 @@ final class ViewCartUseCaseTest {
 
     @Test
     void givenItemAddedToCartEvent_whenViewCart_thenCartHasThatItem() {
-        module.onItemCreatedEventUseCase().onEvent(new ItemCreated(1, userId, itemId, "item"));
-        module.onItemAddedToCartEventUseCase().onEvent(new ItemAddedToCart(1, userId, itemId, 1));
+        module.onItemCreatedEventUseCase().onEvent(new ItemCreated(itemId, userId, "item", 1));
+        module.onItemAddedToCartEventUseCase().onEvent(new ItemAddedToCart(userId, itemId, 1, 1));
 
         assertThat(module.viewCartUseCase().view(userId, UserType.REGULAR))
                 .isEqualTo(
@@ -51,9 +51,9 @@ final class ViewCartUseCaseTest {
 
     @Test
     void givenItemDeactivatedEvent_whenViewCart_thenItemInCartIsDeactivated() {
-        module.onItemCreatedEventUseCase().onEvent(new ItemCreated(1, userId, itemId, "item"));
-        module.onItemAddedToCartEventUseCase().onEvent(new ItemAddedToCart(1, userId, itemId, 1));
-        module.onItemDeactivatedEventUseCase().onEvent(new ItemDeactivated(2, userId, itemId));
+        module.onItemCreatedEventUseCase().onEvent(new ItemCreated(itemId, userId, "item", 1));
+        module.onItemAddedToCartEventUseCase().onEvent(new ItemAddedToCart(userId, itemId, 1, 1));
+        module.onItemDeactivatedEventUseCase().onEvent(new ItemDeactivated(itemId, userId, 2));
 
         assertThat(module.viewCartUseCase().view(userId, UserType.REGULAR))
                 .isEqualTo(
@@ -67,10 +67,10 @@ final class ViewCartUseCaseTest {
 
     @Test
     void givenItemActivatedEvent_whenViewCart_thenItemInCartIsActivated() {
-        module.onItemCreatedEventUseCase().onEvent(new ItemCreated(1, userId, itemId, "item"));
-        module.onItemAddedToCartEventUseCase().onEvent(new ItemAddedToCart(1, userId, itemId, 1));
-        module.onItemDeactivatedEventUseCase().onEvent(new ItemDeactivated(2, userId, itemId));
-        module.onItemActivatedEventUseCase().onEvent(new ItemActivated(3, userId, itemId));
+        module.onItemCreatedEventUseCase().onEvent(new ItemCreated(itemId, userId, "item", 1));
+        module.onItemAddedToCartEventUseCase().onEvent(new ItemAddedToCart(userId, itemId, 1, 1));
+        module.onItemDeactivatedEventUseCase().onEvent(new ItemDeactivated(itemId, userId, 2));
+        module.onItemActivatedEventUseCase().onEvent(new ItemActivated(itemId, userId, 3));
 
         assertThat(module.viewCartUseCase().view(userId, UserType.REGULAR))
                 .isEqualTo(
@@ -84,9 +84,9 @@ final class ViewCartUseCaseTest {
 
     @Test
     void givenCartHasItem_whenViewCart_thenCartHasMoreOfThatItem() {
-        module.onItemCreatedEventUseCase().onEvent(new ItemCreated(1, userId, itemId, "item"));
-        module.onItemAddedToCartEventUseCase().onEvent(new ItemAddedToCart(1, userId, itemId, 1));
-        module.onItemAddedToCartEventUseCase().onEvent(new ItemAddedToCart(2, userId, itemId, 2));
+        module.onItemCreatedEventUseCase().onEvent(new ItemCreated(itemId, userId, "item", 1));
+        module.onItemAddedToCartEventUseCase().onEvent(new ItemAddedToCart(userId, itemId, 1, 1));
+        module.onItemAddedToCartEventUseCase().onEvent(new ItemAddedToCart(userId, itemId, 2, 2));
 
         assertThat(module.viewCartUseCase().view(userId, UserType.REGULAR))
                 .isEqualTo(
@@ -100,18 +100,18 @@ final class ViewCartUseCaseTest {
 
     @Test
     void givenItemRemovedFromCartEvent_whenViewCart_thenCartHasNotThatItem() {
-        module.onItemCreatedEventUseCase().onEvent(new ItemCreated(1, userId, itemId, "item"));
-        module.onItemAddedToCartEventUseCase().onEvent(new ItemAddedToCart(1, userId, itemId, 1));
-        module.onItemRemovedFromCartEventUseCase().onEvent(new ItemRemovedFromCart(2, userId, itemId, 1));
+        module.onItemCreatedEventUseCase().onEvent(new ItemCreated(itemId, userId, "item", 1));
+        module.onItemAddedToCartEventUseCase().onEvent(new ItemAddedToCart(userId, itemId, 1, 1));
+        module.onItemRemovedFromCartEventUseCase().onEvent(new ItemRemovedFromCart(userId, itemId, 1, 2));
 
         assertThat(module.viewCartUseCase().view(userId, UserType.REGULAR)).isEqualTo(new Cart(userId, 2));
     }
 
     @Test
     void givenCartHasItem_whenViewCart_thenCartHasLessOfThatItem() {
-        module.onItemCreatedEventUseCase().onEvent(new ItemCreated(1, userId, itemId, "item"));
-        module.onItemAddedToCartEventUseCase().onEvent(new ItemAddedToCart(1, userId, itemId, 2));
-        module.onItemRemovedFromCartEventUseCase().onEvent(new ItemRemovedFromCart(2, userId, itemId, 1));
+        module.onItemCreatedEventUseCase().onEvent(new ItemCreated(itemId, userId, "item", 1));
+        module.onItemAddedToCartEventUseCase().onEvent(new ItemAddedToCart(userId, itemId, 2, 1));
+        module.onItemRemovedFromCartEventUseCase().onEvent(new ItemRemovedFromCart(userId, itemId, 1, 2));
 
         assertThat(module.viewCartUseCase().view(userId, UserType.REGULAR))
                 .isEqualTo(
@@ -125,18 +125,18 @@ final class ViewCartUseCaseTest {
 
     @Test
     void givenItemOrderedEvent_whenViewCart_thenCartIsEmpty() {
-        module.onItemCreatedEventUseCase().onEvent(new ItemCreated(1, userId, itemId, "item"));
-        module.onItemAddedToCartEventUseCase().onEvent(new ItemAddedToCart(1, userId, itemId, 1));
-        module.onItemsOrderedEventUseCase().onEvent(new ItemsOrdered(2, userId));
+        module.onItemCreatedEventUseCase().onEvent(new ItemCreated(itemId, userId, "item", 1));
+        module.onItemAddedToCartEventUseCase().onEvent(new ItemAddedToCart(userId, itemId, 1, 1));
+        module.onItemsOrderedEventUseCase().onEvent(new ItemsOrdered(userId, 2));
 
         assertThat(module.viewCartUseCase().view(userId, UserType.REGULAR)).isEqualTo(new Cart(userId, 2));
     }
 
     @Test
     void givenCartVersionGreaterOrEqualToItemAddedToCartEventVersion_whenViewCart_thenCartWasNotChanged() {
-        module.onItemCreatedEventUseCase().onEvent(new ItemCreated(1, userId, itemId, "item"));
-        module.onItemAddedToCartEventUseCase().onEvent(new ItemAddedToCart(1, userId, itemId, 1));
-        module.onItemAddedToCartEventUseCase().onEvent(new ItemAddedToCart(1, userId, itemId, 1));
+        module.onItemCreatedEventUseCase().onEvent(new ItemCreated(itemId, userId, "item", 1));
+        module.onItemAddedToCartEventUseCase().onEvent(new ItemAddedToCart(userId, itemId, 1, 1));
+        module.onItemAddedToCartEventUseCase().onEvent(new ItemAddedToCart(userId, itemId, 1, 1));
 
         assertThat(module.viewCartUseCase().view(userId, UserType.REGULAR))
                 .isEqualTo(
@@ -150,9 +150,9 @@ final class ViewCartUseCaseTest {
 
     @Test
     void givenCartVersionGreaterOrEqualToItemRemovedFromCartEventVersion_whenViewCart_thenCartWasNotChanged() {
-        module.onItemCreatedEventUseCase().onEvent(new ItemCreated(1, userId, itemId, "item"));
-        module.onItemAddedToCartEventUseCase().onEvent(new ItemAddedToCart(1, userId, itemId, 1));
-        module.onItemRemovedFromCartEventUseCase().onEvent(new ItemRemovedFromCart(1, userId, itemId, 1));
+        module.onItemCreatedEventUseCase().onEvent(new ItemCreated(itemId, userId, "item", 1));
+        module.onItemAddedToCartEventUseCase().onEvent(new ItemAddedToCart(userId, itemId, 1, 1));
+        module.onItemRemovedFromCartEventUseCase().onEvent(new ItemRemovedFromCart(userId, itemId, 1, 1));
 
         assertThat(module.viewCartUseCase().view(userId, UserType.REGULAR))
                 .isEqualTo(
@@ -166,9 +166,9 @@ final class ViewCartUseCaseTest {
 
     @Test
     void givenCartVersionGreaterOrEqualToItemsOrderedEventVersion_whenViewCart_thenCartWasNotChanged() {
-        module.onItemCreatedEventUseCase().onEvent(new ItemCreated(1, userId, itemId, "item"));
-        module.onItemAddedToCartEventUseCase().onEvent(new ItemAddedToCart(1, userId, itemId, 1));
-        module.onItemsOrderedEventUseCase().onEvent(new ItemsOrdered(1, userId));
+        module.onItemCreatedEventUseCase().onEvent(new ItemCreated(itemId, userId, "item", 1));
+        module.onItemAddedToCartEventUseCase().onEvent(new ItemAddedToCart(userId, itemId, 1, 1));
+        module.onItemsOrderedEventUseCase().onEvent(new ItemsOrdered(userId, 1));
 
         assertThat(module.viewCartUseCase().view(userId, UserType.REGULAR))
                 .isEqualTo(
@@ -182,9 +182,9 @@ final class ViewCartUseCaseTest {
 
     @Test
     void givenItemInCartVersionGreaterOrEqualToItemDeactivatedEventVersion_whenViewCart_thenCartWasNotChanged() {
-        module.onItemCreatedEventUseCase().onEvent(new ItemCreated(1, userId, itemId, "item"));
-        module.onItemAddedToCartEventUseCase().onEvent(new ItemAddedToCart(1, userId, itemId, 1));
-        module.onItemDeactivatedEventUseCase().onEvent(new ItemDeactivated(1, userId, itemId));
+        module.onItemCreatedEventUseCase().onEvent(new ItemCreated(itemId, userId, "item", 1));
+        module.onItemAddedToCartEventUseCase().onEvent(new ItemAddedToCart(userId, itemId, 1, 1));
+        module.onItemDeactivatedEventUseCase().onEvent(new ItemDeactivated(itemId, userId, 1));
 
         assertThat(module.viewCartUseCase().view(userId, UserType.REGULAR))
                 .isEqualTo(
@@ -198,10 +198,10 @@ final class ViewCartUseCaseTest {
 
     @Test
     void givenItemInCartVersionGreaterOrEqualToItemActivatedEventVersion_whenViewCart_thenCartWasNotChanged() {
-        module.onItemCreatedEventUseCase().onEvent(new ItemCreated(1, userId, itemId, "item"));
-        module.onItemAddedToCartEventUseCase().onEvent(new ItemAddedToCart(1, userId, itemId, 1));
-        module.onItemDeactivatedEventUseCase().onEvent(new ItemDeactivated(2, userId, itemId));
-        module.onItemActivatedEventUseCase().onEvent(new ItemActivated(2, userId, itemId));
+        module.onItemCreatedEventUseCase().onEvent(new ItemCreated(itemId, userId, "item", 1));
+        module.onItemAddedToCartEventUseCase().onEvent(new ItemAddedToCart(userId, itemId, 1, 1));
+        module.onItemDeactivatedEventUseCase().onEvent(new ItemDeactivated(itemId, userId, 2));
+        module.onItemActivatedEventUseCase().onEvent(new ItemActivated(itemId, userId, 2));
 
         assertThat(module.viewCartUseCase().view(userId, UserType.REGULAR))
                 .isEqualTo(
