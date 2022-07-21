@@ -1,4 +1,4 @@
-package com.github.xini1.orders.write.application;
+package com.github.xini1.common.mongodb;
 
 import com.github.xini1.common.event.*;
 import org.springframework.data.annotation.*;
@@ -10,14 +10,14 @@ import java.util.*;
  * @author Maxim Tereshchenko
  */
 @Document(collection = "events")
-final class EventDocument {
+public final class EventDocument {
 
     @Id
     private EventId id = new EventId();
     private EventType eventType;
     private String data;
 
-    EventDocument() {
+    public EventDocument() {
     }
 
     public EventDocument(Event event, String data) {
@@ -25,6 +25,38 @@ final class EventDocument {
         id.setVersion(event.version());
         this.eventType = event.type();
         this.data = data;
+    }
+
+    public EventId getId() {
+        return id;
+    }
+
+    public void setId(EventId id) {
+        this.id = id;
+    }
+
+    public EventType getEventType() {
+        return eventType;
+    }
+
+    public void setEventType(EventType eventType) {
+        this.eventType = eventType;
+    }
+
+    public String getData() {
+        return data;
+    }
+
+    public void setData(String data) {
+        this.data = data;
+    }
+
+    public void setAggregateId(UUID aggregateId) {
+        id.setAggregateId(aggregateId);
+    }
+
+    public void setVersion(int version) {
+        id.setVersion(version);
     }
 
     @Override
@@ -55,42 +87,26 @@ final class EventDocument {
                 '}';
     }
 
-    EventId getId() {
-        return id;
-    }
-
-    void setId(EventId id) {
-        this.id = id;
-    }
-
-    EventType getEventType() {
-        return eventType;
-    }
-
-    void setEventType(EventType eventType) {
-        this.eventType = eventType;
-    }
-
-    String getData() {
-        return data;
-    }
-
-    void setData(String data) {
-        this.data = data;
-    }
-
-    void setAggregateId(UUID aggregateId) {
-        id.setAggregateId(aggregateId);
-    }
-
-    void setVersion(int version) {
-        id.setVersion(version);
-    }
-
     private static final class EventId {
 
         private UUID aggregateId;
         private long version;
+
+        public UUID getAggregateId() {
+            return aggregateId;
+        }
+
+        public void setAggregateId(UUID aggregateId) {
+            this.aggregateId = aggregateId;
+        }
+
+        public long getVersion() {
+            return version;
+        }
+
+        public void setVersion(long version) {
+            this.version = version;
+        }
 
         @Override
         public int hashCode() {
@@ -116,22 +132,6 @@ final class EventDocument {
                     "aggregateId=" + aggregateId +
                     ", version=" + version +
                     '}';
-        }
-
-        UUID getAggregateId() {
-            return aggregateId;
-        }
-
-        void setAggregateId(UUID aggregateId) {
-            this.aggregateId = aggregateId;
-        }
-
-        long getVersion() {
-            return version;
-        }
-
-        void setVersion(long version) {
-            this.version = version;
         }
     }
 }

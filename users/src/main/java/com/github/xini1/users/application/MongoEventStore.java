@@ -2,6 +2,7 @@ package com.github.xini1.users.application;
 
 import com.github.xini1.common.*;
 import com.github.xini1.common.event.*;
+import com.github.xini1.common.mongodb.*;
 import com.google.gson.*;
 import org.apache.kafka.clients.producer.*;
 import reactor.core.publisher.*;

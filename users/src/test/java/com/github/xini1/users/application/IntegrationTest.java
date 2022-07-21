@@ -2,6 +2,7 @@ package com.github.xini1.users.application;
 
 import com.github.xini1.common.*;
 import com.github.xini1.common.event.*;
+import com.github.xini1.common.mongodb.*;
 import com.github.xini1.users.*;
 import com.github.xini1.users.rpc.*;
 import io.grpc.*;
@@ -105,7 +106,7 @@ final class IntegrationTest {
         assertThatThrownBy(() -> stub.register(registerRequest))
                 .isInstanceOf(StatusRuntimeException.class)
                 .extracting(Status::fromThrowable)
-                .isEqualTo(Status.INVALID_ARGUMENT);
+                .isEqualTo(Status.FAILED_PRECONDITION);
     }
 
     @Test

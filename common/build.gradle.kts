@@ -15,6 +15,7 @@ repositories {
 }
 
 dependencies {
+    compileOnly(libs.spring.mongodb)
     api(libs.grpc)
     implementation(libs.annotation.api)
 }
