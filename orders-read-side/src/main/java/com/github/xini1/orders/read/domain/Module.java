@@ -1,18 +1,9 @@
 package com.github.xini1.orders.read.domain;
 
-import com.github.xini1.orders.read.port.ViewStore;
-import com.github.xini1.orders.read.usecase.OnItemActivatedEventUseCase;
-import com.github.xini1.orders.read.usecase.OnItemAddedToCartEventUseCase;
-import com.github.xini1.orders.read.usecase.OnItemCreatedEventUseCase;
-import com.github.xini1.orders.read.usecase.OnItemDeactivatedEventUseCase;
-import com.github.xini1.orders.read.usecase.OnItemRemovedFromCartEventUseCase;
-import com.github.xini1.orders.read.usecase.OnItemsOrderedEventUseCase;
-import com.github.xini1.orders.read.usecase.ViewCartUseCase;
-import com.github.xini1.orders.read.usecase.ViewItemsUseCase;
-import com.github.xini1.orders.read.usecase.ViewOrderedItemsUseCase;
-import com.github.xini1.orders.read.usecase.ViewTopOrderedItemsUseCase;
+import com.github.xini1.orders.read.port.*;
+import com.github.xini1.orders.read.usecase.*;
 
-import java.time.Clock;
+import java.time.*;
 
 /**
  * @author Maxim Tereshchenko

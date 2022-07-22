@@ -1,20 +1,17 @@
 package com.github.xini1.orders.read.application;
 
-import com.github.xini1.common.Shared;
+import com.github.xini1.common.*;
 import com.github.xini1.orders.read.domain.Module;
-import org.apache.kafka.clients.admin.NewTopic;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRepositories;
-import org.springframework.kafka.config.TopicBuilder;
-import reactor.kafka.receiver.KafkaReceiver;
-import reactor.kafka.receiver.ReceiverOptions;
+import org.apache.kafka.clients.admin.*;
+import org.springframework.boot.autoconfigure.condition.*;
+import org.springframework.boot.autoconfigure.kafka.*;
+import org.springframework.context.annotation.*;
+import org.springframework.data.mongodb.repository.config.*;
+import org.springframework.kafka.config.*;
+import reactor.kafka.receiver.*;
 
-import java.time.Clock;
-import java.util.List;
-import java.util.UUID;
+import java.time.*;
+import java.util.*;
 
 /**
  * @author Maxim Tereshchenko

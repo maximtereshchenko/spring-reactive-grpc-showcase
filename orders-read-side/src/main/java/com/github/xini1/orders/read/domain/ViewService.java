@@ -1,19 +1,12 @@
 package com.github.xini1.orders.read.domain;
 
-import com.github.xini1.common.UserType;
-import com.github.xini1.orders.read.exception.UserIsNotAdmin;
-import com.github.xini1.orders.read.exception.UserIsNotRegular;
-import com.github.xini1.orders.read.port.ViewStore;
-import com.github.xini1.orders.read.usecase.ViewCartUseCase;
-import com.github.xini1.orders.read.usecase.ViewItemsUseCase;
-import com.github.xini1.orders.read.usecase.ViewOrderedItemsUseCase;
-import com.github.xini1.orders.read.usecase.ViewTopOrderedItemsUseCase;
-import com.github.xini1.orders.read.view.Cart;
-import com.github.xini1.orders.read.view.Item;
-import com.github.xini1.orders.read.view.OrderedItems;
-import com.github.xini1.orders.read.view.TopOrderedItem;
+import com.github.xini1.common.*;
+import com.github.xini1.orders.read.exception.*;
+import com.github.xini1.orders.read.port.*;
+import com.github.xini1.orders.read.usecase.*;
+import com.github.xini1.orders.read.view.*;
 
-import java.util.UUID;
+import java.util.*;
 
 /**
  * @author Maxim Tereshchenko

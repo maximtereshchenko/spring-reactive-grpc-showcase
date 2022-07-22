@@ -1,9 +1,8 @@
 package com.github.xini1.orders.read.view;
 
-import com.github.xini1.common.event.item.ItemCreated;
+import com.github.xini1.common.event.item.*;
 
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * @author Maxim Tereshchenko

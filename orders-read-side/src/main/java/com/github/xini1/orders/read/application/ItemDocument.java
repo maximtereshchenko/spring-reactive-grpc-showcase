@@ -1,10 +1,10 @@
 package com.github.xini1.orders.read.application;
 
-import com.github.xini1.orders.read.view.Item;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import com.github.xini1.orders.read.view.*;
+import org.springframework.data.annotation.*;
+import org.springframework.data.mongodb.core.mapping.*;
 
-import java.util.UUID;
+import java.util.*;
 
 /**
  * @author Maxim Tereshchenko

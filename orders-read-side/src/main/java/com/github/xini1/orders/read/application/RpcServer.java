@@ -1,12 +1,10 @@
 package com.github.xini1.orders.read.application;
 
 import com.github.xini1.orders.read.domain.Module;
-import io.grpc.Server;
-import io.grpc.ServerBuilder;
+import io.grpc.*;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-import java.io.IOException;
+import javax.annotation.*;
+import java.io.*;
 
 /**
  * @author Maxim Tereshchenko

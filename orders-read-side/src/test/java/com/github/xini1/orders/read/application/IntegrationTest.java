@@ -1,61 +1,32 @@
 package com.github.xini1.orders.read.application;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import com.github.xini1.common.Shared;
-import com.github.xini1.common.event.Event;
-import com.github.xini1.common.event.cart.ItemAddedToCart;
-import com.github.xini1.common.event.cart.ItemRemovedFromCart;
-import com.github.xini1.common.event.cart.ItemsOrdered;
-import com.github.xini1.common.event.item.ItemActivated;
-import com.github.xini1.common.event.item.ItemCreated;
-import com.github.xini1.common.event.item.ItemDeactivated;
-import com.github.xini1.orders.read.Main;
-import com.github.xini1.orders.read.rpc.CartResponse;
-import com.github.xini1.orders.read.rpc.Empty;
-import com.github.xini1.orders.read.rpc.ItemInCartMessage;
-import com.github.xini1.orders.read.rpc.ItemInOrderMessage;
-import com.github.xini1.orders.read.rpc.ItemResponse;
-import com.github.xini1.orders.read.rpc.OrderMessage;
-import com.github.xini1.orders.read.rpc.OrderReadServiceGrpc;
-import com.github.xini1.orders.read.rpc.OrderedItemsResponse;
-import com.github.xini1.orders.read.rpc.TopOrderedItemResponse;
-import com.github.xini1.orders.read.rpc.ViewCartRequest;
-import com.github.xini1.orders.read.rpc.ViewOrderedItemsRequest;
-import com.github.xini1.orders.read.rpc.ViewTopOrderedItemsRequest;
-import com.google.gson.Gson;
-import io.grpc.ManagedChannelBuilder;
-import org.apache.kafka.clients.producer.ProducerConfig;
-import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.kafka.common.serialization.StringSerializer;
-import org.apache.kafka.common.serialization.UUIDSerializer;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.TestMethodOrder;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.KafkaContainer;
-import org.testcontainers.containers.MongoDBContainer;
+import com.github.xini1.common.*;
+import com.github.xini1.common.event.*;
+import com.github.xini1.common.event.cart.*;
+import com.github.xini1.common.event.item.*;
+import com.github.xini1.orders.read.*;
+import com.github.xini1.orders.read.rpc.*;
+import com.google.gson.*;
+import io.grpc.*;
+import org.apache.kafka.clients.producer.*;
+import org.apache.kafka.common.serialization.*;
+import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.*;
+import org.springframework.boot.autoconfigure.kafka.*;
+import org.springframework.boot.test.context.*;
+import org.springframework.context.annotation.*;
+import org.springframework.test.context.*;
+import org.testcontainers.containers.*;
 import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.utility.DockerImageName;
-import reactor.core.publisher.Mono;
-import reactor.kafka.sender.KafkaSender;
-import reactor.kafka.sender.SenderOptions;
-import reactor.kafka.sender.SenderRecord;
+import org.testcontainers.junit.jupiter.*;
+import org.testcontainers.utility.*;
+import reactor.core.publisher.*;
+import reactor.kafka.sender.*;
 
-import java.time.Clock;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.Map;
-import java.util.UUID;
+import java.time.*;
+import java.util.*;
+
+import static org.assertj.core.api.Assertions.*;
 
 /**
  * @author Maxim Tereshchenko
