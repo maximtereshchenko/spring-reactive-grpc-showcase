@@ -1,7 +1,11 @@
 package com.github.xini1.orders.read.view;
 
-import java.time.*;
-import java.util.*;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
 /**
  * @author Maxim Tereshchenko
@@ -74,6 +78,14 @@ public final class OrderedItems {
             this(timestamp, List.of(items));
         }
 
+        public Instant getTimestamp() {
+            return timestamp;
+        }
+
+        public Collection<ItemInOrder> getItems() {
+            return items;
+        }
+
         @Override
         public int hashCode() {
             return Objects.hash(timestamp, items);
@@ -113,6 +125,14 @@ public final class OrderedItems {
 
         public ItemInOrder(Cart.ItemInCart itemInCart) {
             this(itemInCart.getId(), itemInCart.getQuantity());
+        }
+
+        public UUID getId() {
+            return id;
+        }
+
+        public int getQuantity() {
+            return quantity;
         }
 
         @Override

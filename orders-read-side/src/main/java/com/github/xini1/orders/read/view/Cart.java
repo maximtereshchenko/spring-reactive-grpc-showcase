@@ -1,6 +1,11 @@
 package com.github.xini1.orders.read.view;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * @author Maxim Tereshchenko
@@ -154,6 +159,10 @@ public final class Cart {
 
         public int getQuantity() {
             return quantity;
+        }
+
+        public long getVersion() {
+            return version;
         }
 
         public boolean hasVersionLessThan(long version) {

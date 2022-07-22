@@ -1,8 +1,10 @@
 package com.github.xini1.common.event.cart;
 
-import com.github.xini1.common.event.*;
+import com.github.xini1.common.event.EventType;
 
-import java.util.*;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
 
 /**
  * @author Maxim Tereshchenko
@@ -60,7 +62,8 @@ public final class ItemAddedToCart implements CartEvent {
                 "userId", userId.toString(),
                 "itemId", itemId.toString(),
                 "quantity", String.valueOf(quantity),
-                "version", String.valueOf(version)
+                "version", String.valueOf(version),
+                "eventType", type().name()
         );
     }
 

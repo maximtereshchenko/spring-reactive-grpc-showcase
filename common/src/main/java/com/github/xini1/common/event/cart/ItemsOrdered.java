@@ -43,7 +43,8 @@ public final class ItemsOrdered implements CartEvent {
     public Map<String, String> asMap() {
         return Map.of(
                 "userId", userId.toString(),
-                "version", String.valueOf(version)
+                "version", String.valueOf(version),
+                "eventType", type().name()
         );
     }
 

@@ -55,7 +55,8 @@ public final class ItemCreated implements ItemEvent {
                 "itemId", itemId.toString(),
                 "userId", userId.toString(),
                 "name", name,
-                "version", String.valueOf(version)
+                "version", String.valueOf(version),
+                "eventType", type().name()
         );
     }
 

@@ -51,7 +51,8 @@ public final class ItemActivated implements ItemEvent {
         return Map.of(
                 "itemId", itemId.toString(),
                 "userId", userId.toString(),
-                "version", String.valueOf(version)
+                "version", String.valueOf(version),
+                "eventType", type().name()
         );
     }
 

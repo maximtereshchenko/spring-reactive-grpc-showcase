@@ -59,7 +59,8 @@ public final class ItemRemovedFromCart implements CartEvent {
                 "userId", userId.toString(),
                 "itemId", itemId.toString(),
                 "quantity", String.valueOf(quantity),
-                "version", String.valueOf(version)
+                "version", String.valueOf(version),
+                "eventType", type().name()
         );
     }
 

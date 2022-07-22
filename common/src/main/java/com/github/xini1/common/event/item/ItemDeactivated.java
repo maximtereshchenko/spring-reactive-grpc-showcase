@@ -21,8 +21,8 @@ public final class ItemDeactivated implements ItemEvent {
 
     public ItemDeactivated(Map<String, String> properties) {
         this(
-                UUID.fromString(properties.get("userId")),
                 UUID.fromString(properties.get("itemId")),
+                UUID.fromString(properties.get("userId")),
                 Long.parseLong(properties.get("version"))
         );
     }
@@ -47,7 +47,8 @@ public final class ItemDeactivated implements ItemEvent {
         return Map.of(
                 "itemId", itemId.toString(),
                 "userId", userId.toString(),
-                "version", String.valueOf(version)
+                "version", String.valueOf(version),
+                "eventType", type().name()
         );
     }
 

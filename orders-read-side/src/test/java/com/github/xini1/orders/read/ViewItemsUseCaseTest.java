@@ -1,13 +1,15 @@
 package com.github.xini1.orders.read;
 
-import com.github.xini1.common.event.item.*;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import com.github.xini1.common.event.item.ItemActivated;
+import com.github.xini1.common.event.item.ItemCreated;
+import com.github.xini1.common.event.item.ItemDeactivated;
 import com.github.xini1.orders.read.domain.Module;
-import com.github.xini1.orders.read.view.*;
-import org.junit.jupiter.api.*;
+import com.github.xini1.orders.read.view.Item;
+import org.junit.jupiter.api.Test;
 
-import java.util.*;
-
-import static org.assertj.core.api.Assertions.*;
+import java.util.UUID;
 
 /**
  * @author Maxim Tereshchenko

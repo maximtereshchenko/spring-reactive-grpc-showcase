@@ -47,7 +47,8 @@ public final class UserRegistered implements UserEvent {
         return Map.of(
                 "userId", userId.toString(),
                 "username", username,
-                "version", String.valueOf(version)
+                "version", String.valueOf(version),
+                "eventType", type().name()
         );
     }
 

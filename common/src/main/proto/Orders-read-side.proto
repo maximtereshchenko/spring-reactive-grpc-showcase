@@ -1,0 +1,68 @@
+syntax = "proto3";
+option java_multiple_files = true;
+package com.github.xini1.orders.read.rpc;
+
+message ViewCartRequest {
+    string userId = 1;
+    string userType = 2;
+}
+
+message CartResponse {
+    string userId = 1;
+    repeated ItemInCartMessage itemsInCart = 2;
+    int64 version = 3;
+}
+
+message ItemInCartMessage {
+    string id = 1;
+    string name = 2;
+    bool active = 3;
+    int32 quantity = 4;
+    int64 version = 5;
+}
+
+message Empty {}
+
+message ItemResponse {
+    string id = 1;
+    string name = 2;
+    bool active = 3;
+    int64 version = 4;
+}
+
+message ViewOrderedItemsRequest {
+    string userId = 1;
+    string userType = 2;
+}
+
+message OrderedItemsResponse {
+    string userId = 1;
+    repeated OrderMessage orders = 2;
+}
+
+message OrderMessage {
+    string timestamp = 1;
+    repeated ItemInOrderMessage items = 2;
+}
+
+message ItemInOrderMessage {
+    string id = 1;
+    int32 quantity = 2;
+}
+
+message ViewTopOrderedItemsRequest {
+    string userType = 1;
+}
+
+message TopOrderedItemResponse {
+    string id = 1;
+    string name = 2;
+    int64 timesOrdered = 3;
+}
+
+service OrderReadService {
+    rpc viewCart(ViewCartRequest) returns (CartResponse);
+    rpc viewItems(Empty) returns (stream ItemResponse);
+    rpc viewOrderedItems(ViewOrderedItemsRequest) returns (OrderedItemsResponse);
+    rpc viewTopOrderedItems(ViewTopOrderedItemsRequest) returns (stream TopOrderedItemResponse);
+}

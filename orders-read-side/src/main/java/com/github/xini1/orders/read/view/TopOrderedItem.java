@@ -1,6 +1,7 @@
 package com.github.xini1.orders.read.view;
 
-import java.util.*;
+import java.util.Objects;
+import java.util.UUID;
 
 /**
  * @author Maxim Tereshchenko
