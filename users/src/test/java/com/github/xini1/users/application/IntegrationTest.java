@@ -151,7 +151,8 @@ final class IntegrationTest {
     }
 
     private String expectedEventJson() {
-        return "{\"userId\":\"" + userId + "\",\"username\":\"username\",\"version\":\"1\"}";
+        return "{\"eventType\":\"USER_REGISTERED\",\"userId\":\"" + userId +
+                "\",\"username\":\"username\",\"version\":\"1\"}";
     }
 
     @TestConfiguration

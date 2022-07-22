@@ -289,27 +289,32 @@ final class IntegrationTest {
     }
 
     private String itemCreatedEventJson() {
-        return "{\"itemId\":\"" + itemId + "\",\"name\":\"item\",\"userId\":\"" + userId + "\",\"version\":\"1\"}";
+        return "{\"eventType\":\"ITEM_CREATED\",\"itemId\":\"" + itemId + "\",\"name\":\"item\",\"userId\":\"" +
+                userId + "\",\"version\":\"1\"}";
     }
 
     private String itemDeactivatedEventJson() {
-        return "{\"itemId\":\"" + itemId + "\",\"userId\":\"" + userId + "\",\"version\":\"2\"}";
+        return "{\"eventType\":\"ITEM_DEACTIVATED\",\"itemId\":\"" + itemId + "\",\"userId\":\"" + userId +
+                "\",\"version\":\"2\"}";
     }
 
     private String itemActivatedEventJson() {
-        return "{\"itemId\":\"" + itemId + "\",\"userId\":\"" + userId + "\",\"version\":\"3\"}";
+        return "{\"eventType\":\"ITEM_ACTIVATED\",\"itemId\":\"" + itemId + "\",\"userId\":\"" + userId +
+                "\",\"version\":\"3\"}";
     }
 
     private String itemAddedToCartEventJson() {
-        return "{\"itemId\":\"" + itemId + "\",\"quantity\":\"2\",\"userId\":\"" + userId + "\",\"version\":\"1\"}";
+        return "{\"eventType\":\"ITEM_ADDED_TO_CART\",\"itemId\":\"" + itemId + "\",\"quantity\":\"2\",\"userId\":\"" +
+                userId + "\",\"version\":\"1\"}";
     }
 
     private String itemRemovedFromCartEventJson() {
-        return "{\"itemId\":\"" + itemId + "\",\"quantity\":\"1\",\"userId\":\"" + userId + "\",\"version\":\"2\"}";
+        return "{\"eventType\":\"ITEM_REMOVED_FROM_CART\",\"itemId\":\"" + itemId +
+                "\",\"quantity\":\"1\",\"userId\":\"" + userId + "\",\"version\":\"2\"}";
     }
 
     private String itemsOrderedEventJson() {
-        return "{\"userId\":\"" + userId + "\",\"version\":\"3\"}";
+        return "{\"eventType\":\"ITEMS_ORDERED\",\"userId\":\"" + userId + "\",\"version\":\"3\"}";
     }
 
     @TestConfiguration
