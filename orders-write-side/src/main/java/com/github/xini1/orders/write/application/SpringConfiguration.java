@@ -1,6 +1,7 @@
 package com.github.xini1.orders.write.application;
 
 import com.github.xini1.common.*;
+import com.github.xini1.common.rpc.*;
 import com.github.xini1.orders.write.domain.Module;
 import org.apache.kafka.clients.admin.*;
 import org.springframework.boot.autoconfigure.kafka.*;
@@ -21,12 +22,20 @@ public class SpringConfiguration {
             EventRepository eventRepository,
             KafkaProperties kafkaProperties
     ) {
+        var module = new Module(
+                new MongoEventStore(
+                        eventRepository,
+                        KafkaSender.create(SenderOptions.create(kafkaProperties.buildProducerProperties()))
+                )
+        );
         return new RpcServer(
-                new Module(
-                        new MongoEventStore(
-                                eventRepository,
-                                KafkaSender.create(SenderOptions.create(kafkaProperties.buildProducerProperties()))
-                        )
+                new OrderRpcService(
+                        module.activateItemUseCase(),
+                        module.addItemToCartUseCase(),
+                        module.createItemUseCase(),
+                        module.deactivateItemUseCase(),
+                        module.orderItemsInCartUseCase(),
+                        module.removeItemFromCartUseCase()
                 )
         );
     }

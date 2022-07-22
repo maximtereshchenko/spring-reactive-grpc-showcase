@@ -1,6 +1,5 @@
-package com.github.xini1.users.application;
+package com.github.xini1.common.rpc;
 
-import com.github.xini1.users.domain.Module;
 import io.grpc.*;
 
 import javax.annotation.*;
@@ -9,15 +8,13 @@ import java.io.*;
 /**
  * @author Maxim Tereshchenko
  */
-final class RpcServer {
+public final class RpcServer {
 
     private final Server server;
 
-    RpcServer(Module module) {
+    public RpcServer(BindableService service) {
         this.server = ServerBuilder.forPort(8080)
-                .addService(
-                        new UserRpcService(module.registerUseCase(), module.loginUseCase(), module.decodeJwtUseCase())
-                )
+                .addService(service)
                 .build();
     }
 

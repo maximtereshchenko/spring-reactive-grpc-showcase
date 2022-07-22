@@ -1,6 +1,7 @@
 package com.github.xini1.orders.read.application;
 
 import com.github.xini1.common.*;
+import com.github.xini1.common.rpc.*;
 import com.github.xini1.orders.read.domain.Module;
 import org.apache.kafka.clients.admin.*;
 import org.springframework.boot.autoconfigure.condition.*;
@@ -47,7 +48,14 @@ public class SpringConfiguration {
 
     @Bean
     RpcServer rpcServer(Module module) {
-        return new RpcServer(module);
+        return new RpcServer(
+                new OrderRpcService(
+                        module.viewCartUseCase(),
+                        module.viewItemsUseCase(),
+                        module.viewOrderedItemsUseCase(),
+                        module.viewTopOrderedItemsUseCase()
+                )
+        );
     }
 
     @Bean

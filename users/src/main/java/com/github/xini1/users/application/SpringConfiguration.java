@@ -1,6 +1,7 @@
 package com.github.xini1.users.application;
 
 import com.github.xini1.common.*;
+import com.github.xini1.common.rpc.*;
 import com.github.xini1.users.domain.Module;
 import org.apache.kafka.clients.admin.*;
 import org.springframework.boot.autoconfigure.kafka.*;
@@ -22,16 +23,17 @@ public class SpringConfiguration {
             EventRepository eventRepository,
             KafkaProperties kafkaProperties
     ) {
+        var module = new Module(
+                new MongoUserStore(userRepository),
+                new MongoEventStore(
+                        eventRepository,
+                        KafkaSender.create(SenderOptions.create(kafkaProperties.buildProducerProperties()))
+                ),
+                new JwtProvider(),
+                new Pbkdf2HashingAlgorithm()
+        );
         return new RpcServer(
-                new Module(
-                        new MongoUserStore(userRepository),
-                        new MongoEventStore(
-                                eventRepository,
-                                KafkaSender.create(SenderOptions.create(kafkaProperties.buildProducerProperties()))
-                        ),
-                        new JwtProvider(),
-                        new Pbkdf2HashingAlgorithm()
-                )
+                new UserRpcService(module.registerUseCase(), module.loginUseCase(), module.decodeJwtUseCase())
         );
     }
 
