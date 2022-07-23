@@ -37,6 +37,15 @@ Kafka and MongoDB were chosen mostly of their reactive driver support.
 9) Admin can view top ordered items.
 10) Regular user can view his previous ordered items.
 
+# API
+
+```bash
+curl -X POST \
+-H Content-Type:application/json \
+http://localhost:8080/users \
+-d '{"username":"user","password":"pass","userType":"ADMIN"}'
+```
+
 # What have I learnt?
 
 * How to organize aggregates in case of Event Sourcing.

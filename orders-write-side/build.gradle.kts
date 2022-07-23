@@ -1,5 +1,9 @@
 plugins {
-    java
+    application
+}
+
+application {
+    mainClass.set("com.github.xini1.orders.write.Main")
 }
 
 dependencies {

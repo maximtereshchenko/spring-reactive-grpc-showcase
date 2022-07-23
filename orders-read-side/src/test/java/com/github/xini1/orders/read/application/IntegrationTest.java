@@ -38,11 +38,11 @@ import static org.assertj.core.api.Assertions.*;
 final class IntegrationTest {
 
     @Container
-    public static final MongoDBContainer MONGO_DB = new MongoDBContainer(
+    private static final MongoDBContainer MONGO_DB = new MongoDBContainer(
             DockerImageName.parse("mongo:5.0.9")
     );
     @Container
-    public static final KafkaContainer KAFKA = new KafkaContainer(
+    private static final KafkaContainer KAFKA = new KafkaContainer(
             DockerImageName.parse("confluentinc/cp-kafka:7.2.0")
     );
 
