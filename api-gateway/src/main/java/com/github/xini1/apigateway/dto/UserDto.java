@@ -25,7 +25,7 @@ public final class UserDto {
         return new CreateItemDto(id, userType, itemName);
     }
 
-    public DeactivateItemDto toDeactivateItemDto(String itemId) {
-        return new DeactivateItemDto(id, userType, itemId);
+    public ActivateDeactivateItemDto toActivateDeactivateItemDto(String itemId) {
+        return new ActivateDeactivateItemDto(id, userType, itemId);
     }
 }

@@ -1,5 +1,7 @@
 package com.github.xini1.apigateway.dto;
 
+import com.github.xini1.orders.write.rpc.*;
+
 /**
  * @author Maxim Tereshchenko
  */
@@ -15,15 +17,11 @@ public final class CreateItemDto {
         this.name = name;
     }
 
-    public String getUserId() {
-        return userId;
-    }
-
-    public String getUserType() {
-        return userType;
-    }
-
-    public String getName() {
-        return name;
+    public CreateItemRequest toCreateItemRequest() {
+        return CreateItemRequest.newBuilder()
+                .setUserId(userId)
+                .setUserType(userType)
+                .setName(name)
+                .build();
     }
 }

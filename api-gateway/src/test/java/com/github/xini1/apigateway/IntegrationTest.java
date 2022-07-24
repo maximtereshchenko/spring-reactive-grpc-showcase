@@ -197,6 +197,37 @@ final class IntegrationTest {
         });
     }
 
+    @Test
+    @Order(6)
+    void adminCanActivateItem() {
+        var deactivateItemResponse = webClient.post()
+                .uri("/items/{itemId}/activate", itemId)
+                .header(HttpHeaders.AUTHORIZATION, adminUserJwt)
+                .exchange()
+                .returnResult(Void.class);
+
+        assertThat(deactivateItemResponse.getStatus()).isEqualTo(HttpStatus.OK);
+
+        await(() -> {
+            var itemsResponse = webClient.get()
+                    .uri("/items")
+                    .exchange()
+                    .returnResult(ItemDto.class);
+
+            assertThat(itemsResponse.getStatus()).isEqualTo(HttpStatus.OK);
+            assertThat(
+                    itemsResponse.getResponseBody()
+                            .collectList()
+                            .block()
+            )
+                    .containsExactly(expectedActivatedItemDto());
+        });
+    }
+
+    private ItemDto expectedActivatedItemDto() {
+        return itemDto(true, 3);
+    }
+
     private ItemDto expectedDeactivatedItemDto() {
         return itemDto(false, 2);
     }

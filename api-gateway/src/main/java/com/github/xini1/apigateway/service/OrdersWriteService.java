@@ -23,24 +23,25 @@ public final class OrdersWriteService {
     public Mono<String> create(CreateItemDto dto) {
         return Mono.create(sink ->
                 orderWriteServiceGrpc.create(
-                        CreateItemRequest.newBuilder()
-                                .setUserId(dto.getUserId())
-                                .setUserType(dto.getUserType())
-                                .setName(dto.getName())
-                                .build(),
+                        dto.toCreateItemRequest(),
                         new MonoStreamObserverAdapter<>(sink, ItemIdResponse::getItemId)
                 )
         );
     }
 
-    public Mono<Void> deactivate(DeactivateItemDto dto) {
+    public Mono<Void> deactivate(ActivateDeactivateItemDto dto) {
         return Mono.create(sink ->
                 orderWriteServiceGrpc.deactivate(
-                        DeactivateItemRequest.newBuilder()
-                                .setUserId(dto.getUserId())
-                                .setUserType(dto.getUserType())
-                                .setItemId(dto.getItemId())
-                                .build(),
+                        dto.toDeactivateItemRequest(),
+                        new VoidMonoStreamObserverAdapter<>(sink)
+                )
+        );
+    }
+
+    public Mono<Void> activate(ActivateDeactivateItemDto dto) {
+        return Mono.create(sink ->
+                orderWriteServiceGrpc.activate(
+                        dto.toActivateItemRequest(),
                         new VoidMonoStreamObserverAdapter<>(sink)
                 )
         );

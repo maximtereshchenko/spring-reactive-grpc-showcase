@@ -39,8 +39,20 @@ public final class OrdersWriteController {
             @PathVariable String id
     ) {
         return usersService.decode(jwt)
-                .map(userDto -> userDto.toDeactivateItemDto(id))
+                .map(userDto -> userDto.toActivateDeactivateItemDto(id))
                 .flatMap(ordersWriteService::deactivate)
+                .map(ResponseEntity::ok)
+                .onErrorResume(StatusRuntimeException.class, this::responseEntityMono);
+    }
+
+    @PostMapping("/{id}/activate")
+    Mono<ResponseEntity<Void>> activateItem(
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String jwt,
+            @PathVariable String id
+    ) {
+        return usersService.decode(jwt)
+                .map(userDto -> userDto.toActivateDeactivateItemDto(id))
+                .flatMap(ordersWriteService::activate)
                 .map(ResponseEntity::ok)
                 .onErrorResume(StatusRuntimeException.class, this::responseEntityMono);
     }
