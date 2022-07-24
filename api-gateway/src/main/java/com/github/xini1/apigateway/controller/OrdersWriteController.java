@@ -14,11 +14,11 @@ import reactor.core.publisher.*;
 public final class OrdersWriteController {
 
     private final UsersService usersService;
-    private final OrdersWriteService itemsService;
+    private final OrdersWriteService ordersWriteService;
 
-    public OrdersWriteController(UsersService usersService, OrdersWriteService itemsService) {
+    public OrdersWriteController(UsersService usersService, OrdersWriteService ordersWriteService) {
         this.usersService = usersService;
-        this.itemsService = itemsService;
+        this.ordersWriteService = ordersWriteService;
     }
 
     @PostMapping
@@ -28,20 +28,35 @@ public final class OrdersWriteController {
     ) {
         return usersService.decode(jwt)
                 .map(userDto -> userDto.toCreateItemDto(name))
-                .flatMap(itemsService::create)
+                .flatMap(ordersWriteService::create)
                 .map(ResponseEntity::ok)
                 .onErrorResume(StatusRuntimeException.class, this::responseEntityMono);
     }
 
-    private Mono<ResponseEntity<String>> responseEntityMono(StatusRuntimeException e) {
+    @PostMapping("/{id}/deactivate")
+    Mono<ResponseEntity<Void>> deactivateItem(
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String jwt,
+            @PathVariable String id
+    ) {
+        return usersService.decode(jwt)
+                .map(userDto -> userDto.toDeactivateItemDto(id))
+                .flatMap(ordersWriteService::deactivate)
+                .map(ResponseEntity::ok)
+                .onErrorResume(StatusRuntimeException.class, this::responseEntityMono);
+    }
+
+    private <T> Mono<ResponseEntity<T>> responseEntityMono(StatusRuntimeException e) {
         return Mono.just(responseEntity(e));
     }
 
-    private ResponseEntity<String> responseEntity(StatusRuntimeException e) {
-        if (e.getStatus() == Status.PERMISSION_DENIED) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+    private <T> ResponseEntity<T> responseEntity(StatusRuntimeException e) {
+        switch (e.getStatus().getCode()) {
+            case PERMISSION_DENIED:
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            case NOT_FOUND:
+                ResponseEntity.notFound().build();
+            default:
+                return ResponseEntity.badRequest().build();
         }
-
-        return ResponseEntity.badRequest().build();
     }
 }

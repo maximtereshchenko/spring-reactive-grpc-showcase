@@ -32,4 +32,17 @@ public final class OrdersWriteService {
                 )
         );
     }
+
+    public Mono<Void> deactivate(DeactivateItemDto dto) {
+        return Mono.create(sink ->
+                orderWriteServiceGrpc.deactivate(
+                        DeactivateItemRequest.newBuilder()
+                                .setUserId(dto.getUserId())
+                                .setUserType(dto.getUserType())
+                                .setItemId(dto.getItemId())
+                                .build(),
+                        new VoidMonoStreamObserverAdapter<>(sink)
+                )
+        );
+    }
 }

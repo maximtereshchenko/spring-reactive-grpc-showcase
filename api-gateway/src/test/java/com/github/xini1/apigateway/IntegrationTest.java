@@ -144,15 +144,15 @@ final class IntegrationTest {
     @Test
     @Order(4)
     void adminCanCreateItem() {
-        var createItemsResponse = webClient.post()
+        var createItemResponse = webClient.post()
                 .uri("/items")
                 .header(HttpHeaders.AUTHORIZATION, adminUserJwt)
                 .bodyValue("item")
                 .exchange()
                 .returnResult(String.class);
-        itemId = createItemsResponse.getResponseBody().blockFirst();
+        itemId = createItemResponse.getResponseBody().blockFirst();
 
-        assertThat(createItemsResponse.getStatus()).isEqualTo(HttpStatus.OK);
+        assertThat(createItemResponse.getStatus()).isEqualTo(HttpStatus.OK);
 
         await(() -> {
             var itemsResponse = webClient.get()
@@ -170,12 +170,47 @@ final class IntegrationTest {
         });
     }
 
+    @Test
+    @Order(5)
+    void adminCanDeactivateItem() {
+        var deactivateItemResponse = webClient.post()
+                .uri("/items/{itemId}/deactivate", itemId)
+                .header(HttpHeaders.AUTHORIZATION, adminUserJwt)
+                .exchange()
+                .returnResult(Void.class);
+
+        assertThat(deactivateItemResponse.getStatus()).isEqualTo(HttpStatus.OK);
+
+        await(() -> {
+            var itemsResponse = webClient.get()
+                    .uri("/items")
+                    .exchange()
+                    .returnResult(ItemDto.class);
+
+            assertThat(itemsResponse.getStatus()).isEqualTo(HttpStatus.OK);
+            assertThat(
+                    itemsResponse.getResponseBody()
+                            .collectList()
+                            .block()
+            )
+                    .containsExactly(expectedDeactivatedItemDto());
+        });
+    }
+
+    private ItemDto expectedDeactivatedItemDto() {
+        return itemDto(false, 2);
+    }
+
     private ItemDto expectedItemDto() {
+        return itemDto(true, 1);
+    }
+
+    private ItemDto itemDto(boolean active, int version) {
         var dto = new ItemDto();
         dto.setId(itemId);
         dto.setName("item");
-        dto.setActive(true);
-        dto.setVersion(1);
+        dto.setActive(active);
+        dto.setVersion(version);
         return dto;
     }
 
