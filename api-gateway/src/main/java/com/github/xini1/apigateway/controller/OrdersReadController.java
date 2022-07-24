@@ -7,6 +7,8 @@ import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.*;
 
+import java.util.*;
+
 /**
  * @author Maxim Tereshchenko
  */
@@ -31,6 +33,23 @@ public final class OrdersReadController {
     Mono<ResponseEntity<CartDto>> cart(@RequestHeader(HttpHeaders.AUTHORIZATION) String jwt) {
         return usersService.decode(jwt)
                 .flatMap(ordersReadService::cart)
+                .map(ResponseEntity::ok)
+                .onErrorResume(StatusRuntimeException.class, handler::handle);
+    }
+
+    @GetMapping("/orders")
+    Mono<ResponseEntity<OrderedItemsDto>> orders(@RequestHeader(HttpHeaders.AUTHORIZATION) String jwt) {
+        return usersService.decode(jwt)
+                .flatMap(ordersReadService::orders)
+                .map(ResponseEntity::ok)
+                .onErrorResume(StatusRuntimeException.class, handler::handle);
+    }
+
+    @GetMapping("/items/top")
+    Mono<ResponseEntity<List<TopOrderedItemDto>>> topOrderedItems(@RequestHeader(HttpHeaders.AUTHORIZATION) String jwt) {
+        return usersService.decode(jwt)
+                .flatMapMany(ordersReadService::topOrderedItems)
+                .collectList()
                 .map(ResponseEntity::ok)
                 .onErrorResume(StatusRuntimeException.class, handler::handle);
     }

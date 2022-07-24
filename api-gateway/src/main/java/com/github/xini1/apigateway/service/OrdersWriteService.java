@@ -64,4 +64,13 @@ public final class OrdersWriteService {
                 )
         );
     }
+
+    public Mono<Void> order(UserDto userDto) {
+        return Mono.create(sink ->
+                orderWriteServiceGrpc.order(
+                        userDto.toOrderItemsInCartRequest(),
+                        new VoidMonoStreamObserverAdapter<>(sink)
+                )
+        );
+    }
 }

@@ -48,4 +48,24 @@ public final class UserDto {
                 .setQuantity(dto.getQuantity())
                 .build();
     }
+
+    public OrderItemsInCartRequest toOrderItemsInCartRequest() {
+        return OrderItemsInCartRequest.newBuilder()
+                .setUserId(id)
+                .setUserType(userType)
+                .build();
+    }
+
+    public ViewOrderedItemsRequest toViewOrderedItemsRequest() {
+        return ViewOrderedItemsRequest.newBuilder()
+                .setUserId(id)
+                .setUserType(userType)
+                .build();
+    }
+
+    public ViewTopOrderedItemsRequest toViewTopOrderedItemsRequest() {
+        return ViewTopOrderedItemsRequest.newBuilder()
+                .setUserType(userType)
+                .build();
+    }
 }

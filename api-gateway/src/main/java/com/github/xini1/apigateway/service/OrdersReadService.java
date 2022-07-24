@@ -37,4 +37,22 @@ public final class OrdersReadService {
                 )
         );
     }
+
+    public Mono<OrderedItemsDto> orders(UserDto userDto) {
+        return Mono.create(sink ->
+                orderReadServiceGrpc.viewOrderedItems(
+                        userDto.toViewOrderedItemsRequest(),
+                        new MonoStreamObserverAdapter<>(sink, OrderedItemsDto::new)
+                )
+        );
+    }
+
+    public Flux<TopOrderedItemDto> topOrderedItems(UserDto userDto) {
+        return Flux.create(sink ->
+                orderReadServiceGrpc.viewTopOrderedItems(
+                        userDto.toViewTopOrderedItemsRequest(),
+                        new FluxStreamObserverAdapter<>(sink, TopOrderedItemDto::new)
+                )
+        );
+    }
 }

@@ -4,7 +4,6 @@ import com.github.xini1.common.*;
 import com.github.xini1.common.rpc.*;
 import com.github.xini1.orders.read.domain.Module;
 import org.apache.kafka.clients.admin.*;
-import org.springframework.boot.autoconfigure.condition.*;
 import org.springframework.boot.autoconfigure.kafka.*;
 import org.springframework.context.annotation.*;
 import org.springframework.data.mongodb.repository.config.*;
@@ -41,9 +40,19 @@ public class SpringConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean
+    @Profile("!test")
     Clock clock() {
         return Clock.systemDefaultZone();
+    }
+
+    @Bean
+    @Profile("test")
+    Clock fixed() {
+        return Clock.fixed(
+                LocalDateTime.of(2020, 1, 1, 1, 0)
+                        .toInstant(ZoneOffset.UTC),
+                ZoneOffset.UTC
+        );
     }
 
     @Bean

@@ -43,22 +43,78 @@ Kafka and MongoDB were chosen mostly of their reactive driver support.
 curl -X POST \
 -H 'Content-Type:application/json' \
 http://localhost:8080/users \
--d '{"username":"user","password":"pass","userType":"ADMIN"}'
+-d '{"username":"admin","password":"pass","userType":"ADMIN"}'
 ```
 
 ```bash
 curl -X POST \
 -H 'Content-Type:application/json' \
 http://localhost:8080/users/login \
--d '{"username":"user","password":"pass"}'
+-d '{"username":"admin","password":"pass"}'
 ```
 
 ```bash
 curl -X POST \
 -H 'Content-Type:application/json' \
--H 'Authorization:jwt' \
+-H 'Authorization:eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6ImNmMjk4NjliLThiZjQtNGUyYy04MWRmLTZmYWNjZTFkZDExNCJ9.FSb43miXCp9o2JkmD2WtFVEOF4mc7W0De2X6aACUu8Q' \
 http://localhost:8080/items \
 -d 'item'
+```
+
+```bash
+curl -X GET http://localhost:8080/items
+```
+
+```bash
+curl -X POST \
+-H 'Authorization:eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6ImNmMjk4NjliLThiZjQtNGUyYy04MWRmLTZmYWNjZTFkZDExNCJ9.FSb43miXCp9o2JkmD2WtFVEOF4mc7W0De2X6aACUu8Q' \
+http://localhost:8080/items/ce0d2582-aee3-4a3d-92c1-c5100e69eef7/deactivate 
+```
+
+```bash
+curl -X POST \
+-H 'Authorization:eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6ImNmMjk4NjliLThiZjQtNGUyYy04MWRmLTZmYWNjZTFkZDExNCJ9.FSb43miXCp9o2JkmD2WtFVEOF4mc7W0De2X6aACUu8Q' \
+http://localhost:8080/items/ce0d2582-aee3-4a3d-92c1-c5100e69eef7/activate 
+```
+
+```bash
+curl -X POST \
+-H 'Content-Type:application/json' \
+-H 'Authorization:eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6Ijk5NzZkOTU5LTU0ZjktNGZjMy1hMDI3LWIzMjU4OWJiYzUzNCJ9.ooszZOiqpUiRanQ8vC8UqTG28pPPt04Q5nlKwqGDJ0U' \
+http://localhost:8080/cart/add \
+-d '{"itemId":"ce0d2582-aee3-4a3d-92c1-c5100e69eef7","quantity":"1"}'
+```
+
+```bash
+curl -X POST \
+-H 'Content-Type:application/json' \
+-H 'Authorization:eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6Ijk5NzZkOTU5LTU0ZjktNGZjMy1hMDI3LWIzMjU4OWJiYzUzNCJ9.ooszZOiqpUiRanQ8vC8UqTG28pPPt04Q5nlKwqGDJ0U' \
+http://localhost:8080/cart/remove \
+-d '{"itemId":"ce0d2582-aee3-4a3d-92c1-c5100e69eef7","quantity":"1"}'
+```
+
+```bash
+curl -X GET \
+-H 'Authorization:eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6Ijk5NzZkOTU5LTU0ZjktNGZjMy1hMDI3LWIzMjU4OWJiYzUzNCJ9.ooszZOiqpUiRanQ8vC8UqTG28pPPt04Q5nlKwqGDJ0U' \
+http://localhost:8080/cart
+```
+
+```bash
+curl -X POST \
+-H 'Authorization:eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6Ijk5NzZkOTU5LTU0ZjktNGZjMy1hMDI3LWIzMjU4OWJiYzUzNCJ9.ooszZOiqpUiRanQ8vC8UqTG28pPPt04Q5nlKwqGDJ0U' \
+http://localhost:8080/cart/order
+```
+
+```bash
+curl -X GET \
+-H 'Authorization:eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6Ijk5NzZkOTU5LTU0ZjktNGZjMy1hMDI3LWIzMjU4OWJiYzUzNCJ9.ooszZOiqpUiRanQ8vC8UqTG28pPPt04Q5nlKwqGDJ0U' \
+http://localhost:8080/orders
+```
+
+```bash
+curl -X GET \
+-H 'Authorization:eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6ImNmMjk4NjliLThiZjQtNGUyYy04MWRmLTZmYWNjZTFkZDExNCJ9.FSb43miXCp9o2JkmD2WtFVEOF4mc7W0De2X6aACUu8Q' \
+http://localhost:8080/items/top
 ```
 
 # What have I learnt?

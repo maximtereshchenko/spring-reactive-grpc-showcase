@@ -23,7 +23,6 @@ import org.testcontainers.utility.*;
 import reactor.core.publisher.*;
 import reactor.kafka.sender.*;
 
-import java.time.*;
 import java.util.*;
 
 import static com.github.xini1.Await.*;
@@ -33,6 +32,7 @@ import static org.assertj.core.api.Assertions.*;
  * @author Maxim Tereshchenko
  */
 @SpringBootTest(classes = {IntegrationTest.TestConfig.class, Main.class})
+@ActiveProfiles("test")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Testcontainers
@@ -290,15 +290,6 @@ final class IntegrationTest {
         @Bean
         KafkaSender<UUID, String> kafkaProducer(KafkaProperties kafkaProperties) {
             return KafkaSender.create(SenderOptions.create(properties(kafkaProperties)));
-        }
-
-        @Bean
-        Clock fixed() {
-            return Clock.fixed(
-                    LocalDateTime.of(2020, 1, 1, 1, 0)
-                            .toInstant(ZoneOffset.UTC),
-                    ZoneOffset.UTC
-            );
         }
 
         private Map<String, Object> properties(KafkaProperties kafkaProperties) {

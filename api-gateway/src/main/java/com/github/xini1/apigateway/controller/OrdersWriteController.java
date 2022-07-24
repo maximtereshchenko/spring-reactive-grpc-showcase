@@ -79,4 +79,12 @@ public final class OrdersWriteController {
                 .map(ResponseEntity::ok)
                 .onErrorResume(StatusRuntimeException.class, handler::handle);
     }
+
+    @PostMapping("/cart/order")
+    Mono<ResponseEntity<Void>> orderItems(@RequestHeader(HttpHeaders.AUTHORIZATION) String jwt) {
+        return usersService.decode(jwt)
+                .flatMap(ordersWriteService::order)
+                .map(ResponseEntity::ok)
+                .onErrorResume(StatusRuntimeException.class, handler::handle);
+    }
 }

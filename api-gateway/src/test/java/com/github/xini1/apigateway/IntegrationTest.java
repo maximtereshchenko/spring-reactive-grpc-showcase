@@ -44,7 +44,8 @@ final class IntegrationTest {
     @Container
     private static final GenericContainer<?> ORDERS_WRITE_SIDE = container("orders-write-side");
     @Container
-    private static final GenericContainer<?> ORDERS_READ_SIDE = container("orders-read-side");
+    private static final GenericContainer<?> ORDERS_READ_SIDE = container("orders-read-side")
+            .withEnv("SPRING_PROFILES_ACTIVE", "test");
 
     static {
         MONGO_DB.start();
@@ -168,7 +169,7 @@ final class IntegrationTest {
                             .collectList()
                             .block()
             )
-                    .containsExactly(expectedItemDto());
+                    .containsExactly(expectedItem());
         });
     }
 
@@ -195,7 +196,7 @@ final class IntegrationTest {
                             .collectList()
                             .block()
             )
-                    .containsExactly(expectedDeactivatedItemDto());
+                    .containsExactly(expectedDeactivatedItem());
         });
     }
 
@@ -222,7 +223,7 @@ final class IntegrationTest {
                             .collectList()
                             .block()
             )
-                    .containsExactly(expectedActivatedItemDto());
+                    .containsExactly(expectedActivatedItem());
         });
     }
 
@@ -250,7 +251,7 @@ final class IntegrationTest {
                     cartResponse.getResponseBody()
                             .blockFirst()
             )
-                    .isEqualTo(expectedCartDto());
+                    .isEqualTo(expectedCart());
         });
     }
 
@@ -278,8 +279,87 @@ final class IntegrationTest {
                     cartResponse.getResponseBody()
                             .blockFirst()
             )
-                    .isEqualTo(expectedAfterRemovalCartDto());
+                    .isEqualTo(expectedAfterRemovalCart());
         });
+    }
+
+    @Test
+    @Order(9)
+    void userCanOrderItems() {
+        var orderItemsResponse = webClient.post()
+                .uri("/cart/order")
+                .header(HttpHeaders.AUTHORIZATION, regularUserJwt)
+                .exchange()
+                .returnResult(Void.class);
+
+        assertThat(orderItemsResponse.getStatus()).isEqualTo(HttpStatus.OK);
+
+        await(() -> {
+            var cartResponse = webClient.get()
+                    .uri("/cart")
+                    .header(HttpHeaders.AUTHORIZATION, regularUserJwt)
+                    .exchange()
+                    .returnResult(CartDto.class);
+            assertThat(cartResponse.getStatus()).isEqualTo(HttpStatus.OK);
+            assertThat(
+                    cartResponse.getResponseBody()
+                            .blockFirst()
+            )
+                    .isEqualTo(emptyCartDto());
+
+            var orderedItemsResponse = webClient.get()
+                    .uri("/orders")
+                    .header(HttpHeaders.AUTHORIZATION, regularUserJwt)
+                    .exchange()
+                    .returnResult(OrderedItemsDto.class);
+            assertThat(orderedItemsResponse.getStatus()).isEqualTo(HttpStatus.OK);
+            assertThat(
+                    orderedItemsResponse.getResponseBody()
+                            .blockFirst()
+            )
+                    .isEqualTo(expectedOrderedItems());
+
+            var topOrderedItemsResponse = webClient.get()
+                    .uri("/items/top")
+                    .header(HttpHeaders.AUTHORIZATION, adminUserJwt)
+                    .exchange()
+                    .returnResult(TopOrderedItemDto.class);
+            assertThat(topOrderedItemsResponse.getStatus()).isEqualTo(HttpStatus.OK);
+            assertThat(
+                    topOrderedItemsResponse.getResponseBody()
+                            .collectList()
+                            .block()
+            )
+                    .containsExactly(expectedTopOrderedItem());
+        });
+    }
+
+    private TopOrderedItemDto expectedTopOrderedItem() {
+        var dto = new TopOrderedItemDto();
+        dto.setId(itemId);
+        dto.setName("item");
+        dto.setTimesOrdered(1);
+        return dto;
+    }
+
+    private OrderedItemsDto expectedOrderedItems() {
+        var itemInOrderDto = new OrderedItemsDto.ItemInOrderDto();
+        itemInOrderDto.setId(itemId);
+        itemInOrderDto.setQuantity(1);
+        var orderDto = new OrderedItemsDto.OrderDto();
+        orderDto.setTimestamp("2020-01-01T01:00:00Z");
+        orderDto.setItems(List.of(itemInOrderDto));
+        var orderedItemsDto = new OrderedItemsDto();
+        orderedItemsDto.setUserId(userId);
+        orderedItemsDto.setOrders(List.of(orderDto));
+        return orderedItemsDto;
+    }
+
+    private CartDto emptyCartDto() {
+        var cart = new CartDto();
+        cart.setUserId(userId);
+        cart.setVersion(3);
+        return cart;
     }
 
     private AddRemoveItemToCartDto removeItemFromCartDto() {
@@ -297,11 +377,11 @@ final class IntegrationTest {
         return dto;
     }
 
-    private CartDto expectedAfterRemovalCartDto() {
+    private CartDto expectedAfterRemovalCart() {
         return cartDto(1, 2);
     }
 
-    private CartDto expectedCartDto() {
+    private CartDto expectedCart() {
         return cartDto(2, 1);
     }
 
@@ -319,15 +399,15 @@ final class IntegrationTest {
         return cart;
     }
 
-    private ItemDto expectedActivatedItemDto() {
+    private ItemDto expectedActivatedItem() {
         return itemDto(true, 3);
     }
 
-    private ItemDto expectedDeactivatedItemDto() {
+    private ItemDto expectedDeactivatedItem() {
         return itemDto(false, 2);
     }
 
-    private ItemDto expectedItemDto() {
+    private ItemDto expectedItem() {
         return itemDto(true, 1);
     }
 
@@ -368,10 +448,5 @@ final class IntegrationTest {
         dto.setPassword("pass");
         dto.setUserType("ADMIN");
         return dto;
-    }
-
-    @TestConfiguration
-    static class TestConfig {
-
     }
 }
