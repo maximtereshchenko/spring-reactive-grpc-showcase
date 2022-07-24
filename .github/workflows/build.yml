@@ -23,5 +23,11 @@ jobs:
       - name: Change Gradle wrapper permissions
         run: chmod +x ./gradlew
 
+      - name: Build images
+        run: |
+          docker build --build-arg module=orders-read-side -t orders-read-side ./
+          docker build --build-arg module=orders-write-side -t orders-write-side ./
+          docker build --build-arg module=users -t users ./
+
       - name: Build with Gradle
         run: ./gradlew build

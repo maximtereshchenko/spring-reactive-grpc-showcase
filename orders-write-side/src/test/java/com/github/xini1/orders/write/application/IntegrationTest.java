@@ -99,8 +99,7 @@ final class IntegrationTest {
 
     @Test
     @Order(1)
-    void adminCanDeactivateItem() throws InterruptedException {
-        Thread.sleep(10000);
+    void adminCanDeactivateItem() {
         stub.deactivate(
                 DeactivateItemRequest.newBuilder()
                         .setUserId(userId)
