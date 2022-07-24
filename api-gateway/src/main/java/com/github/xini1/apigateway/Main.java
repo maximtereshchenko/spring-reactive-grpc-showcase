@@ -18,10 +18,32 @@ public class Main {
     }
 
     @Bean
-    UsersController usersController(
+    UsersService usersService(
             @Value("${application.rpc.users.address}") String address,
             @Value("${application.rpc.users.port}") int port
     ) {
-        return new UsersController(new UsersService(address, port));
+        return new UsersService(address, port);
+    }
+
+    @Bean
+    UsersController usersController(UsersService usersService) {
+        return new UsersController(usersService);
+    }
+
+    @Bean
+    OrdersWriteController ordersWriteController(
+            UsersService usersService,
+            @Value("${application.rpc.orders.write.address}") String address,
+            @Value("${application.rpc.orders.write.port}") int port
+    ) {
+        return new OrdersWriteController(usersService, new OrdersWriteService(address, port));
+    }
+
+    @Bean
+    OrdersReadController ordersReadController(
+            @Value("${application.rpc.orders.read.address}") String address,
+            @Value("${application.rpc.orders.read.port}") int port
+    ) {
+        return new OrdersReadController(new OrdersReadService(address, port));
     }
 }

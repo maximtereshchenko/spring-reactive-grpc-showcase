@@ -20,4 +20,8 @@ public final class UserDto {
     public String getUserType() {
         return userType;
     }
+
+    public CreateItemDto toCreateItemDto(String itemName) {
+        return new CreateItemDto(id, userType, itemName);
+    }
 }

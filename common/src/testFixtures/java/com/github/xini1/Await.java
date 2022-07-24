@@ -1,4 +1,4 @@
-package com.github.xini1.orders.read.application;
+package com.github.xini1;
 
 import java.time.*;
 import java.util.stream.*;
@@ -6,18 +6,20 @@ import java.util.stream.*;
 /**
  * @author Maxim Tereshchenko
  */
-final class Await {
+public final class Await {
 
-    private final Instant start = Instant.now();
+    private Await() {
+    }
 
-    void await(Runnable assertion) {
-        Stream.generate(() -> tryAssert(assertion))
+    public static void await(Runnable assertion) {
+        var start = Instant.now();
+        Stream.generate(() -> tryAssert(start, assertion))
                 .filter(result -> result.canStop(Instant.now()))
                 .findAny()
                 .ifPresent(Result::onComplete);
     }
 
-    private Result tryAssert(Runnable assertion) {
+    private static Result tryAssert(Instant start, Runnable assertion) {
         try {
             assertion.run();
             return new Success();

@@ -19,6 +19,7 @@ dependencies {
     testImplementation(libs.testcontainers.junit)
     testImplementation(libs.testcontainers.mongodb)
     testImplementation(libs.testcontainers.kafka)
+    testImplementation(testFixtures(project("::common")))
 }
 
 tasks.test {

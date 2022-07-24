@@ -26,6 +26,7 @@ import reactor.kafka.sender.*;
 import java.time.*;
 import java.util.*;
 
+import static com.github.xini1.Await.*;
 import static org.assertj.core.api.Assertions.*;
 
 /**
@@ -74,7 +75,7 @@ final class IntegrationTest {
     void canConsumeItemCreatedEvent() {
         emit(new ItemCreated(itemId, userId, "item", 1));
 
-        new Await().await(() -> {
+        await(() -> {
             assertThat(stub.viewItems(Empty.newBuilder().build()))
                     .toIterable()
                     .containsExactly(
@@ -108,7 +109,7 @@ final class IntegrationTest {
     void canConsumeItemDeactivatedEvent() {
         emit(new ItemDeactivated(itemId, userId, 2));
 
-        new Await().await(() ->
+        await(() ->
                 assertThat(stub.viewItems(Empty.newBuilder().build()))
                         .toIterable()
                         .containsExactly(
@@ -127,7 +128,7 @@ final class IntegrationTest {
     void canConsumeItemActivatedEvent() {
         emit(new ItemActivated(itemId, userId, 3));
 
-        new Await().await(() ->
+        await(() ->
                 assertThat(stub.viewItems(Empty.newBuilder().build()))
                         .toIterable()
                         .containsExactly(
@@ -146,7 +147,7 @@ final class IntegrationTest {
     void canConsumeItemAddedToCartEvent() {
         emit(new ItemAddedToCart(userId, itemId, 2, 1));
 
-        new Await().await(() ->
+        await(() ->
                 assertThat(
                         stub.viewCart(
                                 ViewCartRequest.newBuilder()
@@ -178,7 +179,7 @@ final class IntegrationTest {
     void canConsumeItemRemovedFromCartEvent() {
         emit(new ItemRemovedFromCart(userId, itemId, 1, 2));
 
-        new Await().await(() ->
+        await(() ->
                 assertThat(
                         stub.viewCart(
                                 ViewCartRequest.newBuilder()
@@ -210,7 +211,7 @@ final class IntegrationTest {
     void canConsumeItemsOrderedEvent() {
         emit(new ItemsOrdered(userId, 3));
 
-        new Await().await(() -> {
+        await(() -> {
             assertThat(
                     stub.viewCart(
                             ViewCartRequest.newBuilder()

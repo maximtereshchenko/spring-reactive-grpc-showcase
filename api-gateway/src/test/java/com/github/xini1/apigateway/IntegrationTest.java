@@ -14,6 +14,7 @@ import org.testcontainers.utility.*;
 import java.time.*;
 import java.util.*;
 
+import static com.github.xini1.Await.*;
 import static org.assertj.core.api.Assertions.*;
 
 /**
@@ -58,11 +59,16 @@ final class IntegrationTest {
             .build();
     private String regularUserJwt;
     private String adminUserJwt;
+    private String itemId;
 
     @DynamicPropertySource
     static void properties(DynamicPropertyRegistry registry) {
         registry.add("application.rpc.users.address", USERS::getHost);
         registry.add("application.rpc.users.port", USERS::getFirstMappedPort);
+        registry.add("application.rpc.orders.write.address", ORDERS_WRITE_SIDE::getHost);
+        registry.add("application.rpc.orders.write.port", ORDERS_WRITE_SIDE::getFirstMappedPort);
+        registry.add("application.rpc.orders.read.address", ORDERS_READ_SIDE::getHost);
+        registry.add("application.rpc.orders.read.port", ORDERS_READ_SIDE::getFirstMappedPort);
     }
 
     private static GenericContainer<?> container(String name) {
@@ -133,6 +139,44 @@ final class IntegrationTest {
 
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK);
         assertThat(adminUserJwt).isNotNull();
+    }
+
+    @Test
+    @Order(4)
+    void adminCanCreateItem() {
+        var createItemsResponse = webClient.post()
+                .uri("/items")
+                .header(HttpHeaders.AUTHORIZATION, adminUserJwt)
+                .bodyValue("item")
+                .exchange()
+                .returnResult(String.class);
+        itemId = createItemsResponse.getResponseBody().blockFirst();
+
+        assertThat(createItemsResponse.getStatus()).isEqualTo(HttpStatus.OK);
+
+        await(() -> {
+            var itemsResponse = webClient.get()
+                    .uri("/items")
+                    .exchange()
+                    .returnResult(ItemDto.class);
+
+            assertThat(itemsResponse.getStatus()).isEqualTo(HttpStatus.OK);
+            assertThat(
+                    itemsResponse.getResponseBody()
+                            .collectList()
+                            .block()
+            )
+                    .containsExactly(expectedItemDto());
+        });
+    }
+
+    private ItemDto expectedItemDto() {
+        var dto = new ItemDto();
+        dto.setId(itemId);
+        dto.setName("item");
+        dto.setActive(true);
+        dto.setVersion(1);
+        return dto;
     }
 
     private LoginDto loginRegularUserDto() {

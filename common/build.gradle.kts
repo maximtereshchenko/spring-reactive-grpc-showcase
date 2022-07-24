@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.protobuf)
     idea
     `java-library`
+    `java-test-fixtures`
 }
 
 repositories {

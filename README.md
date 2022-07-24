@@ -41,9 +41,24 @@ Kafka and MongoDB were chosen mostly of their reactive driver support.
 
 ```bash
 curl -X POST \
--H Content-Type:application/json \
+-H 'Content-Type:application/json' \
 http://localhost:8080/users \
 -d '{"username":"user","password":"pass","userType":"ADMIN"}'
+```
+
+```bash
+curl -X POST \
+-H 'Content-Type:application/json' \
+http://localhost:8080/users/login \
+-d '{"username":"user","password":"pass"}'
+```
+
+```bash
+curl -X POST \
+-H 'Content-Type:application/json' \
+-H 'Authorization:jwt' \
+http://localhost:8080/items \
+-d 'item'
 ```
 
 # What have I learnt?
