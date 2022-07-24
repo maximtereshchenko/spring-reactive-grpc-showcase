@@ -50,7 +50,9 @@ final class IntegrationTest {
     static {
         MONGO_DB.start();
         KAFKA.start();
-        start(USERS, ORDERS_READ_SIDE, ORDERS_WRITE_SIDE);
+        USERS.start();
+        ORDERS_READ_SIDE.start();
+        ORDERS_WRITE_SIDE.start();
     }
 
     private final WebTestClient webClient = WebTestClient.bindToServer()
@@ -78,15 +80,6 @@ final class IntegrationTest {
                 .withNetwork(NETWORK)
                 .withNetworkAliases(name)
                 .withExposedPorts(8080);
-    }
-
-    private static void start(GenericContainer<?>... containers) {
-        for (GenericContainer<?> container : containers) {
-            container.withEnv("SPRING_DATA_MONGODB_HOST", "database")
-                    .withEnv("SPRING_DATA_MONGODB_PORT", "27017")
-                    .withEnv("SPRING_KAFKA_BOOTSTRAP_SERVERS", "kafka:9092")
-                    .start();
-        }
     }
 
     @Test
