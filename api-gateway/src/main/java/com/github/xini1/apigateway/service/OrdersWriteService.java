@@ -46,4 +46,13 @@ public final class OrdersWriteService {
                 )
         );
     }
+
+    public Mono<Void> addItemToCart(UserDto userDto, AddItemToCartDto addItemToCartDto) {
+        return Mono.create(sink ->
+                orderWriteServiceGrpc.add(
+                        userDto.toAddItemToCartRequest(addItemToCartDto),
+                        new VoidMonoStreamObserverAdapter<>(sink)
+                )
+        );
+    }
 }

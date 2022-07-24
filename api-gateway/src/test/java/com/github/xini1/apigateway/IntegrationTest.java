@@ -59,6 +59,7 @@ final class IntegrationTest {
             .build();
     private String regularUserJwt;
     private String adminUserJwt;
+    private String userId;
     private String itemId;
 
     @DynamicPropertySource
@@ -94,10 +95,11 @@ final class IntegrationTest {
                 .uri("/users")
                 .bodyValue(registerRegularUserDto())
                 .exchange()
-                .returnResult(UUID.class);
+                .returnResult(String.class);
+        userId = response.getResponseBody().blockFirst();
 
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getResponseBody().blockFirst()).isNotNull();
+        assertThat(userId).isNotNull();
     }
 
     @Test
@@ -121,7 +123,7 @@ final class IntegrationTest {
                 .uri("/users")
                 .bodyValue(registerAdminDto())
                 .exchange()
-                .returnResult(UUID.class);
+                .returnResult(String.class);
 
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK);
         assertThat(response.getResponseBody().blockFirst()).isNotNull();
@@ -200,13 +202,13 @@ final class IntegrationTest {
     @Test
     @Order(6)
     void adminCanActivateItem() {
-        var deactivateItemResponse = webClient.post()
+        var activateItemResponse = webClient.post()
                 .uri("/items/{itemId}/activate", itemId)
                 .header(HttpHeaders.AUTHORIZATION, adminUserJwt)
                 .exchange()
                 .returnResult(Void.class);
 
-        assertThat(deactivateItemResponse.getStatus()).isEqualTo(HttpStatus.OK);
+        assertThat(activateItemResponse.getStatus()).isEqualTo(HttpStatus.OK);
 
         await(() -> {
             var itemsResponse = webClient.get()
@@ -222,6 +224,55 @@ final class IntegrationTest {
             )
                     .containsExactly(expectedActivatedItemDto());
         });
+    }
+
+    @Test
+    @Order(7)
+    void userCanAddItemToCart() {
+        var addItemToCartResponse = webClient.post()
+                .uri("/cart")
+                .header(HttpHeaders.AUTHORIZATION, regularUserJwt)
+                .bodyValue(addItemToCartDto())
+                .exchange()
+                .returnResult(Void.class);
+
+        assertThat(addItemToCartResponse.getStatus()).isEqualTo(HttpStatus.OK);
+
+        await(() -> {
+            var cartResponse = webClient.get()
+                    .uri("/cart")
+                    .header(HttpHeaders.AUTHORIZATION, regularUserJwt)
+                    .exchange()
+                    .returnResult(CartDto.class);
+
+            assertThat(cartResponse.getStatus()).isEqualTo(HttpStatus.OK);
+            assertThat(
+                    cartResponse.getResponseBody()
+                            .blockFirst()
+            )
+                    .isEqualTo(expectedCartDto());
+        });
+    }
+
+    private AddItemToCartDto addItemToCartDto() {
+        var dto = new AddItemToCartDto();
+        dto.setItemId(itemId);
+        dto.setQuantity(2);
+        return dto;
+    }
+
+    private CartDto expectedCartDto() {
+        var itemInCart = new CartDto.ItemInCartDto();
+        itemInCart.setId(itemId);
+        itemInCart.setName("item");
+        itemInCart.setActive(true);
+        itemInCart.setQuantity(2);
+        itemInCart.setVersion(3);
+        var cart = new CartDto();
+        cart.setUserId(userId);
+        cart.setItemsInCart(List.of(itemInCart));
+        cart.setVersion(1);
+        return cart;
     }
 
     private ItemDto expectedActivatedItemDto() {

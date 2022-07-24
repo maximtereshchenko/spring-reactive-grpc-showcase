@@ -41,9 +41,10 @@ public class Main {
 
     @Bean
     OrdersReadController ordersReadController(
+            UsersService usersService,
             @Value("${application.rpc.orders.read.address}") String address,
             @Value("${application.rpc.orders.read.port}") int port
     ) {
-        return new OrdersReadController(new OrdersReadService(address, port));
+        return new OrdersReadController(usersService, new OrdersReadService(address, port));
     }
 }

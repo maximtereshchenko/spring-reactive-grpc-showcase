@@ -5,8 +5,6 @@ import com.github.xini1.users.rpc.*;
 import io.grpc.*;
 import reactor.core.publisher.*;
 
-import java.util.*;
-
 /**
  * @author Maxim Tereshchenko
  */
@@ -22,11 +20,11 @@ public final class UsersService {
         );
     }
 
-    public Mono<UUID> register(RegisterUserDto dto) {
+    public Mono<String> register(RegisterUserDto dto) {
         return Mono.create(sink ->
                 userServiceGrpc.register(
                         dto.toRegisterRequest(),
-                        new MonoStreamObserverAdapter<>(sink, response -> UUID.fromString(response.getId()))
+                        new MonoStreamObserverAdapter<>(sink, IdResponse::getId)
                 )
         );
     }

@@ -1,5 +1,8 @@
 package com.github.xini1.apigateway.dto;
 
+import com.github.xini1.orders.read.rpc.*;
+import com.github.xini1.orders.write.rpc.*;
+
 /**
  * @author Maxim Tereshchenko
  */
@@ -27,5 +30,21 @@ public final class UserDto {
 
     public ActivateDeactivateItemDto toActivateDeactivateItemDto(String itemId) {
         return new ActivateDeactivateItemDto(id, userType, itemId);
+    }
+
+    public AddItemToCartRequest toAddItemToCartRequest(AddItemToCartDto addItemToCartDto) {
+        return AddItemToCartRequest.newBuilder()
+                .setUserId(id)
+                .setUserType(userType)
+                .setItemId(addItemToCartDto.getItemId())
+                .setQuantity(addItemToCartDto.getQuantity())
+                .build();
+    }
+
+    public ViewCartRequest toViewCartRequest() {
+        return ViewCartRequest.newBuilder()
+                .setUserId(id)
+                .setUserType(userType)
+                .build();
     }
 }

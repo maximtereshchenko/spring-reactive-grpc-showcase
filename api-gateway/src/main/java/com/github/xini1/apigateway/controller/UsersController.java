@@ -7,8 +7,6 @@ import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.*;
 
-import java.util.*;
-
 /**
  * @author Maxim Tereshchenko
  */
@@ -23,7 +21,7 @@ public final class UsersController {
     }
 
     @PostMapping
-    Mono<ResponseEntity<UUID>> register(@RequestBody RegisterUserDto dto) {
+    Mono<ResponseEntity<String>> register(@RequestBody RegisterUserDto dto) {
         return usersService.register(dto)
                 .map(ResponseEntity::ok)
                 .onErrorResume(StatusRuntimeException.class, e -> Mono.just(ResponseEntity.badRequest().build()));

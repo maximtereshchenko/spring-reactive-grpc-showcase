@@ -28,4 +28,13 @@ public final class OrdersReadService {
                 )
         );
     }
+
+    public Mono<CartDto> cart(UserDto userDto) {
+        return Mono.create(sink ->
+                orderReadServiceGrpc.viewCart(
+                        userDto.toViewCartRequest(),
+                        new MonoStreamObserverAdapter<>(sink, CartDto::new)
+                )
+        );
+    }
 }
