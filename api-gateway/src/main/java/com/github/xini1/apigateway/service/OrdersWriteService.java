@@ -47,10 +47,19 @@ public final class OrdersWriteService {
         );
     }
 
-    public Mono<Void> addItemToCart(UserDto userDto, AddItemToCartDto addItemToCartDto) {
+    public Mono<Void> addItemToCart(UserDto userDto, AddRemoveItemToCartDto addItemToCartDto) {
         return Mono.create(sink ->
                 orderWriteServiceGrpc.add(
                         userDto.toAddItemToCartRequest(addItemToCartDto),
+                        new VoidMonoStreamObserverAdapter<>(sink)
+                )
+        );
+    }
+
+    public Mono<Void> removeItemFromCart(UserDto userDto, AddRemoveItemToCartDto removeItemToCartDto) {
+        return Mono.create(sink ->
+                orderWriteServiceGrpc.remove(
+                        userDto.toRemoveItemFromCartRequest(removeItemToCartDto),
                         new VoidMonoStreamObserverAdapter<>(sink)
                 )
         );

@@ -230,7 +230,7 @@ final class IntegrationTest {
     @Order(7)
     void userCanAddItemToCart() {
         var addItemToCartResponse = webClient.post()
-                .uri("/cart")
+                .uri("/cart/add")
                 .header(HttpHeaders.AUTHORIZATION, regularUserJwt)
                 .bodyValue(addItemToCartDto())
                 .exchange()
@@ -254,24 +254,68 @@ final class IntegrationTest {
         });
     }
 
-    private AddItemToCartDto addItemToCartDto() {
-        var dto = new AddItemToCartDto();
+    @Test
+    @Order(8)
+    void userCanRemoveItemFromCart() {
+        var removeItemFromCartResponse = webClient.post()
+                .uri("/cart/remove")
+                .header(HttpHeaders.AUTHORIZATION, regularUserJwt)
+                .bodyValue(removeItemFromCartDto())
+                .exchange()
+                .returnResult(Void.class);
+
+        assertThat(removeItemFromCartResponse.getStatus()).isEqualTo(HttpStatus.OK);
+
+        await(() -> {
+            var cartResponse = webClient.get()
+                    .uri("/cart")
+                    .header(HttpHeaders.AUTHORIZATION, regularUserJwt)
+                    .exchange()
+                    .returnResult(CartDto.class);
+
+            assertThat(cartResponse.getStatus()).isEqualTo(HttpStatus.OK);
+            assertThat(
+                    cartResponse.getResponseBody()
+                            .blockFirst()
+            )
+                    .isEqualTo(expectedAfterRemovalCartDto());
+        });
+    }
+
+    private AddRemoveItemToCartDto removeItemFromCartDto() {
+        return addRemoveItemToCartDto(1);
+    }
+
+    private AddRemoveItemToCartDto addItemToCartDto() {
+        return addRemoveItemToCartDto(2);
+    }
+
+    private AddRemoveItemToCartDto addRemoveItemToCartDto(int quantity) {
+        var dto = new AddRemoveItemToCartDto();
         dto.setItemId(itemId);
-        dto.setQuantity(2);
+        dto.setQuantity(quantity);
         return dto;
     }
 
+    private CartDto expectedAfterRemovalCartDto() {
+        return cartDto(1, 2);
+    }
+
     private CartDto expectedCartDto() {
+        return cartDto(2, 1);
+    }
+
+    private CartDto cartDto(int quantity, long version) {
         var itemInCart = new CartDto.ItemInCartDto();
         itemInCart.setId(itemId);
         itemInCart.setName("item");
         itemInCart.setActive(true);
-        itemInCart.setQuantity(2);
+        itemInCart.setQuantity(quantity);
         itemInCart.setVersion(3);
         var cart = new CartDto();
         cart.setUserId(userId);
         cart.setItemsInCart(List.of(itemInCart));
-        cart.setVersion(1);
+        cart.setVersion(version);
         return cart;
     }
 

@@ -3,7 +3,7 @@ package com.github.xini1.apigateway.dto;
 /**
  * @author Maxim Tereshchenko
  */
-public final class AddItemToCartDto {
+public final class AddRemoveItemToCartDto {
 
     private String itemId;
     private int quantity;

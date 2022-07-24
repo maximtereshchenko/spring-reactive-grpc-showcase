@@ -16,14 +16,6 @@ public final class UserDto {
         this.userType = userType;
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public String getUserType() {
-        return userType;
-    }
-
     public CreateItemDto toCreateItemDto(String itemName) {
         return new CreateItemDto(id, userType, itemName);
     }
@@ -32,12 +24,12 @@ public final class UserDto {
         return new ActivateDeactivateItemDto(id, userType, itemId);
     }
 
-    public AddItemToCartRequest toAddItemToCartRequest(AddItemToCartDto addItemToCartDto) {
+    public AddItemToCartRequest toAddItemToCartRequest(AddRemoveItemToCartDto dto) {
         return AddItemToCartRequest.newBuilder()
                 .setUserId(id)
                 .setUserType(userType)
-                .setItemId(addItemToCartDto.getItemId())
-                .setQuantity(addItemToCartDto.getQuantity())
+                .setItemId(dto.getItemId())
+                .setQuantity(dto.getQuantity())
                 .build();
     }
 
@@ -45,6 +37,15 @@ public final class UserDto {
         return ViewCartRequest.newBuilder()
                 .setUserId(id)
                 .setUserType(userType)
+                .build();
+    }
+
+    public RemoveItemFromCartRequest toRemoveItemFromCartRequest(AddRemoveItemToCartDto dto) {
+        return RemoveItemFromCartRequest.newBuilder()
+                .setUserId(id)
+                .setUserType(userType)
+                .setItemId(dto.getItemId())
+                .setQuantity(dto.getQuantity())
                 .build();
     }
 }

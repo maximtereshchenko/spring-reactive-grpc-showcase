@@ -58,13 +58,24 @@ public final class OrdersWriteController {
                 .onErrorResume(StatusRuntimeException.class, handler::handle);
     }
 
-    @PostMapping("/cart")
+    @PostMapping("/cart/add")
     Mono<ResponseEntity<Void>> addItemToCart(
             @RequestHeader(HttpHeaders.AUTHORIZATION) String jwt,
-            @RequestBody AddItemToCartDto dto
+            @RequestBody AddRemoveItemToCartDto dto
     ) {
         return usersService.decode(jwt)
                 .flatMap(userDto -> ordersWriteService.addItemToCart(userDto, dto))
+                .map(ResponseEntity::ok)
+                .onErrorResume(StatusRuntimeException.class, handler::handle);
+    }
+
+    @PostMapping("/cart/remove")
+    Mono<ResponseEntity<Void>> removeItemFromCart(
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String jwt,
+            @RequestBody AddRemoveItemToCartDto dto
+    ) {
+        return usersService.decode(jwt)
+                .flatMap(userDto -> ordersWriteService.removeItemFromCart(userDto, dto))
                 .map(ResponseEntity::ok)
                 .onErrorResume(StatusRuntimeException.class, handler::handle);
     }
