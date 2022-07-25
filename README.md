@@ -5,6 +5,7 @@ This is a repository to try out gRPC and Spring Reactor technologies.
 # How the project is looking?
 
 ![](structure.png)
+
 There will be 4 "Microservices" (not really, but they will be deployed separately as Docker containers). I will
 utilize Ports and Adapters architecture, which will enable TDD approach in developing business logic. I will try CQRS
 pattern to separate write side from read side for functionality related to creating orders and managing items to buy.
@@ -22,22 +23,26 @@ items to/from user's cart, ordering items in cart.
 items, top ordered items.
 
 To build these services Spring Reactor will be used alongside with gRPC for communication between them. Apache
-Kafka and MongoDB were chosen mostly of their reactive driver support.
+Kafka and MongoDB were chosen mostly to try out their reactive driver support.
 
 # User stories
 
-1) Admin can create new item for purchase.
-2) Admin can deactivate active item.
-3) Admin can activate deactivated item.
-4) Regular user can add active item to cart.
-5) Regular user can remove item from cart.
-6) Regular user can order items in cart, if it contains any.
-7) Any user can view all items.
-8) Regular user can view his cart.
-9) Admin can view top ordered items.
-10) Regular user can view his previous ordered items.
+1) Anyone can register.
+2) Anyone can log in.
+3) Admin can create new item for purchase.
+4) Admin can deactivate active item.
+5) Admin can activate deactivated item.
+6) Regular user can add active item to cart.
+7) Regular user can remove item from cart.
+8) Regular user can order items in cart, if it contains any.
+9) Any user can view all items.
+10) Regular user can view his cart.
+11) Admin can view top ordered items.
+12) Regular user can view his previous ordered items.
 
 # API
+
+* Register
 
 ```bash
 curl -X POST \
@@ -46,6 +51,8 @@ http://localhost:8080/users \
 -d '{"username":"admin","password":"pass","userType":"ADMIN"}'
 ```
 
+* Log in
+
 ```bash
 curl -X POST \
 -H 'Content-Type:application/json' \
@@ -53,76 +60,121 @@ http://localhost:8080/users/login \
 -d '{"username":"admin","password":"pass"}'
 ```
 
+* Create item
+
 ```bash
 curl -X POST \
 -H 'Content-Type:application/json' \
--H 'Authorization:eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6ImNmMjk4NjliLThiZjQtNGUyYy04MWRmLTZmYWNjZTFkZDExNCJ9.FSb43miXCp9o2JkmD2WtFVEOF4mc7W0De2X6aACUu8Q' \
+-H 'Authorization:{admin jwt}' \
 http://localhost:8080/items \
 -d 'item'
 ```
+
+* View all items
 
 ```bash
 curl -X GET http://localhost:8080/items
 ```
 
-```bash
-curl -X POST \
--H 'Authorization:eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6ImNmMjk4NjliLThiZjQtNGUyYy04MWRmLTZmYWNjZTFkZDExNCJ9.FSb43miXCp9o2JkmD2WtFVEOF4mc7W0De2X6aACUu8Q' \
-http://localhost:8080/items/ce0d2582-aee3-4a3d-92c1-c5100e69eef7/deactivate 
-```
+* Deactivate item
 
 ```bash
 curl -X POST \
--H 'Authorization:eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6ImNmMjk4NjliLThiZjQtNGUyYy04MWRmLTZmYWNjZTFkZDExNCJ9.FSb43miXCp9o2JkmD2WtFVEOF4mc7W0De2X6aACUu8Q' \
-http://localhost:8080/items/ce0d2582-aee3-4a3d-92c1-c5100e69eef7/activate 
+-H 'Authorization:{admin jwt}' \
+http://localhost:8080/items/{item id}/deactivate 
 ```
+
+* Activate item
+
+```bash
+curl -X POST \
+-H 'Authorization:{admin jwt}' \
+http://localhost:8080/items/{item id}/activate 
+```
+
+* Add items to cart
 
 ```bash
 curl -X POST \
 -H 'Content-Type:application/json' \
--H 'Authorization:eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6Ijk5NzZkOTU5LTU0ZjktNGZjMy1hMDI3LWIzMjU4OWJiYzUzNCJ9.ooszZOiqpUiRanQ8vC8UqTG28pPPt04Q5nlKwqGDJ0U' \
+-H 'Authorization:{regular user jwt}' \
 http://localhost:8080/cart/add \
--d '{"itemId":"ce0d2582-aee3-4a3d-92c1-c5100e69eef7","quantity":"1"}'
+-d '{"itemId":"{item id}","quantity":"1"}'
 ```
+
+* Remove items from cart
 
 ```bash
 curl -X POST \
 -H 'Content-Type:application/json' \
--H 'Authorization:eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6Ijk5NzZkOTU5LTU0ZjktNGZjMy1hMDI3LWIzMjU4OWJiYzUzNCJ9.ooszZOiqpUiRanQ8vC8UqTG28pPPt04Q5nlKwqGDJ0U' \
+-H 'Authorization:{regular user jwt}' \
 http://localhost:8080/cart/remove \
--d '{"itemId":"ce0d2582-aee3-4a3d-92c1-c5100e69eef7","quantity":"1"}'
+-d '{"itemId":"{item id}","quantity":"1"}'
 ```
+
+* View items in cart
 
 ```bash
 curl -X GET \
--H 'Authorization:eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6Ijk5NzZkOTU5LTU0ZjktNGZjMy1hMDI3LWIzMjU4OWJiYzUzNCJ9.ooszZOiqpUiRanQ8vC8UqTG28pPPt04Q5nlKwqGDJ0U' \
+-H 'Authorization:{regular user jwt})' \
 http://localhost:8080/cart
 ```
 
+* Order items in cart
+
 ```bash
 curl -X POST \
--H 'Authorization:eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6Ijk5NzZkOTU5LTU0ZjktNGZjMy1hMDI3LWIzMjU4OWJiYzUzNCJ9.ooszZOiqpUiRanQ8vC8UqTG28pPPt04Q5nlKwqGDJ0U' \
+-H 'Authorization:{regular user jwt}' \
 http://localhost:8080/cart/order
 ```
 
-```bash
-curl -X GET \
--H 'Authorization:eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6Ijk5NzZkOTU5LTU0ZjktNGZjMy1hMDI3LWIzMjU4OWJiYzUzNCJ9.ooszZOiqpUiRanQ8vC8UqTG28pPPt04Q5nlKwqGDJ0U' \
-http://localhost:8080/orders
-```
+* View previous orders
 
 ```bash
 curl -X GET \
--H 'Authorization:eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6ImNmMjk4NjliLThiZjQtNGUyYy04MWRmLTZmYWNjZTFkZDExNCJ9.FSb43miXCp9o2JkmD2WtFVEOF4mc7W0De2X6aACUu8Q' \
+-H 'Authorization:{regular user jwt}' \
+http://localhost:8080/orders
+```
+
+* View top ordered items
+
+```bash
+curl -X GET \
+-H 'Authorization:{admin jwt}' \
 http://localhost:8080/items/top
+```
+
+# How to test?
+
+Execute [script](build-images.sh) to build service images, required to test api-gateway. Then execute test task:
+
+```bash 
+./gradlew test
+```
+
+# How to run?
+
+Simply use [compose file](docker-compose.yml):
+
+```bash 
+docker compose up -d
 ```
 
 # What have I learnt?
 
-* How to organize aggregates in case of Event Sourcing.
+* Organizing aggregates in case of Event Sourcing.
+* Building functional endpoints with Spring WebFlux.
+* Working with reactive repository.
+* Using custom images in Testcontainers.
+* Using gRPC for communication between services.
+* Managing dependencies with catalog versions in Gradle.
+* Establishing CI/CD pipeline with GitHub Actions.
 
 # Out of scope concerns
 
 * Optimistic locking, regarding events with the same version.
 * Separation of writing events to database and their publishing, which can lead to interested parties not knowing about
   something important happened. Can be resolved with Outbox pattern, I guess.
+* Proper logging.
+* Proper exception handling.
+* Following ReST conventions.
