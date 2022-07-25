@@ -63,7 +63,7 @@ final class IntegrationTest {
 
     @DynamicPropertySource
     static void properties(DynamicPropertyRegistry registry) {
-        registry.add("spring.data.mongodb.uri", MONGO_DB::getConnectionString);
+        registry.add("spring.data.mongodb.uri", MONGO_DB::getReplicaSetUrl);
         registry.add("spring.kafka.bootstrap-servers", KAFKA::getBootstrapServers);
     }
 
