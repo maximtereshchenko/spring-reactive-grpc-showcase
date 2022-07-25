@@ -1,11 +1,12 @@
 package com.github.xini1.apigateway;
 
-import com.github.xini1.apigateway.controller.*;
+import com.github.xini1.apigateway.router.*;
 import com.github.xini1.apigateway.service.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.boot.*;
 import org.springframework.boot.autoconfigure.*;
 import org.springframework.context.annotation.*;
+import org.springframework.web.reactive.function.server.*;
 
 /**
  * @author Maxim Tereshchenko
@@ -26,25 +27,25 @@ public class Main {
     }
 
     @Bean
-    UsersController usersController(UsersService usersService) {
-        return new UsersController(usersService);
+    RouterFunction<ServerResponse> usersRouterFunction(UsersService usersService) {
+        return new UsersRouterFunction(usersService);
     }
 
     @Bean
-    OrdersWriteController ordersWriteController(
+    RouterFunction<ServerResponse> ordersWriteRouterFunction(
             UsersService usersService,
             @Value("${application.rpc.orders.write.address}") String address,
             @Value("${application.rpc.orders.write.port}") int port
     ) {
-        return new OrdersWriteController(usersService, new OrdersWriteService(address, port));
+        return new OrdersWriteRouterFunction(usersService, new OrdersWriteService(address, port));
     }
 
     @Bean
-    OrdersReadController ordersReadController(
+    RouterFunction<ServerResponse> ordersReadRouterFunction(
             UsersService usersService,
             @Value("${application.rpc.orders.read.address}") String address,
             @Value("${application.rpc.orders.read.port}") int port
     ) {
-        return new OrdersReadController(usersService, new OrdersReadService(address, port));
+        return new OrdersReadRouterFunction(usersService, new OrdersReadService(address, port));
     }
 }
