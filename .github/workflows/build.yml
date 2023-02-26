@@ -20,14 +20,13 @@ jobs:
       - name: Validate Gradle wrapper
         uses: gradle/wrapper-validation-action@v1
 
-      - name: Change Gradle wrapper permissions
-        run: chmod +x ./gradlew
+      - name: Change permissions
+        run: |
+          chmod +x ./gradlew
+          chmod +x ./build-images.sh
 
       - name: Build images
-        run: |
-          docker build --build-arg module=orders-read-side -t orders-read-side ./
-          docker build --build-arg module=orders-write-side -t orders-write-side ./
-          docker build --build-arg module=users -t users ./
+        run: ./build-images.sh
 
       - name: Build with Gradle
         run: ./gradlew build

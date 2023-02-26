@@ -24,6 +24,8 @@ dependencyResolutionManagement {
 
             library("spring-webflux", "org.springframework.boot", "spring-boot-starter-webflux")
                 .versionRef("spring-boot-starter")
+            library("spring-actuator", "org.springframework.boot", "spring-boot-starter-actuator")
+                .versionRef("spring-boot-starter")
             library("spring-test", "org.springframework.boot", "spring-boot-starter-test")
                 .versionRef("spring-boot-starter")
             library(

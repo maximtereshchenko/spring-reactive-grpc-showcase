@@ -11,6 +11,7 @@ dependencies {
     implementation(libs.spring.mongodb)
     implementation(libs.spring.kafka)
     implementation(libs.reactor.kafka)
+    implementation(libs.spring.actuator)
 
     testCompileOnly(libs.junit.api)
     testRuntimeOnly(libs.junit.engine)

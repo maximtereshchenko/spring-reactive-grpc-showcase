@@ -9,6 +9,7 @@ application {
 dependencies {
     implementation(project("::common"))
     implementation(libs.spring.webflux)
+    implementation(libs.spring.actuator)
 
     testCompileOnly(libs.junit.api)
     testRuntimeOnly(libs.junit.engine)
