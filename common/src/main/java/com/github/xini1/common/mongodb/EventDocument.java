@@ -1,10 +1,12 @@
 package com.github.xini1.common.mongodb;
 
-import com.github.xini1.common.event.*;
-import org.springframework.data.annotation.*;
-import org.springframework.data.mongodb.core.mapping.*;
+import com.github.xini1.common.event.Event;
+import com.github.xini1.common.event.EventType;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.*;
+import java.util.Objects;
+import java.util.UUID;
 
 /**
  * @author Maxim Tereshchenko

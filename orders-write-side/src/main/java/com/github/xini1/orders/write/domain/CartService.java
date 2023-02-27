@@ -1,11 +1,13 @@
 package com.github.xini1.orders.write.domain;
 
-import com.github.xini1.common.*;
+import com.github.xini1.common.UserType;
 import com.github.xini1.orders.write.exception.*;
-import com.github.xini1.orders.write.port.*;
-import com.github.xini1.orders.write.usecase.*;
+import com.github.xini1.orders.write.port.EventStore;
+import com.github.xini1.orders.write.usecase.AddItemToCartUseCase;
+import com.github.xini1.orders.write.usecase.OrderItemsInCartUseCase;
+import com.github.xini1.orders.write.usecase.RemoveItemFromCartUseCase;
 
-import java.util.*;
+import java.util.UUID;
 
 /**
  * @author Maxim Tereshchenko

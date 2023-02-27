@@ -1,10 +1,11 @@
 package com.github.xini1.users.application;
 
-import com.auth0.jwt.*;
-import com.auth0.jwt.algorithms.*;
-import com.github.xini1.users.port.*;
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.github.xini1.users.port.TokenProvider;
 
-import java.util.*;
+import java.util.UUID;
 
 /**
  * @author Maxim Tereshchenko

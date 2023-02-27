@@ -1,11 +1,13 @@
 package com.github.xini1.users.application;
 
-import com.github.xini1.users.exception.*;
-import com.github.xini1.users.port.*;
-import org.springframework.dao.*;
-import reactor.core.publisher.*;
+import com.github.xini1.users.exception.UsernameIsTaken;
+import com.github.xini1.users.port.HashingAlgorithm;
+import com.github.xini1.users.port.UserStore;
+import org.springframework.dao.DuplicateKeyException;
+import reactor.core.publisher.Mono;
 
-import java.util.*;
+import java.util.Optional;
+import java.util.UUID;
 
 /**
  * @author Maxim Tereshchenko

@@ -1,8 +1,10 @@
 package com.github.xini1.users;
 
-import com.github.xini1.common.event.*;
+import com.github.xini1.common.event.BasicEventStore;
+import com.github.xini1.common.event.Event;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Maxim Tereshchenko

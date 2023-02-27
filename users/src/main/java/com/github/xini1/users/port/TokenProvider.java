@@ -1,6 +1,6 @@
 package com.github.xini1.users.port;
 
-import java.util.*;
+import java.util.UUID;
 
 /**
  * @author Maxim Tereshchenko

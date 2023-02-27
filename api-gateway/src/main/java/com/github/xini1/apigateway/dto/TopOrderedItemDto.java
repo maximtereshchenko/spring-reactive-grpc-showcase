@@ -1,8 +1,8 @@
 package com.github.xini1.apigateway.dto;
 
-import com.github.xini1.orders.read.rpc.*;
+import com.github.xini1.orders.read.rpc.TopOrderedItemResponse;
 
-import java.util.*;
+import java.util.Objects;
 
 /**
  * @author Maxim Tereshchenko

@@ -1,10 +1,10 @@
 package com.github.xini1.orders.write.domain;
 
-import com.github.xini1.common.event.*;
-import com.github.xini1.orders.write.port.*;
+import com.github.xini1.common.event.Event;
+import com.github.xini1.orders.write.port.EventStore;
 
 import java.util.*;
-import java.util.function.*;
+import java.util.function.Consumer;
 
 /**
  * @author Maxim Tereshchenko

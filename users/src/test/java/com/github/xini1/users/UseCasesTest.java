@@ -1,13 +1,17 @@
 package com.github.xini1.users;
 
-import com.github.xini1.common.*;
-import com.github.xini1.common.event.user.*;
+import com.github.xini1.common.UserType;
+import com.github.xini1.common.event.user.UserRegistered;
 import com.github.xini1.users.domain.Module;
-import com.github.xini1.users.exception.*;
-import com.github.xini1.users.usecase.*;
-import org.junit.jupiter.api.*;
+import com.github.xini1.users.exception.IncorrectUsernameOrPassword;
+import com.github.xini1.users.exception.PasswordIsEmpty;
+import com.github.xini1.users.exception.UsernameIsEmpty;
+import com.github.xini1.users.exception.UsernameIsTaken;
+import com.github.xini1.users.usecase.DecodeJwtUseCase;
+import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * @author Maxim Tereshchenko

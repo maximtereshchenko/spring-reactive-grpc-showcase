@@ -1,27 +1,32 @@
 package com.github.xini1.orders.read.application;
 
-import com.github.xini1.common.event.*;
-import com.github.xini1.common.event.cart.*;
-import com.github.xini1.common.event.item.*;
-import com.github.xini1.common.event.user.*;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.xini1.common.Shared;
+import com.github.xini1.common.event.Event;
+import com.github.xini1.common.event.EventType;
+import com.github.xini1.common.event.cart.ItemAddedToCart;
+import com.github.xini1.common.event.cart.ItemRemovedFromCart;
+import com.github.xini1.common.event.cart.ItemsOrdered;
+import com.github.xini1.common.event.item.ItemActivated;
+import com.github.xini1.common.event.item.ItemCreated;
+import com.github.xini1.common.event.item.ItemDeactivated;
+import com.github.xini1.common.event.user.UserRegistered;
 import com.github.xini1.orders.read.domain.Module;
-import com.google.gson.*;
-import com.google.gson.reflect.*;
-import org.apache.kafka.clients.consumer.*;
-import reactor.kafka.receiver.*;
+import org.springframework.cloud.aws.messaging.listener.annotation.SqsListener;
+import org.springframework.messaging.handler.annotation.Payload;
 
-import javax.annotation.*;
-import java.util.*;
+import java.io.IOException;
+import java.util.Map;
 import java.util.function.Consumer;
-import java.util.function.*;
+import java.util.function.Function;
 
 /**
  * @author Maxim Tereshchenko
  */
-final class KafkaEventConsumer {
+final class SqsEventConsumer {
 
-    private final KafkaReceiver<UUID, String> kafkaReceiver;
-    private final Gson gson = new Gson();
+    private final ObjectMapper objectMapper = new ObjectMapper();
     private final Map<EventType, Consumer<Event>> handlers;
     private final Map<EventType, Function<Map<String, String>, Event>> eventConstructors = Map.of(
             EventType.ITEM_ACTIVATED, ItemActivated::new,
@@ -33,8 +38,7 @@ final class KafkaEventConsumer {
             EventType.ITEMS_ORDERED, ItemsOrdered::new
     );
 
-    public KafkaEventConsumer(KafkaReceiver<UUID, String> kafkaReceiver, Module module) {
-        this.kafkaReceiver = kafkaReceiver;
+    public SqsEventConsumer(Module module) {
         handlers = Map.of(
                 EventType.ITEM_ACTIVATED,
                 event -> module.onItemActivatedEventUseCase().onEvent((ItemActivated) event),
@@ -51,19 +55,13 @@ final class KafkaEventConsumer {
         );
     }
 
-    @PostConstruct
-    void subscribe() {
-        kafkaReceiver.receive()
-                .map(ConsumerRecord::value)
-                .map(this::properties)
-                .map(this::event)
-                .doOnNext(this::consume)
-                .subscribe();
+    @SqsListener(Shared.ORDERS_READ_SIDE_SQS_QUEUE)
+    void subscribe(@Payload String message) {
+        consume(event(properties(message)));
     }
 
     private void consume(Event event) {
-        handlers.getOrDefault(event.type(), ignored -> {
-                })
+        handlers.getOrDefault(event.type(), ignored -> {})
                 .accept(event);
     }
 
@@ -71,8 +69,11 @@ final class KafkaEventConsumer {
         return eventConstructors.get(EventType.valueOf(properties.get("eventType"))).apply(properties);
     }
 
-    private Map<String, String> properties(String json) {
-        return gson.fromJson(json, new TypeToken<Map<String, String>>() {
-        }.getType());
+    private Map<String, String> properties(String message) {
+        try {
+            return objectMapper.readValue(message, new TypeReference<>() {});
+        } catch (IOException e) {
+            throw new IllegalArgumentException("Could not read JSON", e);
+        }
     }
 }

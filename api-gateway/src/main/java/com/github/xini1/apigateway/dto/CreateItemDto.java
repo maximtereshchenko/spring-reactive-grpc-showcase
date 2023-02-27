@@ -1,6 +1,6 @@
 package com.github.xini1.apigateway.dto;
 
-import com.github.xini1.orders.write.rpc.*;
+import com.github.xini1.orders.write.rpc.CreateItemRequest;
 
 /**
  * @author Maxim Tereshchenko

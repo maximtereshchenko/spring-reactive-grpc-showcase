@@ -1,6 +1,6 @@
 package com.github.xini1.users;
 
-import com.github.xini1.users.port.*;
+import com.github.xini1.users.port.HashingAlgorithm;
 
 /**
  * @author Maxim Tereshchenko

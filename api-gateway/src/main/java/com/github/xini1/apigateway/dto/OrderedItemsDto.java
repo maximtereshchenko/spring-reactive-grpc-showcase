@@ -1,9 +1,13 @@
 package com.github.xini1.apigateway.dto;
 
-import com.github.xini1.orders.read.rpc.*;
+import com.github.xini1.orders.read.rpc.ItemInOrderMessage;
+import com.github.xini1.orders.read.rpc.OrderMessage;
+import com.github.xini1.orders.read.rpc.OrderedItemsResponse;
 
-import java.util.*;
-import java.util.stream.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * @author Maxim Tereshchenko

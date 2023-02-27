@@ -1,14 +1,20 @@
 package com.github.xini1.orders.write;
 
-import com.github.xini1.common.*;
-import com.github.xini1.common.event.item.*;
+import com.github.xini1.common.UserType;
+import com.github.xini1.common.event.item.ItemActivated;
+import com.github.xini1.common.event.item.ItemCreated;
+import com.github.xini1.common.event.item.ItemDeactivated;
 import com.github.xini1.orders.write.domain.Module;
-import com.github.xini1.orders.write.exception.*;
-import org.junit.jupiter.api.*;
+import com.github.xini1.orders.write.exception.ItemIsAlreadyActive;
+import com.github.xini1.orders.write.exception.ItemIsAlreadyDeactivated;
+import com.github.xini1.orders.write.exception.ItemIsNotFound;
+import com.github.xini1.orders.write.exception.UserIsNotAdmin;
+import org.junit.jupiter.api.Test;
 
-import java.util.*;
+import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * @author Maxim Tereshchenko

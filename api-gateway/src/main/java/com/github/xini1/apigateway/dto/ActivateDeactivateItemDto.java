@@ -1,6 +1,7 @@
 package com.github.xini1.apigateway.dto;
 
-import com.github.xini1.orders.write.rpc.*;
+import com.github.xini1.orders.write.rpc.ActivateItemRequest;
+import com.github.xini1.orders.write.rpc.DeactivateItemRequest;
 
 /**
  * @author Maxim Tereshchenko

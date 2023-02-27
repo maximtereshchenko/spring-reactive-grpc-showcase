@@ -1,10 +1,12 @@
 package com.github.xini1.users.domain;
 
-import com.github.xini1.common.event.*;
-import com.github.xini1.common.event.user.*;
-import com.github.xini1.users.port.*;
+import com.github.xini1.common.event.BasicEventStore;
+import com.github.xini1.common.event.user.UserRegistered;
+import com.github.xini1.users.port.HashingAlgorithm;
+import com.github.xini1.users.port.UserStore;
 
-import java.util.*;
+import java.util.Optional;
+import java.util.UUID;
 
 /**
  * @author Maxim Tereshchenko

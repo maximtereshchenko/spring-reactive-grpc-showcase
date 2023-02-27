@@ -1,9 +1,12 @@
 package com.github.xini1.common.rpc;
 
-import io.grpc.*;
+import io.grpc.BindableService;
+import io.grpc.Server;
+import io.grpc.ServerBuilder;
 
-import javax.annotation.*;
-import java.io.*;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import java.io.IOException;
 
 /**
  * @author Maxim Tereshchenko

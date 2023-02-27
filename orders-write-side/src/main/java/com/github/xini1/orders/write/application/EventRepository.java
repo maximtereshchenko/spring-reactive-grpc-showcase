@@ -1,11 +1,12 @@
 package com.github.xini1.orders.write.application;
 
-import com.github.xini1.common.event.*;
-import com.github.xini1.common.mongodb.*;
-import org.springframework.data.mongodb.repository.*;
-import reactor.core.publisher.*;
+import com.github.xini1.common.event.EventType;
+import com.github.xini1.common.mongodb.EventDocument;
+import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
+import reactor.core.publisher.Flux;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.UUID;
 
 /**
  * @author Maxim Tereshchenko

@@ -2,20 +2,27 @@ package com.github.xini1.apigateway;
 
 import com.github.xini1.apigateway.dto.*;
 import org.junit.jupiter.api.*;
-import org.springframework.boot.test.context.*;
-import org.springframework.http.*;
-import org.springframework.test.context.*;
-import org.springframework.test.web.reactive.server.*;
-import org.testcontainers.containers.*;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.web.reactive.server.WebTestClient;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.MongoDBContainer;
+import org.testcontainers.containers.Network;
+import org.testcontainers.containers.localstack.LocalStackContainer;
+import org.testcontainers.containers.localstack.LocalStackContainer.Service;
 import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.*;
-import org.testcontainers.utility.*;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.utility.DockerImageName;
 
-import java.time.*;
-import java.util.*;
+import java.time.Duration;
+import java.util.List;
 
-import static com.github.xini1.Await.*;
-import static org.assertj.core.api.Assertions.*;
+import static com.github.xini1.Await.await;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Maxim Tereshchenko
@@ -34,11 +41,16 @@ final class IntegrationTest {
             .withNetwork(NETWORK)
             .withNetworkAliases("database");
     @Container
-    private static final KafkaContainer KAFKA = new KafkaContainer(
-            DockerImageName.parse("confluentinc/cp-kafka:7.2.0")
+    private static final LocalStackContainer LOCAL_STACK = new LocalStackContainer(
+            DockerImageName.parse("localstack/localstack:1.4")
     )
+            .withServices(Service.SNS, Service.SQS)
+            .withFileSystemBind(
+                    "../localstack-setup.sh",
+                    "/etc/localstack/init/ready.d/localstack-setup.sh"
+            )
             .withNetwork(NETWORK)
-            .withNetworkAliases("kafka");
+            .withNetworkAliases("localstack");
     @Container
     private static final GenericContainer<?> USERS = container("users");
     @Container
@@ -49,7 +61,7 @@ final class IntegrationTest {
 
     static {
         MONGO_DB.start();
-        KAFKA.start();
+        LOCAL_STACK.start();
         USERS.start();
         ORDERS_READ_SIDE.start();
         ORDERS_WRITE_SIDE.start();
@@ -79,7 +91,9 @@ final class IntegrationTest {
         return new GenericContainer<>(DockerImageName.parse(name))
                 .withNetwork(NETWORK)
                 .withNetworkAliases(name)
-                .withExposedPorts(8080);
+                .withExposedPorts(8080)
+                .withEnv("AWS_ACCESS_KEY_ID", "whatever")
+                .withEnv("AWS_SECRET_KEY", "whatever");
     }
 
     @Test

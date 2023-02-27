@@ -1,8 +1,8 @@
 package com.github.xini1.users;
 
-import com.github.xini1.users.port.*;
+import com.github.xini1.users.port.TokenProvider;
 
-import java.util.*;
+import java.util.UUID;
 
 /**
  * @author Maxim Tereshchenko

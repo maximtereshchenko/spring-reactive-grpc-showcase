@@ -22,8 +22,7 @@ items to/from user's cart, ordering items in cart.
 "Orders (read side)" is responsible for viewing information about available items, user's cart, previously ordered
 items, top ordered items.
 
-To build these services Spring Reactor will be used alongside with gRPC for communication between them. Apache
-Kafka and MongoDB were chosen mostly to try out their reactive driver support.
+To build these services Spring Reactor will be used alongside with gRPC for communication between them.
 
 # User stories
 

@@ -1,17 +1,20 @@
 package com.github.xini1.orders.read.application;
 
-import com.github.xini1.common.*;
-import com.github.xini1.common.rpc.*;
+import com.amazonaws.client.builder.AwsClientBuilder;
+import com.amazonaws.services.sqs.AmazonSQS;
+import com.amazonaws.services.sqs.AmazonSQSAsyncClientBuilder;
+import com.github.xini1.common.rpc.RpcServer;
 import com.github.xini1.orders.read.domain.Module;
-import org.apache.kafka.clients.admin.*;
-import org.springframework.boot.autoconfigure.kafka.*;
-import org.springframework.context.annotation.*;
-import org.springframework.data.mongodb.repository.config.*;
-import org.springframework.kafka.config.*;
-import reactor.kafka.receiver.*;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.aws.core.env.ResourceIdResolver;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRepositories;
 
-import java.time.*;
-import java.util.*;
+import java.time.Clock;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 
 /**
  * @author Maxim Tereshchenko
@@ -68,18 +71,18 @@ public class SpringConfiguration {
     }
 
     @Bean
-    KafkaEventConsumer kafkaEventConsumer(KafkaProperties kafkaProperties, Module module) {
-        return new KafkaEventConsumer(
-                KafkaReceiver.create(
-                        ReceiverOptions.<UUID, String>create(kafkaProperties.buildConsumerProperties())
-                                .subscription(List.of(Shared.EVENTS_KAFKA_TOPIC))
-                ),
-                module
-        );
+    public AmazonSQS amazonSQS(
+            @Value("${application.sqs.endpoint}") String sqsEndpoint,
+            @Value("${cloud.aws.region.static}") String awsRegion,
+            ResourceIdResolver resourceIdResolver
+    ) {
+        return AmazonSQSAsyncClientBuilder.standard()
+                .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(sqsEndpoint, awsRegion))
+                .build();
     }
 
     @Bean
-    NewTopic eventsTopic() {
-        return TopicBuilder.name(Shared.EVENTS_KAFKA_TOPIC).build();
+    SqsEventConsumer sqsEventConsumer(Module module) {
+        return new SqsEventConsumer(module);
     }
 }

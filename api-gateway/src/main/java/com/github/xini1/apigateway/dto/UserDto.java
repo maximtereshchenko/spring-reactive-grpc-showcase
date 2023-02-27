@@ -1,7 +1,11 @@
 package com.github.xini1.apigateway.dto;
 
-import com.github.xini1.orders.read.rpc.*;
-import com.github.xini1.orders.write.rpc.*;
+import com.github.xini1.orders.read.rpc.ViewCartRequest;
+import com.github.xini1.orders.read.rpc.ViewOrderedItemsRequest;
+import com.github.xini1.orders.read.rpc.ViewTopOrderedItemsRequest;
+import com.github.xini1.orders.write.rpc.AddItemToCartRequest;
+import com.github.xini1.orders.write.rpc.OrderItemsInCartRequest;
+import com.github.xini1.orders.write.rpc.RemoveItemFromCartRequest;
 
 /**
  * @author Maxim Tereshchenko

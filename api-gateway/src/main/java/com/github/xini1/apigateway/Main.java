@@ -1,12 +1,17 @@
 package com.github.xini1.apigateway;
 
-import com.github.xini1.apigateway.router.*;
-import com.github.xini1.apigateway.service.*;
-import org.springframework.beans.factory.annotation.*;
-import org.springframework.boot.*;
-import org.springframework.boot.autoconfigure.*;
-import org.springframework.context.annotation.*;
-import org.springframework.web.reactive.function.server.*;
+import com.github.xini1.apigateway.router.OrdersReadRouterFunction;
+import com.github.xini1.apigateway.router.OrdersWriteRouterFunction;
+import com.github.xini1.apigateway.router.UsersRouterFunction;
+import com.github.xini1.apigateway.service.OrdersReadService;
+import com.github.xini1.apigateway.service.OrdersWriteService;
+import com.github.xini1.apigateway.service.UsersService;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.web.reactive.function.server.RouterFunction;
+import org.springframework.web.reactive.function.server.ServerResponse;
 
 /**
  * @author Maxim Tereshchenko

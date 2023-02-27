@@ -1,6 +1,6 @@
 package com.github.xini1.orders.write.domain;
 
-import com.github.xini1.orders.write.port.*;
+import com.github.xini1.orders.write.port.EventStore;
 import com.github.xini1.orders.write.usecase.*;
 
 /**

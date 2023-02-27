@@ -1,6 +1,6 @@
 package com.github.xini1.apigateway.dto;
 
-import com.github.xini1.users.rpc.*;
+import com.github.xini1.users.rpc.RegisterRequest;
 
 /**
  * @author Maxim Tereshchenko

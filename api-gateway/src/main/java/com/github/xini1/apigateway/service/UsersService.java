@@ -1,9 +1,14 @@
 package com.github.xini1.apigateway.service;
 
-import com.github.xini1.apigateway.dto.*;
-import com.github.xini1.users.rpc.*;
-import io.grpc.*;
-import reactor.core.publisher.*;
+import com.github.xini1.apigateway.dto.LoginDto;
+import com.github.xini1.apigateway.dto.RegisterUserDto;
+import com.github.xini1.apigateway.dto.UserDto;
+import com.github.xini1.users.rpc.DecodeJwtRequest;
+import com.github.xini1.users.rpc.IdResponse;
+import com.github.xini1.users.rpc.JwtResponse;
+import com.github.xini1.users.rpc.UserServiceGrpc;
+import io.grpc.ManagedChannelBuilder;
+import reactor.core.publisher.Mono;
 
 /**
  * @author Maxim Tereshchenko

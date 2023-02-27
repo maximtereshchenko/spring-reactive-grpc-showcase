@@ -1,6 +1,7 @@
 package com.github.xini1.common.event;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * @author Maxim Tereshchenko

@@ -1,12 +1,13 @@
 package com.github.xini1.users.application;
 
-import com.github.xini1.common.*;
-import com.github.xini1.users.port.*;
-import org.springframework.data.annotation.*;
-import org.springframework.data.mongodb.core.index.*;
-import org.springframework.data.mongodb.core.mapping.*;
+import com.github.xini1.common.UserType;
+import com.github.xini1.users.port.HashingAlgorithm;
+import com.github.xini1.users.port.UserStore;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.*;
+import java.util.UUID;
 
 /**
  * @author Maxim Tereshchenko

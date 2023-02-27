@@ -1,9 +1,11 @@
 package com.github.xini1.apigateway.service;
 
 import com.github.xini1.apigateway.dto.*;
-import com.github.xini1.orders.read.rpc.*;
-import io.grpc.*;
-import reactor.core.publisher.*;
+import com.github.xini1.orders.read.rpc.Empty;
+import com.github.xini1.orders.read.rpc.OrderReadServiceGrpc;
+import io.grpc.ManagedChannelBuilder;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * @author Maxim Tereshchenko

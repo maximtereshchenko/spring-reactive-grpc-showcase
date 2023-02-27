@@ -19,7 +19,8 @@ dependencies {
     testImplementation(libs.testcontainers)
     testImplementation(libs.testcontainers.junit)
     testImplementation(libs.testcontainers.mongodb)
-    testImplementation(libs.testcontainers.kafka)
+    testImplementation(libs.testcontainers.localstack)
+    testRuntimeOnly(libs.aws)
     testImplementation(testFixtures(project("::common")))
 }
 

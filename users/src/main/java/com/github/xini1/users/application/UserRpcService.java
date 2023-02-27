@@ -1,12 +1,17 @@
 package com.github.xini1.users.application;
 
-import com.github.xini1.common.*;
-import com.github.xini1.users.exception.*;
+import com.github.xini1.common.UserType;
+import com.github.xini1.users.exception.IncorrectUsernameOrPassword;
+import com.github.xini1.users.exception.UsernameIsTaken;
 import com.github.xini1.users.rpc.*;
-import com.github.xini1.users.usecase.*;
-import io.grpc.*;
-import io.grpc.stub.*;
-import org.slf4j.*;
+import com.github.xini1.users.usecase.DecodeJwtUseCase;
+import com.github.xini1.users.usecase.LoginUseCase;
+import com.github.xini1.users.usecase.RegisterUseCase;
+import io.grpc.Status;
+import io.grpc.StatusException;
+import io.grpc.stub.StreamObserver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Maxim Tereshchenko

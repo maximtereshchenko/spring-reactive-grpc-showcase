@@ -1,11 +1,13 @@
 package com.github.xini1.users.domain;
 
-import com.github.xini1.common.*;
-import com.github.xini1.users.exception.*;
-import com.github.xini1.users.port.*;
-import com.github.xini1.users.usecase.*;
+import com.github.xini1.common.UserType;
+import com.github.xini1.users.exception.PasswordIsEmpty;
+import com.github.xini1.users.exception.UsernameIsEmpty;
+import com.github.xini1.users.port.TokenProvider;
+import com.github.xini1.users.port.UserStore;
+import com.github.xini1.users.usecase.DecodeJwtUseCase;
 
-import java.util.*;
+import java.util.UUID;
 
 /**
  * @author Maxim Tereshchenko

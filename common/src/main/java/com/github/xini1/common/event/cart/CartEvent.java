@@ -1,6 +1,6 @@
 package com.github.xini1.common.event.cart;
 
-import com.github.xini1.common.event.*;
+import com.github.xini1.common.event.Event;
 
 /**
  * @author Maxim Tereshchenko

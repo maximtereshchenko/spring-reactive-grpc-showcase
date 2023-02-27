@@ -1,8 +1,10 @@
 package com.github.xini1.common.event.user;
 
-import com.github.xini1.common.event.*;
+import com.github.xini1.common.event.EventType;
 
-import java.util.*;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
 
 /**
  * @author Maxim Tereshchenko

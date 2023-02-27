@@ -5,25 +5,18 @@ services:
     image: mongo:5.0.9
     ports:
       - "27017"
-  zookeeper:
-    container_name: zookeeper
-    image: confluentinc/cp-zookeeper:7.2.0
+  localstack:
+    container_name: localstack
+    image: localstack/localstack:1.4
     environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
+      - "SERVICES=sqs"
+      - "DOCKER_HOST=unix:///var/run/docker.sock"
+      - "HOSTNAME_EXTERNAL=localstack"
+    volumes:
+      - "./localstack-setup.sh:/etc/localstack/init/ready.d/localstack-setup.sh"
+      - "/var/run/docker.sock:/var/run/docker.sock"
     ports:
-      - "2181"
-  kafka:
-    depends_on:
-      - zookeeper
-    container_name: kafka
-    image: confluentinc/cp-kafka:7.2.0
-    environment:
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-    ports:
-      - "9092"
+      - "4566"
   users:
     container_name: users
     image: users:latest
@@ -31,6 +24,9 @@ services:
       context: ./
       args:
         - module=users
+    environment:
+      - "AWS_ACCESS_KEY_ID=whatever"
+      - "AWS_SECRET_KEY=whatever"
   orders-read-side:
     container_name: orders-read-side
     image: orders-read-side:latest
@@ -38,6 +34,9 @@ services:
       context: ./
       args:
         - module=orders-read-side
+    environment:
+      - "AWS_ACCESS_KEY_ID=whatever"
+      - "AWS_SECRET_KEY=whatever"
   orders-write-side:
     container_name: orders-write-side
     image: orders-write-side:latest
@@ -45,6 +44,9 @@ services:
       context: ./
       args:
         - module=orders-write-side
+    environment:
+      - "AWS_ACCESS_KEY_ID=whatever"
+      - "AWS_SECRET_KEY=whatever"
   api-gateway:
     container_name: api-gateway
     image: api-gateway:latest

@@ -1,9 +1,9 @@
 package com.github.xini1.apigateway.service;
 
-import io.grpc.stub.*;
-import reactor.core.publisher.*;
+import io.grpc.stub.StreamObserver;
+import reactor.core.publisher.FluxSink;
 
-import java.util.function.*;
+import java.util.function.Function;
 
 /**
  * @author Maxim Tereshchenko

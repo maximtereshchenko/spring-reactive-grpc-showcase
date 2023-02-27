@@ -1,35 +1,42 @@
 package com.github.xini1.users.application;
 
-import com.github.xini1.common.*;
-import com.github.xini1.common.event.*;
-import com.github.xini1.common.mongodb.*;
-import com.github.xini1.users.*;
+import com.amazonaws.client.builder.AwsClientBuilder;
+import com.amazonaws.services.sqs.AmazonSQSAsyncClientBuilder;
+import com.github.xini1.common.Shared;
+import com.github.xini1.common.event.EventType;
+import com.github.xini1.common.mongodb.EventDocument;
+import com.github.xini1.users.Main;
+import com.github.xini1.users.application.IntegrationTest.TestConfig;
 import com.github.xini1.users.rpc.*;
-import io.grpc.*;
-import org.apache.kafka.clients.consumer.*;
-import org.apache.kafka.common.serialization.*;
+import io.grpc.ManagedChannelBuilder;
+import io.grpc.Status;
+import io.grpc.StatusRuntimeException;
 import org.junit.jupiter.api.*;
-import org.springframework.beans.factory.annotation.*;
-import org.springframework.boot.autoconfigure.kafka.*;
-import org.springframework.boot.test.context.*;
-import org.springframework.context.annotation.*;
-import org.springframework.test.context.*;
-import org.testcontainers.containers.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.cloud.aws.core.env.ResourceIdResolver;
+import org.springframework.cloud.aws.messaging.core.QueueMessagingTemplate;
+import org.springframework.context.annotation.Bean;
+import org.springframework.messaging.converter.StringMessageConverter;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.containers.MongoDBContainer;
+import org.testcontainers.containers.localstack.LocalStackContainer;
+import org.testcontainers.containers.localstack.LocalStackContainer.Service;
 import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.*;
-import org.testcontainers.utility.*;
-import reactor.core.publisher.*;
-import reactor.kafka.receiver.*;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.utility.DockerImageName;
 
-import java.time.*;
-import java.util.*;
+import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * @author Maxim Tereshchenko
  */
-@SpringBootTest(classes = {Main.class, IntegrationTest.TestConfig.class})
+@SpringBootTest(classes = {Main.class, TestConfig.class})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Testcontainers
@@ -40,13 +47,18 @@ final class IntegrationTest {
             DockerImageName.parse("mongo:5.0.9")
     );
     @Container
-    private static final KafkaContainer KAFKA = new KafkaContainer(
-            DockerImageName.parse("confluentinc/cp-kafka:7.2.0")
-    );
+    private static final LocalStackContainer LOCAL_STACK = new LocalStackContainer(
+            DockerImageName.parse("localstack/localstack:1.4")
+    )
+            .withServices(Service.SNS, Service.SQS)
+            .withFileSystemBind(
+                    "../localstack-setup.sh",
+                    "/etc/localstack/init/ready.d/localstack-setup.sh"
+            );
 
     static {
         MONGO_DB.start();
-        KAFKA.start();
+        LOCAL_STACK.start();
     }
 
     private final UserServiceGrpc.UserServiceBlockingStub stub = UserServiceGrpc.newBlockingStub(
@@ -57,14 +69,15 @@ final class IntegrationTest {
     @Autowired
     private EventRepository eventRepository;
     @Autowired
-    private KafkaReceiver<UUID, String> kafkaReceiver;
+    private QueueMessagingTemplate queueMessagingTemplate;
     private String userId;
     private String jwt;
 
     @DynamicPropertySource
     static void properties(DynamicPropertyRegistry registry) {
         registry.add("spring.data.mongodb.uri", MONGO_DB::getReplicaSetUrl);
-        registry.add("spring.kafka.bootstrap-servers", KAFKA::getBootstrapServers);
+        registry.add("cloud.aws.region.static", LOCAL_STACK::getRegion);
+        registry.add("application.sns.endpoint", () -> LOCAL_STACK.getEndpointOverride(Service.SNS).toString());
     }
 
     @Test
@@ -81,16 +94,8 @@ final class IntegrationTest {
 
         assertThat(userId).isNotNull();
         assertThat(eventRepository.findAll().collectList().block()).containsExactly(expectedEventDocument());
-        assertThat(
-                kafkaReceiver.receive()
-                        .timeout(Duration.ofSeconds(1), Mono.empty())
-                        .collectList()
-                        .block()
-        )
-                .hasSize(1)
-                .first()
-                .extracting(record -> record.key().toString(), ConsumerRecord::value)
-                .containsExactly(userId, expectedEventJson());
+        assertThat(queueMessagingTemplate.receiveAndConvert(Shared.USERS_SQS_QUEUE, String.class))
+                .isEqualTo(expectedEventJson());
     }
 
     @Test
@@ -158,20 +163,18 @@ final class IntegrationTest {
     static class TestConfig {
 
         @Bean
-        KafkaReceiver<UUID, String> kafkaReceiver(KafkaProperties kafkaProperties) {
-            return KafkaReceiver.create(
-                    ReceiverOptions.<UUID, String>create(properties(kafkaProperties))
-                            .subscription(List.of(Shared.EVENTS_KAFKA_TOPIC))
-            );
-        }
-
-        private Map<String, Object> properties(KafkaProperties kafkaProperties) {
-            return Map.of(
-                    ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaProperties.getBootstrapServers(),
-                    ConsumerConfig.GROUP_ID_CONFIG, "id",
-                    ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, UUIDDeserializer.class,
-                    ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class,
-                    ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest"
+        public QueueMessagingTemplate queueMessagingTemplate(ResourceIdResolver resourceIdResolver) {
+            return new QueueMessagingTemplate(
+                    AmazonSQSAsyncClientBuilder.standard()
+                            .withEndpointConfiguration(
+                                    new AwsClientBuilder.EndpointConfiguration(
+                                            LOCAL_STACK.getEndpointOverride(Service.SNS).toString(),
+                                            LOCAL_STACK.getRegion()
+                                    )
+                            )
+                            .build(),
+                    resourceIdResolver,
+                    new StringMessageConverter()
             );
         }
     }

@@ -1,6 +1,7 @@
 package com.github.xini1.common.event;
 
-import java.util.*;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * @author Maxim Tereshchenko

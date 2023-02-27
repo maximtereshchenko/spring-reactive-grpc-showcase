@@ -1,32 +1,41 @@
 package com.github.xini1.orders.read.application;
 
-import com.github.xini1.common.*;
-import com.github.xini1.common.event.*;
-import com.github.xini1.common.event.cart.*;
-import com.github.xini1.common.event.item.*;
-import com.github.xini1.orders.read.*;
+import com.amazonaws.client.builder.AwsClientBuilder;
+import com.amazonaws.services.sns.AmazonSNSClientBuilder;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.xini1.common.Shared;
+import com.github.xini1.common.event.Event;
+import com.github.xini1.common.event.cart.ItemAddedToCart;
+import com.github.xini1.common.event.cart.ItemRemovedFromCart;
+import com.github.xini1.common.event.cart.ItemsOrdered;
+import com.github.xini1.common.event.item.ItemActivated;
+import com.github.xini1.common.event.item.ItemCreated;
+import com.github.xini1.common.event.item.ItemDeactivated;
+import com.github.xini1.orders.read.Main;
 import com.github.xini1.orders.read.rpc.*;
-import com.google.gson.*;
-import io.grpc.*;
-import org.apache.kafka.clients.producer.*;
-import org.apache.kafka.common.serialization.*;
+import io.grpc.ManagedChannelBuilder;
 import org.junit.jupiter.api.*;
-import org.springframework.beans.factory.annotation.*;
-import org.springframework.boot.autoconfigure.kafka.*;
-import org.springframework.boot.test.context.*;
-import org.springframework.context.annotation.*;
-import org.springframework.test.context.*;
-import org.testcontainers.containers.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.cloud.aws.core.env.ResourceIdResolver;
+import org.springframework.cloud.aws.messaging.core.NotificationMessagingTemplate;
+import org.springframework.context.annotation.Bean;
+import org.springframework.messaging.converter.StringMessageConverter;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.containers.MongoDBContainer;
+import org.testcontainers.containers.localstack.LocalStackContainer;
 import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.*;
-import org.testcontainers.utility.*;
-import reactor.core.publisher.*;
-import reactor.kafka.sender.*;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.utility.DockerImageName;
 
-import java.util.*;
+import java.util.UUID;
 
-import static com.github.xini1.Await.*;
-import static org.assertj.core.api.Assertions.*;
+import static com.github.xini1.Await.await;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Maxim Tereshchenko
@@ -43,13 +52,18 @@ final class IntegrationTest {
             DockerImageName.parse("mongo:5.0.9")
     );
     @Container
-    private static final KafkaContainer KAFKA = new KafkaContainer(
-            DockerImageName.parse("confluentinc/cp-kafka:7.2.0")
-    );
+    private static final LocalStackContainer LOCAL_STACK = new LocalStackContainer(
+            DockerImageName.parse("localstack/localstack:1.4")
+    )
+            .withServices(LocalStackContainer.Service.SNS, LocalStackContainer.Service.SQS)
+            .withFileSystemBind(
+                    "../localstack-setup.sh",
+                    "/etc/localstack/init/ready.d/localstack-setup.sh"
+            );
 
     static {
         MONGO_DB.start();
-        KAFKA.start();
+        LOCAL_STACK.start();
     }
 
     private final OrderReadServiceGrpc.OrderReadServiceBlockingStub stub = OrderReadServiceGrpc.newBlockingStub(
@@ -57,21 +71,25 @@ final class IntegrationTest {
                     .usePlaintext()
                     .build()
     );
-    private final Gson gson = new Gson();
     private final UUID userId = UUID.fromString("00000000-0000-0000-0000-000000000001");
     private final UUID itemId = UUID.fromString("00000000-0000-0000-0000-000000000002");
+    private final ObjectMapper objectMapper = new ObjectMapper();
     @Autowired
-    private KafkaSender<UUID, String> kafkaProducer;
+    private NotificationMessagingTemplate notificationMessagingTemplate;
 
     @DynamicPropertySource
     static void properties(DynamicPropertyRegistry registry) {
         registry.add("spring.data.mongodb.uri", MONGO_DB::getReplicaSetUrl);
-        registry.add("spring.kafka.bootstrap-servers", KAFKA::getBootstrapServers);
+        registry.add("cloud.aws.region.static", LOCAL_STACK::getRegion);
+        registry.add(
+                "application.sqs.endpoint",
+                () -> LOCAL_STACK.getEndpointOverride(LocalStackContainer.Service.SQS).toString()
+        );
     }
 
     @Test
     @Order(0)
-    void canConsumeItemCreatedEvent() {
+    void canConsumeItemCreatedEvent() throws JsonProcessingException {
         emit(new ItemCreated(itemId, userId, "item", 1));
 
         await(() -> {
@@ -105,7 +123,7 @@ final class IntegrationTest {
 
     @Test
     @Order(1)
-    void canConsumeItemDeactivatedEvent() {
+    void canConsumeItemDeactivatedEvent() throws JsonProcessingException {
         emit(new ItemDeactivated(itemId, userId, 2));
 
         await(() ->
@@ -124,7 +142,7 @@ final class IntegrationTest {
 
     @Test
     @Order(2)
-    void canConsumeItemActivatedEvent() {
+    void canConsumeItemActivatedEvent() throws JsonProcessingException {
         emit(new ItemActivated(itemId, userId, 3));
 
         await(() ->
@@ -143,7 +161,7 @@ final class IntegrationTest {
 
     @Test
     @Order(3)
-    void canConsumeItemAddedToCartEvent() {
+    void canConsumeItemAddedToCartEvent() throws JsonProcessingException {
         emit(new ItemAddedToCart(userId, itemId, 2, 1));
 
         await(() ->
@@ -175,7 +193,7 @@ final class IntegrationTest {
 
     @Test
     @Order(4)
-    void canConsumeItemRemovedFromCartEvent() {
+    void canConsumeItemRemovedFromCartEvent() throws JsonProcessingException {
         emit(new ItemRemovedFromCart(userId, itemId, 1, 2));
 
         await(() ->
@@ -207,7 +225,7 @@ final class IntegrationTest {
 
     @Test
     @Order(5)
-    void canConsumeItemsOrderedEvent() {
+    void canConsumeItemsOrderedEvent() throws JsonProcessingException {
         emit(new ItemsOrdered(userId, 3));
 
         await(() -> {
@@ -267,35 +285,29 @@ final class IntegrationTest {
         });
     }
 
-    private void emit(Event event) {
-        kafkaProducer.send(
-                        Mono.just(
-                                SenderRecord.create(
-                                        new ProducerRecord<>(
-                                                Shared.EVENTS_KAFKA_TOPIC,
-                                                event.aggregateId(),
-                                                gson.toJson(event.asMap())
-                                        ),
-                                        event.aggregateId()
-                                )
-                        )
-                )
-                .subscribe();
+    private void emit(Event event) throws JsonProcessingException {
+        notificationMessagingTemplate.convertAndSend(
+                Shared.EVENTS_SNS_TOPIC,
+                objectMapper.writeValueAsString(event.asMap())
+        );
     }
 
     @TestConfiguration
     static class TestConfig {
 
         @Bean
-        KafkaSender<UUID, String> kafkaProducer(KafkaProperties kafkaProperties) {
-            return KafkaSender.create(SenderOptions.create(properties(kafkaProperties)));
-        }
-
-        private Map<String, Object> properties(KafkaProperties kafkaProperties) {
-            return Map.of(
-                    ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaProperties.getBootstrapServers(),
-                    ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, UUIDSerializer.class,
-                    ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class
+        public NotificationMessagingTemplate notificationMessagingTemplate(ResourceIdResolver resourceIdResolver) {
+            return new NotificationMessagingTemplate(
+                    AmazonSNSClientBuilder.standard()
+                            .withEndpointConfiguration(
+                                    new AwsClientBuilder.EndpointConfiguration(
+                                            LOCAL_STACK.getEndpointOverride(LocalStackContainer.Service.SNS).toString(),
+                                            LOCAL_STACK.getRegion()
+                                    )
+                            )
+                            .build(),
+                    resourceIdResolver,
+                    new StringMessageConverter()
             );
         }
     }

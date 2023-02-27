@@ -1,9 +1,13 @@
 package com.github.xini1.users;
 
-import com.github.xini1.users.exception.*;
-import com.github.xini1.users.port.*;
+import com.github.xini1.users.exception.UsernameIsTaken;
+import com.github.xini1.users.port.HashingAlgorithm;
+import com.github.xini1.users.port.UserStore;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 /**
  * @author Maxim Tereshchenko

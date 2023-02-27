@@ -1,9 +1,9 @@
 package com.github.xini1.users.application;
 
-import com.github.xini1.common.mongodb.*;
-import org.springframework.data.mongodb.repository.*;
+import com.github.xini1.common.mongodb.EventDocument;
+import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 
-import java.util.*;
+import java.util.UUID;
 
 /**
  * @author Maxim Tereshchenko

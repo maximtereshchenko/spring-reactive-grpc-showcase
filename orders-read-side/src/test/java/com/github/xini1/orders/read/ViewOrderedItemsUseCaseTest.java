@@ -1,17 +1,21 @@
 package com.github.xini1.orders.read;
 
-import com.github.xini1.common.*;
-import com.github.xini1.common.event.cart.*;
-import com.github.xini1.common.event.item.*;
+import com.github.xini1.common.UserType;
+import com.github.xini1.common.event.cart.ItemAddedToCart;
+import com.github.xini1.common.event.cart.ItemsOrdered;
+import com.github.xini1.common.event.item.ItemCreated;
 import com.github.xini1.orders.read.domain.Module;
-import com.github.xini1.orders.read.exception.*;
-import com.github.xini1.orders.read.view.*;
-import org.junit.jupiter.api.*;
+import com.github.xini1.orders.read.exception.UserIsNotRegular;
+import com.github.xini1.orders.read.view.OrderedItems;
+import org.junit.jupiter.api.Test;
 
-import java.time.*;
-import java.util.*;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * @author Maxim Tereshchenko

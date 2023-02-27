@@ -1,9 +1,10 @@
 package com.github.xini1.users.port;
 
-import com.github.xini1.common.*;
-import com.github.xini1.users.exception.*;
+import com.github.xini1.common.UserType;
+import com.github.xini1.users.exception.UsernameIsTaken;
 
-import java.util.*;
+import java.util.Optional;
+import java.util.UUID;
 
 /**
  * @author Maxim Tereshchenko

@@ -1,12 +1,14 @@
 package com.github.xini1.users.application;
 
-import com.github.xini1.users.port.*;
+import com.github.xini1.users.port.HashingAlgorithm;
 
-import javax.crypto.*;
-import javax.crypto.spec.*;
-import java.security.*;
-import java.security.spec.*;
-import java.util.*;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.spec.InvalidKeySpecException;
+import java.util.Base64;
+import java.util.Random;
 
 /**
  * @author Maxim Tereshchenko

@@ -1,7 +1,7 @@
 package com.github.xini1.apigateway.service;
 
-import io.grpc.stub.*;
-import reactor.core.publisher.*;
+import io.grpc.stub.StreamObserver;
+import reactor.core.publisher.MonoSink;
 
 /**
  * @author Maxim Tereshchenko

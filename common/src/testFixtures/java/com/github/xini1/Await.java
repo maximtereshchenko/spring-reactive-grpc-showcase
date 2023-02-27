@@ -1,7 +1,7 @@
 package com.github.xini1;
 
-import java.time.*;
-import java.util.stream.*;
+import java.time.Instant;
+import java.util.stream.Stream;
 
 /**
  * @author Maxim Tereshchenko

@@ -1,9 +1,9 @@
 package com.github.xini1.orders.read.domain;
 
-import com.github.xini1.orders.read.port.*;
+import com.github.xini1.orders.read.port.ViewStore;
 import com.github.xini1.orders.read.usecase.*;
 
-import java.time.*;
+import java.time.Clock;
 
 /**
  * @author Maxim Tereshchenko

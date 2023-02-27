@@ -1,10 +1,11 @@
 package com.github.xini1.orders.write.port;
 
-import com.github.xini1.common.event.*;
-import com.github.xini1.common.event.cart.*;
-import com.github.xini1.common.event.item.*;
+import com.github.xini1.common.event.Event;
+import com.github.xini1.common.event.cart.CartEvent;
+import com.github.xini1.common.event.item.ItemEvent;
 
-import java.util.*;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * @author Maxim Tereshchenko
