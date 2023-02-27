@@ -30,6 +30,7 @@ import org.testcontainers.utility.DockerImageName;
 
 import java.util.UUID;
 
+import static com.github.xini1.Await.await;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -96,8 +97,10 @@ final class IntegrationTest {
 
         assertThat(userId).isNotNull();
         assertThat(eventRepository.findAll().collectList().block()).containsExactly(expectedEventDocument());
-        assertThat(queueMessagingTemplate.receiveAndConvert(Shared.USERS_SQS_QUEUE, String.class))
-                .isEqualTo(expectedEventJson());
+        await(() ->
+                assertThat(queueMessagingTemplate.receiveAndConvert(Shared.USERS_SQS_QUEUE, String.class))
+                        .isEqualTo(expectedEventJson())
+        );
     }
 
     @Test

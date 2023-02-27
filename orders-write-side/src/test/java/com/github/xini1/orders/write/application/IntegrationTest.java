@@ -26,6 +26,7 @@ import org.testcontainers.utility.DockerImageName;
 
 import java.util.UUID;
 
+import static com.github.xini1.Await.await;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -97,8 +98,10 @@ final class IntegrationTest {
                 .hasSize(1)
                 .first()
                 .isEqualTo(itemCreatedEventDocument());
-        assertThat(queueMessagingTemplate.receiveAndConvert(Shared.ORDERS_READ_SIDE_SQS_QUEUE, String.class))
-                .isEqualTo(itemCreatedEventJson());
+        await(() ->
+                assertThat(queueMessagingTemplate.receiveAndConvert(Shared.ORDERS_READ_SIDE_SQS_QUEUE, String.class))
+                        .isEqualTo(itemCreatedEventJson())
+        );
     }
 
     @Test
@@ -116,8 +119,10 @@ final class IntegrationTest {
                 .hasSize(2)
                 .last()
                 .isEqualTo(itemDeactivatedEventDocument());
-        assertThat(queueMessagingTemplate.receiveAndConvert(Shared.ORDERS_READ_SIDE_SQS_QUEUE, String.class))
-                .isEqualTo(itemDeactivatedEventJson());
+        await(() ->
+                assertThat(queueMessagingTemplate.receiveAndConvert(Shared.ORDERS_READ_SIDE_SQS_QUEUE, String.class))
+                        .isEqualTo(itemDeactivatedEventJson())
+        );
     }
 
     @Test
@@ -135,8 +140,10 @@ final class IntegrationTest {
                 .hasSize(3)
                 .last()
                 .isEqualTo(itemActivatedEventDocument());
-        assertThat(queueMessagingTemplate.receiveAndConvert(Shared.ORDERS_READ_SIDE_SQS_QUEUE, String.class))
-                .isEqualTo(itemActivatedEventJson());
+        await(() ->
+                assertThat(queueMessagingTemplate.receiveAndConvert(Shared.ORDERS_READ_SIDE_SQS_QUEUE, String.class))
+                        .isEqualTo(itemActivatedEventJson())
+        );
     }
 
     @Test
@@ -155,8 +162,10 @@ final class IntegrationTest {
                 .hasSize(4)
                 .last()
                 .isEqualTo(itemAddedToCartEventDocument());
-        assertThat(queueMessagingTemplate.receiveAndConvert(Shared.ORDERS_READ_SIDE_SQS_QUEUE, String.class))
-                .isEqualTo(itemAddedToCartEventJson());
+        await(() ->
+                assertThat(queueMessagingTemplate.receiveAndConvert(Shared.ORDERS_READ_SIDE_SQS_QUEUE, String.class))
+                        .isEqualTo(itemAddedToCartEventJson())
+        );
     }
 
     @Test
@@ -175,8 +184,10 @@ final class IntegrationTest {
                 .hasSize(5)
                 .last()
                 .isEqualTo(itemRemovedFromCartEventDocument());
-        assertThat(queueMessagingTemplate.receiveAndConvert(Shared.ORDERS_READ_SIDE_SQS_QUEUE, String.class))
-                .isEqualTo(itemRemovedFromCartEventJson());
+        await(() ->
+                assertThat(queueMessagingTemplate.receiveAndConvert(Shared.ORDERS_READ_SIDE_SQS_QUEUE, String.class))
+                        .isEqualTo(itemRemovedFromCartEventJson())
+        );
     }
 
     @Test
@@ -193,8 +204,10 @@ final class IntegrationTest {
                 .hasSize(6)
                 .last()
                 .isEqualTo(itemsOrderedEventDocument());
-        assertThat(queueMessagingTemplate.receiveAndConvert(Shared.ORDERS_READ_SIDE_SQS_QUEUE, String.class))
-                .isEqualTo(itemsOrderedEventJson());
+        await(() ->
+                assertThat(queueMessagingTemplate.receiveAndConvert(Shared.ORDERS_READ_SIDE_SQS_QUEUE, String.class))
+                        .isEqualTo(itemsOrderedEventJson())
+        );
     }
 
     private EventDocument itemCreatedEventDocument() {

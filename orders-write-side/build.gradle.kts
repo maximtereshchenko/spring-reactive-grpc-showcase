@@ -20,6 +20,7 @@ dependencies {
     testImplementation(libs.testcontainers.junit)
     testImplementation(libs.testcontainers.mongodb)
     testImplementation(libs.testcontainers.localstack)
+    testImplementation(testFixtures(project("::common")))
 }
 
 tasks.test {
