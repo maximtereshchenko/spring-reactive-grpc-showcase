@@ -64,6 +64,8 @@ final class IntegrationTest {
     static {
         MONGO_DB.start();
         LOCAL_STACK.start();
+        System.setProperty("aws.accessKeyId", LOCAL_STACK.getAccessKey());
+        System.setProperty("aws.secretKey", LOCAL_STACK.getSecretKey());
     }
 
     private final OrderReadServiceGrpc.OrderReadServiceBlockingStub stub = OrderReadServiceGrpc.newBlockingStub(
