@@ -22,7 +22,7 @@ public final class UsersRouterFunction implements RouterFunction<ServerResponse>
                         handler.handle(request)
                                 .onErrorResume(
                                         StatusRuntimeException.class,
-                                        e -> new StatusExceptionHandler().handle(e)
+                                        e -> new StatusExceptionHandler().handle(request, e)
                                 )
                 )
                 .build();
