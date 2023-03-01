@@ -340,6 +340,13 @@ final class IntegrationTest {
         });
     }
 
+    @Test
+    void canPerformHealthCheck() {
+        webClient.get().uri("http://localhost:8081/actuator/health").exchange()
+                .expectStatus()
+                .isEqualTo(HttpStatus.OK);
+    }
+
     private TopOrderedItemDto expectedTopOrderedItem() {
         var dto = new TopOrderedItemDto();
         dto.setId(itemId);
