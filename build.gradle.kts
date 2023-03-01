@@ -8,9 +8,3 @@ subprojects {
         mavenCentral()
     }
 }
-
-task("version") {
-    doLast {
-        println(project.version)
-    }
-}
