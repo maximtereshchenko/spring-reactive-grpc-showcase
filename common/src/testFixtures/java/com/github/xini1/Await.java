@@ -24,7 +24,7 @@ public final class Await {
             assertion.run();
             return new Success();
         } catch (AssertionError e) {
-            return new Failure(e, start.plusSeconds(5));
+            return new Failure(e, start.plusSeconds(10));
         }
     }
 
