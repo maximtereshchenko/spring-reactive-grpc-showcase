@@ -11,9 +11,12 @@ import com.github.xini1.common.event.EventType;
 import com.github.xini1.users.Main;
 import com.github.xini1.users.application.IntegrationTest.TestConfig;
 import com.github.xini1.users.rpc.*;
+import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
+import io.grpc.health.v1.HealthCheckRequest;
+import io.grpc.health.v1.HealthGrpc;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,11 +24,9 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.cloud.aws.core.env.ResourceIdResolver;
 import org.springframework.cloud.aws.messaging.core.QueueMessagingTemplate;
 import org.springframework.context.annotation.Bean;
-import org.springframework.http.HttpStatus;
 import org.springframework.messaging.converter.StringMessageConverter;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.web.reactive.server.WebTestClient;
 import org.testcontainers.containers.localstack.LocalStackContainer;
 import org.testcontainers.containers.localstack.LocalStackContainer.Service;
 import org.testcontainers.containers.wait.strategy.Wait;
@@ -43,7 +44,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 /**
  * @author Maxim Tereshchenko
  */
-@SpringBootTest(classes = {Main.class, TestConfig.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = {Main.class, TestConfig.class})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Testcontainers
@@ -70,11 +71,6 @@ final class IntegrationTest {
         System.setProperty("aws.secretKey", LOCAL_STACK.getSecretKey());
     }
 
-    private final UserServiceGrpc.UserServiceBlockingStub stub = UserServiceGrpc.newBlockingStub(
-            ManagedChannelBuilder.forAddress("localhost", 8080)
-                    .usePlaintext()
-                    .build()
-    );
     private final AmazonDynamoDB amazonDynamoDB = AmazonDynamoDBClientBuilder.standard()
             .withEndpointConfiguration(
                     new AwsClientBuilder.EndpointConfiguration(
@@ -83,10 +79,13 @@ final class IntegrationTest {
                     )
             )
             .build();
+    private final ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 8080)
+            .usePlaintext()
+            .build();
+    private final UserServiceGrpc.UserServiceBlockingStub stub = UserServiceGrpc.newBlockingStub(channel);
+    private final HealthGrpc.HealthBlockingStub healthStub = HealthGrpc.newBlockingStub(channel);
     @Autowired
     private QueueMessagingTemplate queueMessagingTemplate;
-    @Autowired
-    private WebTestClient webTestClient;
     private String userId;
     private String jwt;
 
@@ -170,9 +169,7 @@ final class IntegrationTest {
 
     @Test
     void canPerformHealthCheck() {
-        webTestClient.get().uri("/actuator/health").exchange()
-                .expectStatus()
-                .isEqualTo(HttpStatus.OK);
+        assertThat(healthStub.check(HealthCheckRequest.newBuilder().build()).getStatusValue()).isOne();
     }
 
     private Map<String, AttributeValue> expectedEventDocument() {

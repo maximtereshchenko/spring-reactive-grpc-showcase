@@ -3,11 +3,11 @@ package com.github.xini1.common.rpc;
 import io.grpc.BindableService;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
+import io.grpc.protobuf.services.HealthStatusManager;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author Maxim Tereshchenko
@@ -19,11 +19,8 @@ public final class RpcServer {
     public RpcServer(BindableService service) {
         server = ServerBuilder.forPort(8080)
                 .addService(service)
+                .addService(new HealthStatusManager().getHealthService())
                 .build();
-    }
-
-    public void awaitTermination() throws InterruptedException {
-        server.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
     }
 
     @PostConstruct

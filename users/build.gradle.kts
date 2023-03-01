@@ -13,7 +13,6 @@ dependencies {
     implementation(project("::common"))
     implementation(libs.jwt)
     implementation(libs.spring.webflux)
-    implementation(libs.spring.actuator)
     implementation(libs.spring.aws.messaging)
     implementation(libs.aws.dynamodb)
 
