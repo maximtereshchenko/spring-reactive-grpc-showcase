@@ -27,6 +27,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.localstack.LocalStackContainer;
+import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
@@ -59,7 +60,8 @@ final class IntegrationTest {
             .withCopyFileToContainer(
                     MountableFile.forHostPath("../localstack-setup.sh"),
                     "/etc/localstack/init/ready.d/localstack-setup.sh"
-            );
+            )
+            .waitingFor(Wait.forHealthcheck());
 
     static {
         LOCAL_STACK.start();
