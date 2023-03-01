@@ -6,14 +6,11 @@ import com.amazonaws.services.sns.AmazonSNSClientBuilder;
 import com.github.xini1.common.rpc.RpcServer;
 import com.github.xini1.users.domain.Module;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.ApplicationRunner;
 import org.springframework.cloud.aws.core.env.ResourceIdResolver;
 import org.springframework.cloud.aws.messaging.core.NotificationMessagingTemplate;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.converter.StringMessageConverter;
-
-import java.util.concurrent.Executors;
 
 /**
  * @author Maxim Tereshchenko
@@ -53,14 +50,5 @@ public class SpringConfiguration {
         return new RpcServer(
                 new UserRpcService(module.registerUseCase(), module.loginUseCase(), module.decodeJwtUseCase())
         );
-    }
-
-    @Bean
-    ApplicationRunner applicationRunner(RpcServer rpcServer) {
-        //to make application run forever
-        return args -> Executors.newSingleThreadExecutor().submit(() -> {
-            rpcServer.awaitTermination();
-            return null;
-        });
     }
 }

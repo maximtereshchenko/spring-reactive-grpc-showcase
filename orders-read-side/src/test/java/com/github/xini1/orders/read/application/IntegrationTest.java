@@ -22,10 +22,12 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.cloud.aws.core.env.ResourceIdResolver;
 import org.springframework.cloud.aws.messaging.core.NotificationMessagingTemplate;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpStatus;
 import org.springframework.messaging.converter.StringMessageConverter;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.web.reactive.server.WebTestClient;
 import org.testcontainers.containers.localstack.LocalStackContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
@@ -41,7 +43,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author Maxim Tereshchenko
  */
-@SpringBootTest(classes = {IntegrationTest.TestConfig.class, Main.class})
+@SpringBootTest(
+        classes = {IntegrationTest.TestConfig.class, Main.class},
+        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
+)
 @ActiveProfiles("test")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -79,6 +84,8 @@ final class IntegrationTest {
     private final ObjectMapper objectMapper = new ObjectMapper();
     @Autowired
     private NotificationMessagingTemplate notificationMessagingTemplate;
+    @Autowired
+    private WebTestClient webTestClient;
 
     @DynamicPropertySource
     static void properties(DynamicPropertyRegistry registry) {
@@ -289,6 +296,13 @@ final class IntegrationTest {
                                     .build()
                     );
         });
+    }
+
+    @Test
+    void canPerformHealthCheck() {
+        webTestClient.get().uri("/actuator/health").exchange()
+                .expectStatus()
+                .isEqualTo(HttpStatus.OK);
     }
 
     private void emit(Event event) throws JsonProcessingException {

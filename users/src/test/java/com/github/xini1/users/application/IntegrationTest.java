@@ -21,9 +21,11 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.cloud.aws.core.env.ResourceIdResolver;
 import org.springframework.cloud.aws.messaging.core.QueueMessagingTemplate;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpStatus;
 import org.springframework.messaging.converter.StringMessageConverter;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.web.reactive.server.WebTestClient;
 import org.testcontainers.containers.localstack.LocalStackContainer;
 import org.testcontainers.containers.localstack.LocalStackContainer.Service;
 import org.testcontainers.containers.wait.strategy.Wait;
@@ -41,7 +43,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 /**
  * @author Maxim Tereshchenko
  */
-@SpringBootTest(classes = {Main.class, TestConfig.class})
+@SpringBootTest(classes = {Main.class, TestConfig.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Testcontainers
@@ -83,6 +85,8 @@ final class IntegrationTest {
             .build();
     @Autowired
     private QueueMessagingTemplate queueMessagingTemplate;
+    @Autowired
+    private WebTestClient webTestClient;
     private String userId;
     private String jwt;
 
@@ -162,6 +166,13 @@ final class IntegrationTest {
                                 .setUserType("REGULAR")
                                 .build()
                 );
+    }
+
+    @Test
+    void canPerformHealthCheck() {
+        webTestClient.get().uri("/actuator/health").exchange()
+                .expectStatus()
+                .isEqualTo(HttpStatus.OK);
     }
 
     private Map<String, AttributeValue> expectedEventDocument() {
