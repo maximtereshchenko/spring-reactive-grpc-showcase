@@ -7,6 +7,7 @@ import io.grpc.ServerBuilder;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Maxim Tereshchenko
@@ -16,9 +17,13 @@ public final class RpcServer {
     private final Server server;
 
     public RpcServer(BindableService service) {
-        this.server = ServerBuilder.forPort(8080)
+        server = ServerBuilder.forPort(8080)
                 .addService(service)
                 .build();
+    }
+
+    public void awaitTermination() throws InterruptedException {
+        server.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
     }
 
     @PostConstruct

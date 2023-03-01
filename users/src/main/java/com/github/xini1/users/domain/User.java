@@ -19,15 +19,15 @@ final class User {
     private final String password;
     private final UserType userType;
 
+    User(UserStore.Dto dto) {
+        this(dto.getId(), dto.getUsername(), dto.getPassword(), dto.getUserType());
+    }
+
     private User(UUID id, String name, String password, UserType userType) {
         this.id = id;
         this.name = name;
         this.password = password;
         this.userType = userType;
-    }
-
-    public User(UserStore.Dto dto) {
-        this(dto.getId(), dto.getUsername(), dto.getPassword(), dto.getUserType());
     }
 
     static User create(String name, String password, UserType userType) {

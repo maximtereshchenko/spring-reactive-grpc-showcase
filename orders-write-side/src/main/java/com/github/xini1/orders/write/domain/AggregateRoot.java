@@ -12,11 +12,11 @@ import java.util.function.Consumer;
 abstract class AggregateRoot {
 
     private final UUID id;
-    private final List<Event> newEvents = new ArrayList<>();
+    private final Collection<Event> newEvents = new ArrayList<>();
     private final Map<Class<? extends Event>, Consumer<Event>> handlers = new HashMap<>();
     private long version = 0;
 
-    protected AggregateRoot(UUID id) {
+    AggregateRoot(UUID id) {
         this.id = id;
     }
 

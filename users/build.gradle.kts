@@ -8,10 +8,10 @@ application {
 
 dependencies {
     implementation(project("::common"))
-    implementation(libs.spring.mongodb)
     implementation(libs.jwt)
     implementation(libs.spring.actuator)
-    implementation(libs.spring.aws)
+    implementation(libs.spring.aws.messaging)
+    implementation(libs.aws.dynamodb)
 
     testCompileOnly(libs.junit.api)
     testRuntimeOnly(libs.junit.engine)
@@ -19,7 +19,6 @@ dependencies {
     testImplementation(libs.spring.test)
     testImplementation(libs.testcontainers)
     testImplementation(libs.testcontainers.junit)
-    testImplementation(libs.testcontainers.mongodb)
     testImplementation(libs.testcontainers.localstack)
     testImplementation(testFixtures(project("::common")))
 }

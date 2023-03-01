@@ -26,11 +26,11 @@ import org.springframework.messaging.converter.StringMessageConverter;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.containers.localstack.LocalStackContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
+import org.testcontainers.utility.MountableFile;
 
 import java.util.UUID;
 
@@ -48,21 +48,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 final class IntegrationTest {
 
     @Container
-    private static final MongoDBContainer MONGO_DB = new MongoDBContainer(
-            DockerImageName.parse("mongo:5.0.9")
-    );
-    @Container
     private static final LocalStackContainer LOCAL_STACK = new LocalStackContainer(
             DockerImageName.parse("localstack/localstack:1.4")
     )
-            .withServices(LocalStackContainer.Service.SNS, LocalStackContainer.Service.SQS)
-            .withFileSystemBind(
-                    "../localstack-setup.sh",
+            .withServices(
+                    LocalStackContainer.Service.SNS,
+                    LocalStackContainer.Service.SQS,
+                    LocalStackContainer.Service.DYNAMODB
+            )
+            .withCopyFileToContainer(
+                    MountableFile.forHostPath("../localstack-setup.sh"),
                     "/etc/localstack/init/ready.d/localstack-setup.sh"
             );
 
     static {
-        MONGO_DB.start();
         LOCAL_STACK.start();
         System.setProperty("aws.accessKeyId", LOCAL_STACK.getAccessKey());
         System.setProperty("aws.secretKey", LOCAL_STACK.getSecretKey());
@@ -81,11 +80,14 @@ final class IntegrationTest {
 
     @DynamicPropertySource
     static void properties(DynamicPropertyRegistry registry) {
-        registry.add("spring.data.mongodb.uri", MONGO_DB::getReplicaSetUrl);
         registry.add("cloud.aws.region.static", LOCAL_STACK::getRegion);
         registry.add(
                 "application.sqs.endpoint",
                 () -> LOCAL_STACK.getEndpointOverride(LocalStackContainer.Service.SQS).toString()
+        );
+        registry.add(
+                "application.dynamodb.endpoint",
+                () -> LOCAL_STACK.getEndpointOverride(LocalStackContainer.Service.DYNAMODB).toString()
         );
     }
 

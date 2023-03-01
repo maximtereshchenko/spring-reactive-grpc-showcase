@@ -1,6 +1,7 @@
 package com.github.xini1.orders.read.application;
 
 import com.amazonaws.client.builder.AwsClientBuilder;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.AmazonSQSAsyncClientBuilder;
 import com.github.xini1.common.rpc.RpcServer;
@@ -10,7 +11,6 @@ import org.springframework.cloud.aws.core.env.ResourceIdResolver;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRepositories;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
@@ -20,23 +20,32 @@ import java.time.ZoneOffset;
  * @author Maxim Tereshchenko
  */
 @Configuration
-@EnableReactiveMongoRepositories(basePackageClasses = CartRepository.class)
 public class SpringConfiguration {
 
     @Bean
+    public AmazonSQS amazonSQS(
+            @Value("${application.sqs.endpoint}") String sqsEndpoint,
+            @Value("${cloud.aws.region.static}") String awsRegion,
+            ResourceIdResolver resourceIdResolver
+    ) {
+        return AmazonSQSAsyncClientBuilder.standard()
+                .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(sqsEndpoint, awsRegion))
+                .build();
+    }
+
+    @Bean
     Module module(
-            CartRepository cartRepository,
-            ItemRepository itemRepository,
-            OrderedItemsRepository orderedItemsRepository,
-            TopOrderedItemRepository topOrderedItemRepository,
+            @Value("${application.dynamodb.endpoint}") String dynamodbEndpoint,
+            @Value("${cloud.aws.region.static}") String awsRegion,
             Clock clock
     ) {
         return new Module(
-                new MongoViewStore(
-                        cartRepository,
-                        itemRepository,
-                        orderedItemsRepository,
-                        topOrderedItemRepository
+                new DynamoDbViewStore(
+                        AmazonDynamoDBClientBuilder.standard()
+                                .withEndpointConfiguration(
+                                        new AwsClientBuilder.EndpointConfiguration(dynamodbEndpoint, awsRegion)
+                                )
+                                .build()
                 ),
                 clock
         );
@@ -68,17 +77,6 @@ public class SpringConfiguration {
                         module.viewTopOrderedItemsUseCase()
                 )
         );
-    }
-
-    @Bean
-    public AmazonSQS amazonSQS(
-            @Value("${application.sqs.endpoint}") String sqsEndpoint,
-            @Value("${cloud.aws.region.static}") String awsRegion,
-            ResourceIdResolver resourceIdResolver
-    ) {
-        return AmazonSQSAsyncClientBuilder.standard()
-                .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(sqsEndpoint, awsRegion))
-                .build();
     }
 
     @Bean

@@ -18,7 +18,7 @@ final class Cart extends AggregateRoot {
 
     private final Map<UUID, Integer> items = new HashMap<>();
 
-    Cart(UUID userId) {
+    private Cart(UUID userId) {
         super(userId);
         register(ItemAddedToCart.class, this::onEvent);
         register(ItemsOrdered.class, event -> items.clear());

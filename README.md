@@ -4,7 +4,7 @@ This is a repository to try out gRPC and Spring Reactor technologies.
 
 # How the project is looking?
 
-![](structure.png)
+![](structure.png) TODO: Users uses DB
 
 There will be 4 "Microservices" (not really, but they will be deployed separately as Docker containers). I will
 utilize Ports and Adapters architecture, which will enable TDD approach in developing business logic. I will try CQRS
@@ -44,103 +44,73 @@ To build these services Spring Reactor will be used alongside with gRPC for comm
 * Register
 
 ```bash
-curl -X POST \
--H 'Content-Type:application/json' \
-http://localhost:8080/users \
--d '{"username":"admin","password":"pass","userType":"ADMIN"}'
+curl -X POST -H "Content-Type:application/json" "http://localhost:8080/users" -d '{"username":"admin","password":"pass","userType":"ADMIN"}'
 ```
 
 * Log in
 
 ```bash
-curl -X POST \
--H 'Content-Type:application/json' \
-http://localhost:8080/users/login \
--d '{"username":"admin","password":"pass"}'
+curl -X POST -H "Content-Type:application/json" "http://localhost:8080/users/login" -d '{"username":"admin","password":"pass"}'
 ```
 
 * Create item
 
 ```bash
-curl -X POST \
--H 'Content-Type:application/json' \
--H 'Authorization:{admin jwt}' \
-http://localhost:8080/items \
--d 'item'
+curl -X POST -H "Content-Type:application/json" -H "Authorization:{admin jwt}" "http://localhost:8080/items" -d "item"
 ```
 
 * View all items
 
 ```bash
-curl -X GET http://localhost:8080/items
+curl -X GET "http://localhost:8080/items"
 ```
 
 * Deactivate item
 
 ```bash
-curl -X POST \
--H 'Authorization:{admin jwt}' \
-http://localhost:8080/items/{item id}/deactivate 
+curl -X POST -H "Authorization:{admin jwt}" "http://localhost:8080/items/{item id}/deactivate"
 ```
 
 * Activate item
 
 ```bash
-curl -X POST \
--H 'Authorization:{admin jwt}' \
-http://localhost:8080/items/{item id}/activate 
+curl -X POST -H "Authorization:{admin jwt}" "http://localhost:8080/items/{item id}/activate" 
 ```
 
 * Add items to cart
 
 ```bash
-curl -X POST \
--H 'Content-Type:application/json' \
--H 'Authorization:{regular user jwt}' \
-http://localhost:8080/cart/add \
--d '{"itemId":"{item id}","quantity":"1"}'
+curl -X POST -H "Content-Type:application/json" -H "Authorization:{regular user jwt}" "http://localhost:8080/cart/add" -d '{"itemId":"{item id}","quantity":"1"}'
 ```
 
 * Remove items from cart
 
 ```bash
-curl -X POST \
--H 'Content-Type:application/json' \
--H 'Authorization:{regular user jwt}' \
-http://localhost:8080/cart/remove \
--d '{"itemId":"{item id}","quantity":"1"}'
+curl -X POST -H "Content-Type:application/json" -H "Authorization:{regular user jwt}" "http://localhost:8080/cart/remove" -d '{"itemId":"{item id}","quantity":"1"}'
 ```
 
 * View items in cart
 
 ```bash
-curl -X GET \
--H 'Authorization:{regular user jwt})' \
-http://localhost:8080/cart
+curl -X GET -H "Authorization:{regular user jwt}" "http://localhost:8080/cart"
 ```
 
 * Order items in cart
 
 ```bash
-curl -X POST \
--H 'Authorization:{regular user jwt}' \
-http://localhost:8080/cart/order
+curl -X POST -H "Authorization:{regular user jwt}" "http://localhost:8080/cart/order"
 ```
 
 * View previous orders
 
 ```bash
-curl -X GET \
--H 'Authorization:{regular user jwt}' \
-http://localhost:8080/orders
+curl -X GET -H "Authorization:{regular user jwt}" "http://localhost:8080/orders"
 ```
 
 * View top ordered items
 
 ```bash
-curl -X GET \
--H 'Authorization:{admin jwt}' \
-http://localhost:8080/items/top
+curl -X GET -H "Authorization:{admin jwt}" "http://localhost:8080/items/top"
 ```
 
 # How to test?
@@ -168,6 +138,8 @@ docker compose up -d
 * Using gRPC for communication between services.
 * Managing dependencies with catalog versions in Gradle.
 * Establishing CI/CD pipeline with GitHub Actions.
+* Working with Amazon infrastructure: SNS, SQS, DynamoDB.
+* Working with Terraform
 
 # Out of scope concerns
 

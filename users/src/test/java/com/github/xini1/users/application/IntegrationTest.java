@@ -1,10 +1,13 @@
 package com.github.xini1.users.application;
 
 import com.amazonaws.client.builder.AwsClientBuilder;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
+import com.amazonaws.services.dynamodbv2.model.AttributeValue;
+import com.amazonaws.services.dynamodbv2.model.ScanRequest;
 import com.amazonaws.services.sqs.AmazonSQSAsyncClientBuilder;
 import com.github.xini1.common.Shared;
 import com.github.xini1.common.event.EventType;
-import com.github.xini1.common.mongodb.EventDocument;
 import com.github.xini1.users.Main;
 import com.github.xini1.users.application.IntegrationTest.TestConfig;
 import com.github.xini1.users.rpc.*;
@@ -21,14 +24,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.messaging.converter.StringMessageConverter;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.containers.localstack.LocalStackContainer;
 import org.testcontainers.containers.localstack.LocalStackContainer.Service;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
+import org.testcontainers.utility.MountableFile;
 
-import java.util.UUID;
+import java.util.Map;
 
 import static com.github.xini1.Await.await;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -44,21 +47,20 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 final class IntegrationTest {
 
     @Container
-    private static final MongoDBContainer MONGO_DB = new MongoDBContainer(
-            DockerImageName.parse("mongo:5.0.9")
-    );
-    @Container
     private static final LocalStackContainer LOCAL_STACK = new LocalStackContainer(
             DockerImageName.parse("localstack/localstack:1.4")
     )
-            .withServices(Service.SNS, Service.SQS)
-            .withFileSystemBind(
-                    "../localstack-setup.sh",
+            .withServices(
+                    LocalStackContainer.Service.SNS,
+                    LocalStackContainer.Service.SQS,
+                    LocalStackContainer.Service.DYNAMODB
+            )
+            .withCopyFileToContainer(
+                    MountableFile.forHostPath("../localstack-setup.sh"),
                     "/etc/localstack/init/ready.d/localstack-setup.sh"
             );
 
     static {
-        MONGO_DB.start();
         LOCAL_STACK.start();
         System.setProperty("aws.accessKeyId", LOCAL_STACK.getAccessKey());
         System.setProperty("aws.secretKey", LOCAL_STACK.getSecretKey());
@@ -69,8 +71,14 @@ final class IntegrationTest {
                     .usePlaintext()
                     .build()
     );
-    @Autowired
-    private EventRepository eventRepository;
+    private final AmazonDynamoDB amazonDynamoDB = AmazonDynamoDBClientBuilder.standard()
+            .withEndpointConfiguration(
+                    new AwsClientBuilder.EndpointConfiguration(
+                            LOCAL_STACK.getEndpointOverride(Service.DYNAMODB).toString(),
+                            LOCAL_STACK.getRegion()
+                    )
+            )
+            .build();
     @Autowired
     private QueueMessagingTemplate queueMessagingTemplate;
     private String userId;
@@ -78,9 +86,12 @@ final class IntegrationTest {
 
     @DynamicPropertySource
     static void properties(DynamicPropertyRegistry registry) {
-        registry.add("spring.data.mongodb.uri", MONGO_DB::getReplicaSetUrl);
         registry.add("cloud.aws.region.static", LOCAL_STACK::getRegion);
         registry.add("application.sns.endpoint", () -> LOCAL_STACK.getEndpointOverride(Service.SNS).toString());
+        registry.add(
+                "application.dynamodb.endpoint",
+                () -> LOCAL_STACK.getEndpointOverride(Service.DYNAMODB).toString()
+        );
     }
 
     @Test
@@ -88,17 +99,18 @@ final class IntegrationTest {
     void userCanRegister() {
         userId = stub.register(
                         RegisterRequest.newBuilder()
-                                .setUsername("username")
-                                .setPassword("password")
+                                .setUsername("user")
+                                .setPassword("pass")
                                 .setUserType("REGULAR")
                                 .build()
                 )
                 .getId();
 
         assertThat(userId).isNotNull();
-        assertThat(eventRepository.findAll().collectList().block()).containsExactly(expectedEventDocument());
+        var result = amazonDynamoDB.scan(new ScanRequest().withTableName("events"));
+        assertThat(result.getItems()).containsExactly(expectedEventDocument());
         await(() ->
-                assertThat(queueMessagingTemplate.receiveAndConvert(Shared.USERS_SQS_QUEUE, String.class))
+                assertThat(queueMessagingTemplate.receiveAndConvert(Shared.ORDERS_READ_SIDE_SQS_QUEUE, String.class))
                         .isEqualTo(expectedEventJson())
         );
     }
@@ -107,8 +119,8 @@ final class IntegrationTest {
     @Order(1)
     void userCannotRegisterIfUsernameIsTaken() {
         var registerRequest = RegisterRequest.newBuilder()
-                .setUsername("username")
-                .setPassword("password")
+                .setUsername("user")
+                .setPassword("pass")
                 .setUserType("REGULAR")
                 .build();
 
@@ -123,8 +135,8 @@ final class IntegrationTest {
     void userCanLogin() {
         jwt = stub.login(
                         LoginRequest.newBuilder()
-                                .setUsername("username")
-                                .setPassword("password")
+                                .setUsername("user")
+                                .setPassword("pass")
                                 .build()
                 )
                 .getJwt();
@@ -150,18 +162,18 @@ final class IntegrationTest {
                 );
     }
 
-    private EventDocument expectedEventDocument() {
-        var eventDocument = new EventDocument();
-        eventDocument.setEventType(EventType.USER_REGISTERED);
-        eventDocument.setAggregateId(UUID.fromString(userId));
-        eventDocument.setVersion(1);
-        eventDocument.setData(expectedEventJson());
-        return eventDocument;
+    private Map<String, AttributeValue> expectedEventDocument() {
+        return Map.of(
+                "aggregateId", new AttributeValue().withS(userId),
+                "version", new AttributeValue().withN("1"),
+                "eventType", new AttributeValue().withS(EventType.USER_REGISTERED.toString()),
+                "data", new AttributeValue().withS(expectedEventJson())
+        );
     }
 
     private String expectedEventJson() {
         return "{\"eventType\":\"USER_REGISTERED\",\"userId\":\"" + userId +
-                "\",\"username\":\"username\",\"version\":\"1\"}";
+                "\",\"username\":\"user\",\"version\":\"1\"}";
     }
 
     @TestConfiguration

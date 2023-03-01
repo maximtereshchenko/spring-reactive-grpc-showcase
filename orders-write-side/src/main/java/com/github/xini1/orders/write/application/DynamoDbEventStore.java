@@ -1,9 +1,11 @@
 package com.github.xini1.orders.write.application;
 
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.xini1.common.Shared;
+import com.github.xini1.common.dynamodb.EventsSchema;
 import com.github.xini1.common.event.Event;
 import com.github.xini1.common.event.EventType;
 import com.github.xini1.common.event.cart.CartEvent;
@@ -14,7 +16,6 @@ import com.github.xini1.common.event.item.ItemActivated;
 import com.github.xini1.common.event.item.ItemCreated;
 import com.github.xini1.common.event.item.ItemDeactivated;
 import com.github.xini1.common.event.item.ItemEvent;
-import com.github.xini1.common.mongodb.EventDocument;
 import com.github.xini1.orders.write.port.EventStore;
 import org.springframework.cloud.aws.messaging.core.NotificationMessagingTemplate;
 
@@ -24,15 +25,17 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.UUID;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * @author Maxim Tereshchenko
  */
-final class MongoEventStore implements EventStore {
+final class DynamoDbEventStore implements EventStore {
 
-    private final EventRepository eventRepository;
+    private final AmazonDynamoDB amazonDynamoDB;
     private final NotificationMessagingTemplate notificationMessagingTemplate;
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private final EventsSchema eventsSchema = new EventsSchema();
     private final Map<EventType, Function<Map<String, String>, ItemEvent>> itemEventConstructors = Map.of(
             EventType.ITEM_ACTIVATED, ItemActivated::new,
             EventType.ITEM_DEACTIVATED, ItemDeactivated::new,
@@ -44,43 +47,46 @@ final class MongoEventStore implements EventStore {
             EventType.ITEMS_ORDERED, ItemsOrdered::new
     );
 
-    MongoEventStore(EventRepository eventRepository, NotificationMessagingTemplate notificationMessagingTemplate) {
-        this.eventRepository = eventRepository;
+    DynamoDbEventStore(AmazonDynamoDB amazonDynamoDB, NotificationMessagingTemplate notificationMessagingTemplate) {
+        this.amazonDynamoDB = amazonDynamoDB;
         this.notificationMessagingTemplate = notificationMessagingTemplate;
     }
 
     @Override
     public void publish(Event event) {
         var json = json(event);
-        eventRepository.save(new EventDocument(event, json))
-                .subscribe();
+        amazonDynamoDB.putItem(eventsSchema.putRequest(event, json));
         notificationMessagingTemplate.convertAndSend(Shared.EVENTS_SNS_TOPIC, json);
     }
 
     @Override
     public List<ItemEvent> itemEvents(UUID itemId) {
-        return eventRepository.findById_AggregateIdAndEventTypeIn(itemId, EventType.itemEvents())
+        return amazonDynamoDB.scan(eventsSchema.findByAggregateIdAndEventTypeInRequest(itemId, EventType.itemEvents()))
+                .getItems()
+                .stream()
+                .map(eventsSchema::bind)
                 .map(this::itemEvent)
-                .collectList()
-                .block();
+                .collect(Collectors.toList());
     }
 
     @Override
     public List<CartEvent> cartEvents(UUID userId) {
-        return eventRepository.findById_AggregateIdAndEventTypeIn(userId, EventType.cartEvents())
+        return amazonDynamoDB.scan(eventsSchema.findByAggregateIdAndEventTypeInRequest(userId, EventType.cartEvents()))
+                .getItems()
+                .stream()
+                .map(eventsSchema::bind)
                 .map(this::cartEvent)
-                .collectList()
-                .block();
+                .collect(Collectors.toList());
     }
 
-    private CartEvent cartEvent(EventDocument eventDocument) {
-        return cartEventConstructors.get(eventDocument.getEventType())
-                .apply(properties(eventDocument));
+    private CartEvent cartEvent(EventsSchema.Binding binding) {
+        return cartEventConstructors.get(binding.eventType())
+                .apply(properties(binding.data()));
     }
 
-    private ItemEvent itemEvent(EventDocument eventDocument) {
-        return itemEventConstructors.get(eventDocument.getEventType())
-                .apply(properties(eventDocument));
+    private ItemEvent itemEvent(EventsSchema.Binding binding) {
+        return itemEventConstructors.get(binding.eventType())
+                .apply(properties(binding.data()));
     }
 
     private String json(Event event) {
@@ -91,9 +97,9 @@ final class MongoEventStore implements EventStore {
         }
     }
 
-    private Map<String, String> properties(EventDocument eventDocument) {
+    private Map<String, String> properties(String json) {
         try {
-            return objectMapper.readValue(eventDocument.getData(), new TypeReference<>() {});
+            return objectMapper.readValue(json, new TypeReference<>() {});
         } catch (IOException e) {
             throw new IllegalArgumentException("Could not read JSON", e);
         }

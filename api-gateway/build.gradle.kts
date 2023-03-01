@@ -13,14 +13,13 @@ dependencies {
 
     testCompileOnly(libs.junit.api)
     testRuntimeOnly(libs.junit.engine)
+    testRuntimeOnly(libs.aws.core)
     testImplementation(libs.assertj)
     testImplementation(libs.assertj)
     testImplementation(libs.spring.test)
     testImplementation(libs.testcontainers)
     testImplementation(libs.testcontainers.junit)
-    testImplementation(libs.testcontainers.mongodb)
     testImplementation(libs.testcontainers.localstack)
-    testRuntimeOnly(libs.aws)
     testImplementation(testFixtures(project("::common")))
 }
 

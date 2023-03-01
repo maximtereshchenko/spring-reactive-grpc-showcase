@@ -1,10 +1,18 @@
 package com.github.xini1.orders.write.application;
 
 import com.amazonaws.client.builder.AwsClientBuilder;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
+import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.sqs.AmazonSQSAsyncClientBuilder;
 import com.github.xini1.common.Shared;
-import com.github.xini1.common.event.EventType;
-import com.github.xini1.common.mongodb.EventDocument;
+import com.github.xini1.common.dynamodb.EventsSchema;
+import com.github.xini1.common.event.cart.ItemAddedToCart;
+import com.github.xini1.common.event.cart.ItemRemovedFromCart;
+import com.github.xini1.common.event.cart.ItemsOrdered;
+import com.github.xini1.common.event.item.ItemActivated;
+import com.github.xini1.common.event.item.ItemCreated;
+import com.github.xini1.common.event.item.ItemDeactivated;
 import com.github.xini1.orders.write.Main;
 import com.github.xini1.orders.write.rpc.*;
 import io.grpc.ManagedChannelBuilder;
@@ -18,12 +26,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.messaging.converter.StringMessageConverter;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.containers.localstack.LocalStackContainer;
+import org.testcontainers.containers.localstack.LocalStackContainer.Service;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
+import org.testcontainers.utility.MountableFile;
 
+import java.util.Map;
 import java.util.UUID;
 
 import static com.github.xini1.Await.await;
@@ -39,21 +49,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 final class IntegrationTest {
 
     @Container
-    private static final MongoDBContainer MONGO_DB = new MongoDBContainer(
-            DockerImageName.parse("mongo:5.0.9")
-    );
-    @Container
     private static final LocalStackContainer LOCAL_STACK = new LocalStackContainer(
             DockerImageName.parse("localstack/localstack:1.4")
     )
-            .withServices(LocalStackContainer.Service.SNS, LocalStackContainer.Service.SQS)
-            .withFileSystemBind(
-                    "../localstack-setup.sh",
+            .withServices(
+                    LocalStackContainer.Service.SNS,
+                    LocalStackContainer.Service.SQS,
+                    LocalStackContainer.Service.DYNAMODB
+            )
+            .withCopyFileToContainer(
+                    MountableFile.forHostPath("../localstack-setup.sh"),
                     "/etc/localstack/init/ready.d/localstack-setup.sh"
             );
 
+    private static final String USER_ID = "00000000-0000-0000-0000-000000000001";
+
     static {
-        MONGO_DB.start();
         LOCAL_STACK.start();
         System.setProperty("aws.accessKeyId", LOCAL_STACK.getAccessKey());
         System.setProperty("aws.secretKey", LOCAL_STACK.getSecretKey());
@@ -64,20 +75,29 @@ final class IntegrationTest {
                     .usePlaintext()
                     .build()
     );
-    private final String userId = "00000000-0000-0000-0000-000000000001";
-    @Autowired
-    private EventRepository eventRepository;
+    private final EventsSchema eventsSchema = new EventsSchema();
+    private final AmazonDynamoDB amazonDynamoDB = AmazonDynamoDBClientBuilder.standard()
+            .withEndpointConfiguration(
+                    new AwsClientBuilder.EndpointConfiguration(
+                            LOCAL_STACK.getEndpointOverride(Service.DYNAMODB).toString()
+                            , LOCAL_STACK.getRegion()
+                    )
+            )
+            .build();
     @Autowired
     private QueueMessagingTemplate queueMessagingTemplate;
     private String itemId;
 
     @DynamicPropertySource
     static void properties(DynamicPropertyRegistry registry) {
-        registry.add("spring.data.mongodb.uri", MONGO_DB::getReplicaSetUrl);
         registry.add("cloud.aws.region.static", LOCAL_STACK::getRegion);
         registry.add(
                 "application.sns.endpoint",
-                () -> LOCAL_STACK.getEndpointOverride(LocalStackContainer.Service.SNS).toString()
+                () -> LOCAL_STACK.getEndpointOverride(Service.SNS).toString()
+        );
+        registry.add(
+                "application.dynamodb.endpoint",
+                () -> LOCAL_STACK.getEndpointOverride(Service.DYNAMODB).toString()
         );
     }
 
@@ -86,7 +106,7 @@ final class IntegrationTest {
     void adminCanCreateItem() {
         itemId = stub.create(
                         CreateItemRequest.newBuilder()
-                                .setUserId(userId)
+                                .setUserId(USER_ID)
                                 .setUserType("ADMIN")
                                 .setName("item")
                                 .build()
@@ -94,10 +114,8 @@ final class IntegrationTest {
                 .getItemId();
 
         assertThat(itemId).isNotNull();
-        assertThat(eventRepository.findAll().collectList().block())
-                .hasSize(1)
-                .first()
-                .isEqualTo(itemCreatedEventDocument());
+        assertThat(amazonDynamoDB.scan(eventsSchema.findAllRequest()).getItems())
+                .containsExactly(itemCreatedEvent());
         await(() ->
                 assertThat(queueMessagingTemplate.receiveAndConvert(Shared.ORDERS_READ_SIDE_SQS_QUEUE, String.class))
                         .isEqualTo(itemCreatedEventJson())
@@ -109,16 +127,15 @@ final class IntegrationTest {
     void adminCanDeactivateItem() {
         stub.deactivate(
                 DeactivateItemRequest.newBuilder()
-                        .setUserId(userId)
+                        .setUserId(USER_ID)
                         .setUserType("ADMIN")
                         .setItemId(itemId)
                         .build()
         );
 
-        assertThat(eventRepository.findAll().collectList().block())
+        assertThat(amazonDynamoDB.scan(eventsSchema.findAllRequest()).getItems())
                 .hasSize(2)
-                .last()
-                .isEqualTo(itemDeactivatedEventDocument());
+                .contains(itemDeactivatedEvent());
         await(() ->
                 assertThat(queueMessagingTemplate.receiveAndConvert(Shared.ORDERS_READ_SIDE_SQS_QUEUE, String.class))
                         .isEqualTo(itemDeactivatedEventJson())
@@ -130,16 +147,15 @@ final class IntegrationTest {
     void adminCanActivateItem() {
         stub.activate(
                 ActivateItemRequest.newBuilder()
-                        .setUserId(userId)
+                        .setUserId(USER_ID)
                         .setUserType("ADMIN")
                         .setItemId(itemId)
                         .build()
         );
 
-        assertThat(eventRepository.findAll().collectList().block())
+        assertThat(amazonDynamoDB.scan(eventsSchema.findAllRequest()).getItems())
                 .hasSize(3)
-                .last()
-                .isEqualTo(itemActivatedEventDocument());
+                .contains(itemActivatedEvent());
         await(() ->
                 assertThat(queueMessagingTemplate.receiveAndConvert(Shared.ORDERS_READ_SIDE_SQS_QUEUE, String.class))
                         .isEqualTo(itemActivatedEventJson())
@@ -151,20 +167,21 @@ final class IntegrationTest {
     void userCanAddItemToCart() {
         stub.add(
                 AddItemToCartRequest.newBuilder()
-                        .setUserId(userId)
+                        .setUserId(USER_ID)
                         .setUserType("REGULAR")
                         .setItemId(itemId)
                         .setQuantity(2)
                         .build()
         );
 
-        assertThat(eventRepository.findAll().collectList().block())
-                .hasSize(4)
-                .last()
-                .isEqualTo(itemAddedToCartEventDocument());
-        await(() ->
-                assertThat(queueMessagingTemplate.receiveAndConvert(Shared.ORDERS_READ_SIDE_SQS_QUEUE, String.class))
-                        .isEqualTo(itemAddedToCartEventJson())
+
+        await(() -> {
+                    assertThat(amazonDynamoDB.scan(eventsSchema.findAllRequest()).getItems())
+                            .hasSize(4)
+                            .contains(itemAddedToCartEvent());
+                    assertThat(queueMessagingTemplate.receiveAndConvert(Shared.ORDERS_READ_SIDE_SQS_QUEUE, String.class))
+                            .isEqualTo(itemAddedToCartEventJson());
+                }
         );
     }
 
@@ -173,20 +190,20 @@ final class IntegrationTest {
     void userCanRemoveItemFromCart() {
         stub.remove(
                 RemoveItemFromCartRequest.newBuilder()
-                        .setUserId(userId)
+                        .setUserId(USER_ID)
                         .setUserType("REGULAR")
                         .setItemId(itemId)
                         .setQuantity(1)
                         .build()
         );
 
-        assertThat(eventRepository.findAll().collectList().block())
-                .hasSize(5)
-                .last()
-                .isEqualTo(itemRemovedFromCartEventDocument());
-        await(() ->
-                assertThat(queueMessagingTemplate.receiveAndConvert(Shared.ORDERS_READ_SIDE_SQS_QUEUE, String.class))
-                        .isEqualTo(itemRemovedFromCartEventJson())
+        await(() -> {
+                    assertThat(amazonDynamoDB.scan(eventsSchema.findAllRequest()).getItems())
+                            .hasSize(5)
+                            .contains(itemRemovedFromCartEvent());
+                    assertThat(queueMessagingTemplate.receiveAndConvert(Shared.ORDERS_READ_SIDE_SQS_QUEUE, String.class))
+                            .isEqualTo(itemRemovedFromCartEventJson());
+                }
         );
     }
 
@@ -195,102 +212,90 @@ final class IntegrationTest {
     void userCanOrderItemsInCart() {
         stub.order(
                 OrderItemsInCartRequest.newBuilder()
-                        .setUserId(userId)
+                        .setUserId(USER_ID)
                         .setUserType("REGULAR")
                         .build()
         );
 
-        assertThat(eventRepository.findAll().collectList().block())
-                .hasSize(6)
-                .last()
-                .isEqualTo(itemsOrderedEventDocument());
-        await(() ->
-                assertThat(queueMessagingTemplate.receiveAndConvert(Shared.ORDERS_READ_SIDE_SQS_QUEUE, String.class))
-                        .isEqualTo(itemsOrderedEventJson())
+        await(() -> {
+                    assertThat(amazonDynamoDB.scan(eventsSchema.findAllRequest()).getItems())
+                            .hasSize(6)
+                            .contains(itemsOrderedEvent());
+                    assertThat(queueMessagingTemplate.receiveAndConvert(Shared.ORDERS_READ_SIDE_SQS_QUEUE, String.class))
+                            .isEqualTo(itemsOrderedEventJson());
+                }
         );
     }
 
-    private EventDocument itemCreatedEventDocument() {
-        var eventDocument = new EventDocument();
-        eventDocument.setEventType(EventType.ITEM_CREATED);
-        eventDocument.setAggregateId(UUID.fromString(itemId));
-        eventDocument.setVersion(1);
-        eventDocument.setData(itemCreatedEventJson());
-        return eventDocument;
+    private Map<String, AttributeValue> itemCreatedEvent() {
+        return eventsSchema.attributes(
+                new ItemCreated(UUID.fromString(itemId), UUID.fromString(USER_ID), "item", 1),
+                itemCreatedEventJson()
+        );
     }
 
-    private EventDocument itemDeactivatedEventDocument() {
-        var eventDocument = new EventDocument();
-        eventDocument.setEventType(EventType.ITEM_DEACTIVATED);
-        eventDocument.setAggregateId(UUID.fromString(itemId));
-        eventDocument.setVersion(2);
-        eventDocument.setData(itemDeactivatedEventJson());
-        return eventDocument;
+    private Map<String, AttributeValue> itemDeactivatedEvent() {
+        return eventsSchema.attributes(
+                new ItemDeactivated(UUID.fromString(itemId), UUID.fromString(USER_ID), 2),
+                itemDeactivatedEventJson()
+        );
     }
 
-    private EventDocument itemActivatedEventDocument() {
-        var eventDocument = new EventDocument();
-        eventDocument.setEventType(EventType.ITEM_ACTIVATED);
-        eventDocument.setAggregateId(UUID.fromString(itemId));
-        eventDocument.setVersion(3);
-        eventDocument.setData(itemActivatedEventJson());
-        return eventDocument;
+    private Map<String, AttributeValue> itemActivatedEvent() {
+        return eventsSchema.attributes(
+                new ItemActivated(UUID.fromString(itemId), UUID.fromString(USER_ID), 3),
+                itemActivatedEventJson()
+        );
     }
 
-    private EventDocument itemAddedToCartEventDocument() {
-        var eventDocument = new EventDocument();
-        eventDocument.setEventType(EventType.ITEM_ADDED_TO_CART);
-        eventDocument.setAggregateId(UUID.fromString(userId));
-        eventDocument.setVersion(1);
-        eventDocument.setData(itemAddedToCartEventJson());
-        return eventDocument;
+    private Map<String, AttributeValue> itemAddedToCartEvent() {
+        return eventsSchema.attributes(
+                new ItemAddedToCart(UUID.fromString(USER_ID), UUID.fromString(itemId), 2, 1),
+                itemAddedToCartEventJson()
+        );
     }
 
-    private EventDocument itemRemovedFromCartEventDocument() {
-        var eventDocument = new EventDocument();
-        eventDocument.setEventType(EventType.ITEM_REMOVED_FROM_CART);
-        eventDocument.setAggregateId(UUID.fromString(userId));
-        eventDocument.setVersion(2);
-        eventDocument.setData(itemRemovedFromCartEventJson());
-        return eventDocument;
+    private Map<String, AttributeValue> itemRemovedFromCartEvent() {
+        return eventsSchema.attributes(
+                new ItemRemovedFromCart(UUID.fromString(USER_ID), UUID.fromString(itemId), 1, 2),
+                itemRemovedFromCartEventJson()
+        );
     }
 
-    private EventDocument itemsOrderedEventDocument() {
-        var eventDocument = new EventDocument();
-        eventDocument.setEventType(EventType.ITEMS_ORDERED);
-        eventDocument.setAggregateId(UUID.fromString(userId));
-        eventDocument.setVersion(3);
-        eventDocument.setData(itemsOrderedEventJson());
-        return eventDocument;
+    private Map<String, AttributeValue> itemsOrderedEvent() {
+        return eventsSchema.attributes(
+                new ItemsOrdered(UUID.fromString(USER_ID), 3),
+                itemsOrderedEventJson()
+        );
     }
 
     private String itemCreatedEventJson() {
         return "{\"eventType\":\"ITEM_CREATED\",\"itemId\":\"" + itemId + "\",\"name\":\"item\",\"userId\":\"" +
-                userId + "\",\"version\":\"1\"}";
+                USER_ID + "\",\"version\":\"1\"}";
     }
 
     private String itemDeactivatedEventJson() {
-        return "{\"eventType\":\"ITEM_DEACTIVATED\",\"itemId\":\"" + itemId + "\",\"userId\":\"" + userId +
+        return "{\"eventType\":\"ITEM_DEACTIVATED\",\"itemId\":\"" + itemId + "\",\"userId\":\"" + USER_ID +
                 "\",\"version\":\"2\"}";
     }
 
     private String itemActivatedEventJson() {
-        return "{\"eventType\":\"ITEM_ACTIVATED\",\"itemId\":\"" + itemId + "\",\"userId\":\"" + userId +
+        return "{\"eventType\":\"ITEM_ACTIVATED\",\"itemId\":\"" + itemId + "\",\"userId\":\"" + USER_ID +
                 "\",\"version\":\"3\"}";
     }
 
     private String itemAddedToCartEventJson() {
         return "{\"eventType\":\"ITEM_ADDED_TO_CART\",\"itemId\":\"" + itemId + "\",\"quantity\":\"2\",\"userId\":\"" +
-                userId + "\",\"version\":\"1\"}";
+                USER_ID + "\",\"version\":\"1\"}";
     }
 
     private String itemRemovedFromCartEventJson() {
         return "{\"eventType\":\"ITEM_REMOVED_FROM_CART\",\"itemId\":\"" + itemId +
-                "\",\"quantity\":\"1\",\"userId\":\"" + userId + "\",\"version\":\"2\"}";
+                "\",\"quantity\":\"1\",\"userId\":\"" + USER_ID + "\",\"version\":\"2\"}";
     }
 
     private String itemsOrderedEventJson() {
-        return "{\"eventType\":\"ITEMS_ORDERED\",\"userId\":\"" + userId + "\",\"version\":\"3\"}";
+        return "{\"eventType\":\"ITEMS_ORDERED\",\"userId\":\"" + USER_ID + "\",\"version\":\"3\"}";
     }
 
     @TestConfiguration
@@ -302,7 +307,7 @@ final class IntegrationTest {
                     AmazonSQSAsyncClientBuilder.standard()
                             .withEndpointConfiguration(
                                     new AwsClientBuilder.EndpointConfiguration(
-                                            LOCAL_STACK.getEndpointOverride(LocalStackContainer.Service.SNS).toString(),
+                                            LOCAL_STACK.getEndpointOverride(Service.SNS).toString(),
                                             LOCAL_STACK.getRegion()
                                     )
                             )

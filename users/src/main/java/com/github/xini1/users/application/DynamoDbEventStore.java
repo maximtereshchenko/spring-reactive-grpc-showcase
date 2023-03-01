@@ -1,11 +1,12 @@
 package com.github.xini1.users.application;
 
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.xini1.common.Shared;
+import com.github.xini1.common.dynamodb.EventsSchema;
 import com.github.xini1.common.event.BasicEventStore;
 import com.github.xini1.common.event.Event;
-import com.github.xini1.common.mongodb.EventDocument;
 import org.springframework.cloud.aws.messaging.core.NotificationMessagingTemplate;
 
 import java.util.TreeMap;
@@ -13,25 +14,22 @@ import java.util.TreeMap;
 /**
  * @author Maxim Tereshchenko
  */
-final class MongoEventStore implements BasicEventStore {
+final class DynamoDbEventStore implements BasicEventStore {
 
-    private final EventRepository eventRepository;
+    private final AmazonDynamoDB amazonDynamoDB;
     private final NotificationMessagingTemplate notificationMessagingTemplate;
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private final EventsSchema eventsSchema = new EventsSchema();
 
-    MongoEventStore(
-            EventRepository eventRepository,
-            NotificationMessagingTemplate notificationMessagingTemplate
-    ) {
-        this.eventRepository = eventRepository;
+    DynamoDbEventStore(AmazonDynamoDB amazonDynamoDB, NotificationMessagingTemplate notificationMessagingTemplate) {
+        this.amazonDynamoDB = amazonDynamoDB;
         this.notificationMessagingTemplate = notificationMessagingTemplate;
     }
 
     @Override
     public void publish(Event event) {
         var json = json(event);
-        eventRepository.save(new EventDocument(event, json))
-                .subscribe();
+        amazonDynamoDB.putItem(eventsSchema.putRequest(event, json));
         notificationMessagingTemplate.convertAndSend(Shared.EVENTS_SNS_TOPIC, json);
     }
 

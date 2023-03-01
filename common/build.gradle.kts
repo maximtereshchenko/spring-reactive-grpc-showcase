@@ -12,7 +12,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly(libs.spring.mongodb)
+    compileOnly(libs.aws.dynamodb)
     api(libs.grpc)
     implementation(libs.annotation.api)
 }

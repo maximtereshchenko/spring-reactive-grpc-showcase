@@ -9,7 +9,6 @@ services:
     container_name: localstack
     image: localstack/localstack:1.4
     environment:
-      - "SERVICES=sqs"
       - "DOCKER_HOST=unix:///var/run/docker.sock"
       - "HOSTNAME_EXTERNAL=localstack"
     volumes:

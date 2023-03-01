@@ -13,6 +13,7 @@ dependencyResolutionManagement {
             version("grpc", "1.47.0")
             version("spring-boot-starter", "2.7.1")
             version("testcontainers", "1.17.3")
+            version("aws", "1.11.792")
 
             library("junit-api", "org.junit.jupiter", "junit-jupiter-api")
                 .versionRef("junit")
@@ -28,24 +29,21 @@ dependencyResolutionManagement {
                 .versionRef("spring-boot-starter")
             library("spring-test", "org.springframework.boot", "spring-boot-starter-test")
                 .versionRef("spring-boot-starter")
-            library(
-                "spring-mongodb",
-                "org.springframework.boot",
-                "spring-boot-starter-data-mongodb-reactive"
-            )
-                .versionRef("spring-boot-starter")
 
             library("testcontainers", "org.testcontainers", "testcontainers")
                 .versionRef("testcontainers")
             library("testcontainers-junit", "org.testcontainers", "junit-jupiter")
                 .versionRef("testcontainers")
-            library("testcontainers-mongodb", "org.testcontainers", "mongodb")
-                .versionRef("testcontainers")
             library("testcontainers-localstack", "org.testcontainers", "localstack")
                 .versionRef("testcontainers")
 
-            library("spring-aws", "org.springframework.cloud:spring-cloud-starter-aws-messaging:2.2.6.RELEASE")
-            library("aws", "com.amazonaws:aws-java-sdk-core:1.11.792")
+            library("aws-core", "com.amazonaws", "aws-java-sdk-core").versionRef("aws")
+            library("aws-dynamodb", "com.amazonaws", "aws-java-sdk-dynamodb").versionRef("aws")
+
+            library(
+                "spring-aws-messaging",
+                "org.springframework.cloud:spring-cloud-starter-aws-messaging:2.2.6.RELEASE"
+            )
             library("assertj", "org.assertj:assertj-core:3.23.1")
             library("protoc-compiler", "com.google.protobuf:protoc:3.0.0")
             library("annotation-api", "javax.annotation:javax.annotation-api:1.3.2")

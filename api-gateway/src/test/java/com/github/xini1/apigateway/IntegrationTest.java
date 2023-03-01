@@ -10,13 +10,12 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.localstack.LocalStackContainer;
-import org.testcontainers.containers.localstack.LocalStackContainer.Service;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
+import org.testcontainers.utility.MountableFile;
 
 import java.time.Duration;
 import java.util.List;
@@ -35,18 +34,16 @@ final class IntegrationTest {
 
     private static final Network NETWORK = Network.newNetwork();
     @Container
-    private static final MongoDBContainer MONGO_DB = new MongoDBContainer(
-            DockerImageName.parse("mongo:5.0.9")
-    )
-            .withNetwork(NETWORK)
-            .withNetworkAliases("database");
-    @Container
     private static final LocalStackContainer LOCAL_STACK = new LocalStackContainer(
             DockerImageName.parse("localstack/localstack:1.4")
     )
-            .withServices(Service.SNS, Service.SQS)
-            .withFileSystemBind(
-                    "../localstack-setup.sh",
+            .withServices(
+                    LocalStackContainer.Service.SNS,
+                    LocalStackContainer.Service.SQS,
+                    LocalStackContainer.Service.DYNAMODB
+            )
+            .withCopyFileToContainer(
+                    MountableFile.forHostPath("../localstack-setup.sh"),
                     "/etc/localstack/init/ready.d/localstack-setup.sh"
             )
             .withNetwork(NETWORK)
@@ -60,7 +57,6 @@ final class IntegrationTest {
             .withEnv("SPRING_PROFILES_ACTIVE", "test");
 
     static {
-        MONGO_DB.start();
         LOCAL_STACK.start();
         USERS.start();
         ORDERS_READ_SIDE.start();
@@ -89,6 +85,7 @@ final class IntegrationTest {
 
     private static GenericContainer<?> container(String name) {
         return new GenericContainer<>(DockerImageName.parse(name))
+                .dependsOn(LOCAL_STACK)
                 .withNetwork(NETWORK)
                 .withNetworkAliases(name)
                 .withExposedPorts(8080)
