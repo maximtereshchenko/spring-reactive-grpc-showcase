@@ -13,6 +13,7 @@ import com.github.xini1.users.application.IntegrationTest.TestConfig;
 import com.github.xini1.users.rpc.*;
 import io.grpc.*;
 import io.grpc.health.v1.HealthCheckRequest;
+import io.grpc.health.v1.HealthCheckResponse;
 import io.grpc.health.v1.HealthGrpc;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,16 +78,21 @@ final class IntegrationTest {
                     )
             )
             .build();
-    private final ManagedChannel channel = Grpc.newChannelBuilderForAddress(
-                    "localhost",
-                    8080,
-                    TlsChannelCredentials.newBuilder()
-                            .trustManager(Shared.rootCertificate())
-                            .build()
-            )
-            .build();
-    private final UserServiceGrpc.UserServiceBlockingStub stub = UserServiceGrpc.newBlockingStub(channel);
-    private final HealthGrpc.HealthBlockingStub healthStub = HealthGrpc.newBlockingStub(channel);
+    private final UserServiceGrpc.UserServiceBlockingStub stub = UserServiceGrpc.newBlockingStub(
+            Grpc.newChannelBuilderForAddress(
+                            "localhost",
+                            Shared.PORT,
+                            TlsChannelCredentials.newBuilder()
+                                    .trustManager(Shared.rootCertificate())
+                                    .build()
+                    )
+                    .build()
+    );
+    private final HealthGrpc.HealthBlockingStub healthStub = HealthGrpc.newBlockingStub(
+            ManagedChannelBuilder.forAddress("localhost", Shared.HEALTH_CHECK_PORT)
+                    .usePlaintext()
+                    .build()
+    );
     @Autowired
     private QueueMessagingTemplate queueMessagingTemplate;
     private String userId;
@@ -174,7 +180,8 @@ final class IntegrationTest {
 
     @Test
     void canPerformHealthCheck() {
-        assertThat(healthStub.check(HealthCheckRequest.newBuilder().build()).getStatusValue()).isOne();
+        assertThat(healthStub.check(HealthCheckRequest.newBuilder().build())
+                .getStatus()).isEqualTo(HealthCheckResponse.ServingStatus.SERVING);
     }
 
     private Map<String, AttributeValue> expectedEventDocument() {

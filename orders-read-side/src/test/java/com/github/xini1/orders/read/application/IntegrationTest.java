@@ -15,9 +15,10 @@ import com.github.xini1.common.event.item.ItemDeactivated;
 import com.github.xini1.orders.read.Main;
 import com.github.xini1.orders.read.rpc.*;
 import io.grpc.Grpc;
-import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
 import io.grpc.TlsChannelCredentials;
 import io.grpc.health.v1.HealthCheckRequest;
+import io.grpc.health.v1.HealthCheckResponse;
 import io.grpc.health.v1.HealthGrpc;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,17 +75,21 @@ final class IntegrationTest {
         System.setProperty("aws.secretKey", LOCAL_STACK.getSecretKey());
     }
 
-    private final ManagedChannel channel = Grpc.newChannelBuilderForAddress(
-                    "localhost",
-                    8080,
-                    TlsChannelCredentials.newBuilder()
-                            .trustManager(Shared.rootCertificate())
-                            .build()
-            )
-            .build();
-    private final OrderReadServiceGrpc.OrderReadServiceBlockingStub stub =
-            OrderReadServiceGrpc.newBlockingStub(channel);
-    private final HealthGrpc.HealthBlockingStub healthStub = HealthGrpc.newBlockingStub(channel);
+    private final OrderReadServiceGrpc.OrderReadServiceBlockingStub stub = OrderReadServiceGrpc.newBlockingStub(
+            Grpc.newChannelBuilderForAddress(
+                            "localhost",
+                            Shared.PORT,
+                            TlsChannelCredentials.newBuilder()
+                                    .trustManager(Shared.rootCertificate())
+                                    .build()
+                    )
+                    .build()
+    );
+    private final HealthGrpc.HealthBlockingStub healthStub = HealthGrpc.newBlockingStub(
+            ManagedChannelBuilder.forAddress("localhost", Shared.HEALTH_CHECK_PORT)
+                    .usePlaintext()
+                    .build()
+    );
     private final UUID userId = UUID.fromString("00000000-0000-0000-0000-000000000001");
     private final UUID itemId = UUID.fromString("00000000-0000-0000-0000-000000000002");
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -306,7 +311,8 @@ final class IntegrationTest {
 
     @Test
     void canPerformHealthCheck() {
-        assertThat(healthStub.check(HealthCheckRequest.newBuilder().build()).getStatusValue()).isOne();
+        assertThat(healthStub.check(HealthCheckRequest.newBuilder().build())
+                .getStatus()).isEqualTo(HealthCheckResponse.ServingStatus.SERVING);
     }
 
     private void emit(Event event) throws JsonProcessingException {

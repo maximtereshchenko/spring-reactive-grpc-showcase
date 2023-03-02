@@ -8,6 +8,8 @@ import java.io.InputStream;
 public enum Shared {
     ;
 
+    public static final int PORT = 8080;
+    public static final int HEALTH_CHECK_PORT = 8081;
     public static final String EVENTS_SNS_TOPIC = "events";
     public static final String ORDERS_READ_SIDE_SQS_QUEUE = "orders-read-side";
 
