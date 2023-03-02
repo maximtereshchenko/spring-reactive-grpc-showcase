@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
+import java.io.IOException;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -68,7 +69,7 @@ public class SpringConfiguration {
     }
 
     @Bean
-    RpcServer rpcServer(Module module) {
+    RpcServer rpcServer(Module module) throws IOException {
         return new RpcServer(
                 new OrderRpcService(
                         module.viewCartUseCase(),

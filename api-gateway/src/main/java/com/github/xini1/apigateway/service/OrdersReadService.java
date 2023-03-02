@@ -3,7 +3,8 @@ package com.github.xini1.apigateway.service;
 import com.github.xini1.apigateway.dto.*;
 import com.github.xini1.orders.read.rpc.Empty;
 import com.github.xini1.orders.read.rpc.OrderReadServiceGrpc;
-import io.grpc.ManagedChannelBuilder;
+import io.grpc.ChannelCredentials;
+import io.grpc.Grpc;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -14,10 +15,9 @@ public final class OrdersReadService {
 
     private final OrderReadServiceGrpc.OrderReadServiceStub orderReadServiceGrpc;
 
-    public OrdersReadService(String address, int port) {
+    public OrdersReadService(String address, int port, ChannelCredentials channelCredentials) {
         orderReadServiceGrpc = OrderReadServiceGrpc.newStub(
-                ManagedChannelBuilder.forAddress(address, port)
-                        .usePlaintext()
+                Grpc.newChannelBuilderForAddress(address, port, channelCredentials)
                         .build()
         );
     }

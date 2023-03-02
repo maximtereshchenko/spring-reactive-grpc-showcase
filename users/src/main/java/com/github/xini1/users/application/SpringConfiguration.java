@@ -12,6 +12,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.converter.StringMessageConverter;
 
+import java.io.IOException;
+
 /**
  * @author Maxim Tereshchenko
  */
@@ -24,7 +26,7 @@ public class SpringConfiguration {
             @Value("${application.dynamodb.endpoint}") String dynamodbEndpoint,
             @Value("${cloud.aws.region.static}") String awsRegion,
             ResourceIdResolver resourceIdResolver
-    ) {
+    ) throws IOException {
         var amazonDynamoDB = AmazonDynamoDBClientBuilder.standard()
                 .withEndpointConfiguration(
                         new AwsClientBuilder.EndpointConfiguration(dynamodbEndpoint, awsRegion)

@@ -11,10 +11,7 @@ import com.github.xini1.common.event.EventType;
 import com.github.xini1.users.Main;
 import com.github.xini1.users.application.IntegrationTest.TestConfig;
 import com.github.xini1.users.rpc.*;
-import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
-import io.grpc.Status;
-import io.grpc.StatusRuntimeException;
+import io.grpc.*;
 import io.grpc.health.v1.HealthCheckRequest;
 import io.grpc.health.v1.HealthGrpc;
 import org.junit.jupiter.api.*;
@@ -35,6 +32,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 import org.testcontainers.utility.MountableFile;
 
+import java.io.IOException;
 import java.util.Map;
 
 import static com.github.xini1.Await.await;
@@ -79,8 +77,13 @@ final class IntegrationTest {
                     )
             )
             .build();
-    private final ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 8080)
-            .usePlaintext()
+    private final ManagedChannel channel = Grpc.newChannelBuilderForAddress(
+                    "localhost",
+                    8080,
+                    TlsChannelCredentials.newBuilder()
+                            .trustManager(Shared.rootCertificate())
+                            .build()
+            )
             .build();
     private final UserServiceGrpc.UserServiceBlockingStub stub = UserServiceGrpc.newBlockingStub(channel);
     private final HealthGrpc.HealthBlockingStub healthStub = HealthGrpc.newBlockingStub(channel);
@@ -88,6 +91,8 @@ final class IntegrationTest {
     private QueueMessagingTemplate queueMessagingTemplate;
     private String userId;
     private String jwt;
+
+    IntegrationTest() throws IOException {}
 
     @DynamicPropertySource
     static void properties(DynamicPropertyRegistry registry) {

@@ -6,7 +6,8 @@ import com.github.xini1.apigateway.dto.CreateItemDto;
 import com.github.xini1.apigateway.dto.UserDto;
 import com.github.xini1.orders.write.rpc.ItemIdResponse;
 import com.github.xini1.orders.write.rpc.OrderWriteServiceGrpc;
-import io.grpc.ManagedChannelBuilder;
+import io.grpc.ChannelCredentials;
+import io.grpc.Grpc;
 import reactor.core.publisher.Mono;
 
 /**
@@ -16,10 +17,9 @@ public final class OrdersWriteService {
 
     private final OrderWriteServiceGrpc.OrderWriteServiceStub orderWriteServiceGrpc;
 
-    public OrdersWriteService(String address, int port) {
+    public OrdersWriteService(String address, int port, ChannelCredentials channelCredentials) {
         orderWriteServiceGrpc = OrderWriteServiceGrpc.newStub(
-                ManagedChannelBuilder.forAddress(address, port)
-                        .usePlaintext()
+                Grpc.newChannelBuilderForAddress(address, port, channelCredentials)
                         .build()
         );
     }

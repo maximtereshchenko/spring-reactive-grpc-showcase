@@ -14,8 +14,9 @@ import com.github.xini1.common.event.item.ItemCreated;
 import com.github.xini1.common.event.item.ItemDeactivated;
 import com.github.xini1.orders.read.Main;
 import com.github.xini1.orders.read.rpc.*;
+import io.grpc.Grpc;
 import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
+import io.grpc.TlsChannelCredentials;
 import io.grpc.health.v1.HealthCheckRequest;
 import io.grpc.health.v1.HealthGrpc;
 import org.junit.jupiter.api.*;
@@ -36,6 +37,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 import org.testcontainers.utility.MountableFile;
 
+import java.io.IOException;
 import java.util.UUID;
 
 import static com.github.xini1.Await.await;
@@ -72,8 +74,13 @@ final class IntegrationTest {
         System.setProperty("aws.secretKey", LOCAL_STACK.getSecretKey());
     }
 
-    private final ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 8080)
-            .usePlaintext()
+    private final ManagedChannel channel = Grpc.newChannelBuilderForAddress(
+                    "localhost",
+                    8080,
+                    TlsChannelCredentials.newBuilder()
+                            .trustManager(Shared.rootCertificate())
+                            .build()
+            )
             .build();
     private final OrderReadServiceGrpc.OrderReadServiceBlockingStub stub =
             OrderReadServiceGrpc.newBlockingStub(channel);
@@ -83,6 +90,8 @@ final class IntegrationTest {
     private final ObjectMapper objectMapper = new ObjectMapper();
     @Autowired
     private NotificationMessagingTemplate notificationMessagingTemplate;
+
+    IntegrationTest() throws IOException {}
 
     @DynamicPropertySource
     static void properties(DynamicPropertyRegistry registry) {

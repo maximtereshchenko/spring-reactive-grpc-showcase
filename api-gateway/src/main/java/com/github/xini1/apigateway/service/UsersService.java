@@ -7,7 +7,8 @@ import com.github.xini1.users.rpc.DecodeJwtRequest;
 import com.github.xini1.users.rpc.IdResponse;
 import com.github.xini1.users.rpc.JwtResponse;
 import com.github.xini1.users.rpc.UserServiceGrpc;
-import io.grpc.ManagedChannelBuilder;
+import io.grpc.ChannelCredentials;
+import io.grpc.Grpc;
 import reactor.core.publisher.Mono;
 
 /**
@@ -17,10 +18,9 @@ public final class UsersService {
 
     private final UserServiceGrpc.UserServiceStub userServiceGrpc;
 
-    public UsersService(String address, int port) {
+    public UsersService(String address, int port, ChannelCredentials channelCredentials) {
         userServiceGrpc = UserServiceGrpc.newStub(
-                ManagedChannelBuilder.forAddress(address, port)
-                        .usePlaintext()
+                Grpc.newChannelBuilderForAddress(address, port, channelCredentials)
                         .build()
         );
     }

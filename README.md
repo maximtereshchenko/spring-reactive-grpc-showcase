@@ -44,73 +44,73 @@ To build these services Spring Reactor will be used alongside with gRPC for comm
 * Register
 
 ```bash
-curl -X POST -H "Content-Type:application/json" "http://localhost:8080/users" -d '{"username":"admin","password":"pass","userType":"ADMIN"}'
+curl -i -X POST -H "Content-Type:application/json" "http://localhost:8080/users" -d '{"username":"admin","password":"pass","userType":"ADMIN"}'
 ```
 
 * Log in
 
 ```bash
-curl -X POST -H "Content-Type:application/json" "http://localhost:8080/users/login" -d '{"username":"admin","password":"pass"}'
+curl -i -X POST -H "Content-Type:application/json" "http://localhost:8080/users/login" -d '{"username":"admin","password":"pass"}'
 ```
 
 * Create item
 
 ```bash
-curl -X POST -H "Content-Type:application/json" -H "Authorization:{admin jwt}" "http://localhost:8080/items" -d "item"
+curl -i -X POST -H "Content-Type:application/json" -H "Authorization:{admin jwt}" "http://localhost:8080/items" -d "item"
 ```
 
 * View all items
 
 ```bash
-curl -X GET "http://localhost:8080/items"
+curl -i -X GET "http://localhost:8080/items"
 ```
 
 * Deactivate item
 
 ```bash
-curl -X POST -H "Authorization:{admin jwt}" "http://localhost:8080/items/{item id}/deactivate"
+curl -i -X POST -H "Authorization:{admin jwt}" "http://localhost:8080/items/{item id}/deactivate"
 ```
 
 * Activate item
 
 ```bash
-curl -X POST -H "Authorization:{admin jwt}" "http://localhost:8080/items/{item id}/activate" 
+curl -i -X POST -H "Authorization:{admin jwt}" "http://localhost:8080/items/{item id}/activate" 
 ```
 
 * Add items to cart
 
 ```bash
-curl -X POST -H "Content-Type:application/json" -H "Authorization:{regular user jwt}" "http://localhost:8080/cart/add" -d '{"itemId":"{item id}","quantity":"1"}'
+curl -i -X POST -H "Content-Type:application/json" -H "Authorization:{regular user jwt}" "http://localhost:8080/cart/add" -d '{"itemId":"{item id}","quantity":"1"}'
 ```
 
 * Remove items from cart
 
 ```bash
-curl -X POST -H "Content-Type:application/json" -H "Authorization:{regular user jwt}" "http://localhost:8080/cart/remove" -d '{"itemId":"{item id}","quantity":"1"}'
+curl -i -X POST -H "Content-Type:application/json" -H "Authorization:{regular user jwt}" "http://localhost:8080/cart/remove" -d '{"itemId":"{item id}","quantity":"1"}'
 ```
 
 * View items in cart
 
 ```bash
-curl -X GET -H "Authorization:{regular user jwt}" "http://localhost:8080/cart"
+curl -i -X GET -H "Authorization:{regular user jwt}" "http://localhost:8080/cart"
 ```
 
 * Order items in cart
 
 ```bash
-curl -X POST -H "Authorization:{regular user jwt}" "http://localhost:8080/cart/order"
+curl -i -X POST -H "Authorization:{regular user jwt}" "http://localhost:8080/cart/order"
 ```
 
 * View previous orders
 
 ```bash
-curl -X GET -H "Authorization:{regular user jwt}" "http://localhost:8080/orders"
+curl -i -X GET -H "Authorization:{regular user jwt}" "http://localhost:8080/orders"
 ```
 
 * View top ordered items
 
 ```bash
-curl -X GET -H "Authorization:{admin jwt}" "http://localhost:8080/items/top"
+curl -i -X GET -H "Authorization:{admin jwt}" "http://localhost:8080/items/top"
 ```
 
 # How to test?

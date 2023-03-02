@@ -15,8 +15,9 @@ import com.github.xini1.common.event.item.ItemCreated;
 import com.github.xini1.common.event.item.ItemDeactivated;
 import com.github.xini1.orders.write.Main;
 import com.github.xini1.orders.write.rpc.*;
+import io.grpc.Grpc;
 import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
+import io.grpc.TlsChannelCredentials;
 import io.grpc.health.v1.HealthCheckRequest;
 import io.grpc.health.v1.HealthGrpc;
 import org.junit.jupiter.api.*;
@@ -37,6 +38,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 import org.testcontainers.utility.MountableFile;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.UUID;
 
@@ -75,8 +77,13 @@ final class IntegrationTest {
         System.setProperty("aws.secretKey", LOCAL_STACK.getSecretKey());
     }
 
-    private final ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 8080)
-            .usePlaintext()
+    private final ManagedChannel channel = Grpc.newChannelBuilderForAddress(
+                    "localhost",
+                    8080,
+                    TlsChannelCredentials.newBuilder()
+                            .trustManager(Shared.rootCertificate())
+                            .build()
+            )
             .build();
     private final OrderWriteServiceGrpc.OrderWriteServiceBlockingStub stub =
             OrderWriteServiceGrpc.newBlockingStub(channel);
@@ -93,6 +100,8 @@ final class IntegrationTest {
     @Autowired
     private QueueMessagingTemplate queueMessagingTemplate;
     private String itemId;
+
+    IntegrationTest() throws IOException {}
 
     @DynamicPropertySource
     static void properties(DynamicPropertyRegistry registry) {
