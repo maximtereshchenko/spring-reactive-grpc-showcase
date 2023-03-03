@@ -4,7 +4,7 @@ This is a repository to try out gRPC and Spring Reactor technologies.
 
 # How the project is looking?
 
-![](structure.png) TODO: Users uses DB
+![](structure.png)
 
 There will be 4 "Microservices" (not really, but they will be deployed separately as Docker containers). I will
 utilize Ports and Adapters architecture, which will enable TDD approach in developing business logic. I will try CQRS
@@ -138,7 +138,7 @@ docker compose up -d
 * Using gRPC for communication between services.
 * Managing dependencies with catalog versions in Gradle.
 * Establishing CI/CD pipeline with GitHub Actions.
-* Working with Amazon infrastructure: SNS, SQS, DynamoDB.
+* Working with Amazon infrastructure: SNS, SQS, DynamoDB, etc.
 * Working with Terraform
 
 # Out of scope concerns
