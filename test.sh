@@ -64,4 +64,3 @@ sleep 5s
 
 printf "\nview top ordered items\n"
 curl -i -X GET -H "Authorization:${ADMIN_TOKEN}" "${HOST}/items/top"
-sleep 5s
